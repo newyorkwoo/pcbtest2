@@ -1,33 +1,39 @@
-Power path: USB unplug -> battery takeover (D2 B5819W + Q3 AO3401A, R5 gate pull-down)
-* @title Power path: USB cable unplugged at 2 ms, 250 mA load on VSYS
-* @plot v(vsys) v(vbus) v(vbat)
+Power path: USB unplug -> battery takeover (D2 B5819W + Q3 AO3401A driven by U9 LTC4412 ideal-diode controller)
+* @title Power path: USB cable unplugged at 2 ms, 250 mA load on VSYS (LTC4412 + AO3401A)
+* @plot v(vsys) v(vbus) v(vbat) v(gate)
 * @expect vsys_usb 4.4 4.9
 * @expect vsys_bat 3.55 3.75
-* @expect t_takeover 0 0.015
-* After unplug VBUS floats: only C1 (4.7u) discharging through R5 holds the P-FET gate.
-* While VBUS > VBAT - |Vth| the FET is off and VSYS is fed through its body diode (~3.0 V).
+* @expect vsys_min 3.5 3.75
+* @expect t_below_36 0 0.0005
+* Hand calc: after unplug C1 (4.7u) is drained through D2 by the 250 mA load within ~0.1 ms; when VSYS falls
+* 20 mV below VBAT the LTC4412 pulls GATE low and Q3 carries the load: VSYS ~ 3.7 - 0.25*(0.08+~0.05) = 3.66 V.
+* While USB is present VSYS (~4.65 V) > VBAT, so GATE follows SENSE and Q3 stays off (charger owns the cell).
 VUSB src 0 5
 SUSB src vbus ctl 0 SWMOD
 VCTL ctl 0 PWL(0 1 2m 1 2.001m 0)
 .model SWMOD SW(Ron=0.2 Roff=1e9 Vt=0.5 Vh=0.1)
 C1 vbus 0 4.7u
-R5 vbus 0 10k
 VB bat_i 0 3.7
 RB bat_i vbat 0.08
 C2 vbat 0 4.7u
 D2 vbus vsys DSCH
 .model DSCH D(Is=3u N=1.05 Rs=0.06 Cjo=110p)
-M3 vbat vbus vsys vsys PMOD W=1 L=1
+* U9 LTC4412 behavioural: forward regulation 20 mV, gate swing 0..SENSE, ~1 us response
+BG graw 0 V = max(0, v(vsys) - max(0, (v(vbat) - v(vsys) - 0.02) * 400))
+RG graw gate 1k
+CG gate 0 1n
+M3 vbat gate vsys vsys PMOD W=1 L=1
 .model PMOD PMOS(Level=1 Vto=-0.9 Kp=12 Lambda=0.01)
 DB3 vbat vsys DBODY
 .model DBODY D(Is=1e-12 N=1.0 Rs=0.05)
 C3 vsys 0 10u
 C4 vsys 0 1u
 RLOAD vsys 0 14.8
-.tran 10u 60m
+.tran 2u 20m
 .meas tran vsys_usb FIND v(vsys) AT=1.5m
-.meas tran vsys_bat FIND v(vsys) AT=55m
-.meas tran vsys_min MIN v(vsys) FROM=2m TO=60m
-.meas tran t_ok WHEN v(vsys)=3.5 RISE=1 FROM=2.1m
-.meas tran t_takeover PARAM='t_ok-2m'
+.meas tran vsys_bat FIND v(vsys) AT=15m
+.meas tran vsys_min MIN v(vsys) FROM=2m TO=20m
+* time VSYS spends below 3.6 V after the unplug (old discrete circuit: ~9 ms at ~3.0 V)
+BLOW low 0 V = u(3.6 - v(vsys))
+.meas tran t_below_36 INTEG v(low) FROM=2m TO=20m
 .end

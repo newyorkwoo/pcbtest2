@@ -13,7 +13,8 @@ notes: |
   - Audio: FM L+R and ESP32 DAC1 (IO25, BT audio) are summed by 10k resistors, RC-filtered (fc ~22 kHz),
     AC-coupled into a PAM8302 class-D mono amplifier driving an 8 ohm / 1 W speaker. AMP_SD (IO26) mutes/powers down the amp.
   - Power: USB-C (5.1k CC pull-downs = 5 V sink) -> MCP73831 1S Li-ion charger, 500 mA (Rprog 2k).
-    Load sharing: VBUS via Schottky to VSYS; battery via AO3401A P-FET (off while VBUS present).
+    Load sharing: VBUS via Schottky to VSYS; battery via AO3401A P-FET driven by an LTC4412 ideal-diode
+    controller (FET off while VSYS > VBAT, on within microseconds when USB is pulled: no brown-out dip).
     VSYS -> AP2112K-3.3 (600 mA) -> +3V3. Slide switch drives the LDO enable (power on/off). PAM8302 runs from VSYS.
   - Programming: CH340C USB-UART at 3.3 V with classic DTR/RTS auto-reset transistors; RESET and BOOT buttons.
   - User controls: UP / DOWN / MODE buttons (ESP32 internal pull-ups). Battery voltage on IO34 via 100k/100k divider.
@@ -81,7 +82,12 @@ parts:
   D2: {symbol: "Device:D_Schottky", footprint: "Diode_SMD:D_SOD-123", value: B5819W, mpn: B5819W, lcsc: C8598, block: charger}
   Q3: {symbol: "Transistor_FET:AO3401A", footprint: "Package_TO_SOT_SMD:SOT-23", value: AO3401A, mpn: AO3401A,
        manufacturer: AOS, lcsc: C15127, block: charger}
-  R5: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: charger, description: "Q3 gate pull-down: 10k so VBUS bleeds fast after unplug (sim 01)"}
+  U9: {symbol: "Power_Management:LTC4412xS6", footprint: "Package_TO_SOT_SMD:TSOT-23-6", value: LTC4412,
+       mpn: "LTC4412ES6#TRPBF", manufacturer: Analog Devices, lcsc: C514442, block: charger,
+       description: "Ideal-diode controller for Q3: VIN = battery (Q3 drain), SENSE = VSYS (Q3 source), CTL = GND (automatic). Datasheet pins 1 VIN 2 GND 3 CTL 4 STAT 5 GATE 6 SENSE.",
+       place: {near: Q3.G, near_dist: 3}}
+  C22: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: charger,
+        description: "U9 VIN bypass", place: {near: U9.VIN, near_dist: 2}}
   C3: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: 10u, mpn: "CL21A106KAYNNNE", lcsc: C15850, block: charger}
   R7: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "0603WAF1003T5E", lcsc: C25803, block: charger}
   R8: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "0603WAF1003T5E", lcsc: C25803, block: charger}
@@ -132,9 +138,9 @@ parts:
   Y1: {symbol: "Device:Crystal", footprint: "Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm", value: 32.768k,
        mpn: "Q13FC1350000400", lcsc: C32346, block: rtc, place: {near: U5.OSCI, near_dist: 2}}
   C12: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: rtc, place: {near: U5.VDD}}
-  D3: {symbol: "Diode:BAT54C", footprint: "Package_TO_SOT_SMD:SOT-23", value: BAT54C, mpn: BAT54C, block: rtc}
-  BT1: {symbol: "Device:Battery_Cell", footprint: "Battery:Battery_Panasonic_CR1220-VCN_Vertical_CircularHoles",
-        value: CR1220, mpn: "CR1220-VCN", manufacturer: Panasonic, block: rtc}
+  D3: {symbol: "Diode:BAT54C", footprint: "Package_TO_SOT_SMD:SOT-23", value: BAT54C, mpn: "BAT54C,215", manufacturer: Nexperia, lcsc: C37704, block: rtc}
+  BT1: {symbol: "Device:Battery_Cell", footprint: "Battery:BatteryHolder_Keystone_3000_1x12mm",
+        value: CR1220, mpn: "3000", manufacturer: Keystone, lcsc: C238097, description: "SMT CR1220 retainer; pads 1 (+, both side clips), 2 (-, centre pad under the cell)", block: rtc}
   R17: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: rtc}
   R18: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: rtc}
 
@@ -163,14 +169,14 @@ parts:
   C20: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: audio, place: {near: U8.VDD}}
   R11: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "0603WAF1003T5E", lcsc: C25803, block: audio, description: "amp off by default"}
   J4: {symbol: "Connector_Generic:Conn_01x02", footprint: "Connector_JST:JST_SH_SM02B-SRSS-TB_1x02-1MP_P1.00mm_Horizontal",
-       value: "Speaker 8R 1W", mpn: "SM02B-SRSS-TB(LF)(SN)", manufacturer: JST, block: audio,
+       value: "Speaker 8R 1W", mpn: "SM02B-SRSS-TB(LF)(SN)", manufacturer: JST, lcsc: C160402, block: audio,
        description: "JST-SH 1.0 mm: deliberately different from the battery JST-PH so the cells cannot be swapped in",
        place: {edge: bottom, rot: 0}}
 
   # ---------------------------------------------------------------- user interface
-  SW4: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_PTS645Sx43SMTR92", value: UP, mpn: PTS645SM43SMTR92, manufacturer: C&K, block: ui, place: {edge: right, y: 24, rot: 0}}
-  SW5: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_PTS645Sx43SMTR92", value: DOWN, mpn: PTS645SM43SMTR92, manufacturer: C&K, block: ui, place: {edge: right, y: 35, rot: 0}}
-  SW6: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_PTS645Sx43SMTR92", value: MODE, mpn: PTS645SM43SMTR92, manufacturer: C&K, block: ui, place: {edge: right, y: 46, rot: 0}}
+  SW4: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_PTS645Sx43SMTR92", value: UP, mpn: "PTS645SM43SMTR92 LFS", manufacturer: C&K, lcsc: C221880, block: ui, place: {edge: right, y: 24, rot: 0}}
+  SW5: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_PTS645Sx43SMTR92", value: DOWN, mpn: "PTS645SM43SMTR92 LFS", manufacturer: C&K, lcsc: C221880, block: ui, place: {edge: right, y: 35, rot: 0}}
+  SW6: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_PTS645Sx43SMTR92", value: MODE, mpn: "PTS645SM43SMTR92 LFS", manufacturer: C&K, lcsc: C221880, block: ui, place: {edge: right, y: 46, rot: 0}}
 
   # ---------------------------------------------------------------- mechanical
   H1: {symbol: "Mechanical:MountingHole", footprint: "MountingHole:MountingHole_2.7mm_M2.5", value: M2.5, block: mechanical, place: {x: 3.5, y: 3.5}}
@@ -179,20 +185,21 @@ parts:
   H4: {symbol: "Mechanical:MountingHole", footprint: "MountingHole:MountingHole_2.7mm_M2.5", value: M2.5, block: mechanical, place: {x: 76.5, y: 56.5}}
 
 nets:
-  GND: [J1.GND, J1.SHIELD, R1.2, R2.2, U7.GND, "U2.V_{SS}", R3.2, J2.2, R5.2, R8.2, C7.2, C1.2, C2.2, C3.2,
+  GND: [J1.GND, J1.SHIELD, R1.2, R2.2, U7.GND, "U2.V_{SS}", R3.2, J2.2, U9.GND, U9.CTL, C22.2, R8.2, C7.2, C1.2, C2.2, C3.2,
         U3.GND, C4.2, C5.2, SW1.C, D4.K, U1.GND, C8.2, C9.2, C10.2, SW2.2, SW3.2, U4.GND, C11.2, C21.2,
         J3.1, U5.VSS, C12.2, BT1.-, U6.GND, C13.2, C14.2, C17.2, C18.2, U8.GND, C19.2, C20.2, R11.2,
         SW4.2, SW5.2, SW6.2]
-  VBUS: [J1.VBUS, U7.VBUS, "U2.V_{DD}", C1.1, D1.A, D2.A, Q3.G, R5.1]
+  VBUS: [J1.VBUS, U7.VBUS, "U2.V_{DD}", C1.1, D1.A, D2.A]
+  Q3_GATE: [Q3.G, U9.GATE]
   USB_DP: [J1.D+, U7.I/O1, U4.UD+]
   USB_DN: [J1.D-, U7.I/O2, U4.UD-]
   CC1: [J1.CC1, R1.1]
   CC2: [J1.CC2, R2.1]
-  VBAT: ["U2.V_{BAT}", C2.1, J2.1, Q3.D, R7.1]
+  VBAT: ["U2.V_{BAT}", C2.1, J2.1, Q3.D, R7.1, U9.VIN, C22.1]
   CHG_STAT: [U2.STAT, R4.2]
   CHG_LED: [R4.1, D1.K]
   PROG: [U2.PROG, R3.1]
-  VSYS: [D2.K, Q3.S, C3.1, U3.VIN, C4.1, SW1.A, U8.VDD, C19.1, C20.1]
+  VSYS: [D2.K, Q3.S, U9.SENSE, C3.1, U3.VIN, C4.1, SW1.A, U8.VDD, C19.1, C20.1]
   LDO_EN: [U3.EN, SW1.B]
   VBAT_SENSE: [R7.2, R8.1, C7.1, U1.IO34]
   "+3V3": [U3.VOUT, C5.1, R24.2, U1.VDD, C8.1, C9.1, R9.1, R10.1, U4.VCC, C11.1, R14.1, R15.1, R16.1, J3.2,
@@ -234,4 +241,4 @@ nets:
 
 nc: [J1.SBU1, J1.SBU2, U1.SENSOR_VP, U1.SENSOR_VN, U1.IO35, U1.IO14, U1.IO12, U1.IO13, U1.IO15, U1.IO2,
      U1.IO16, U1.IO17, U1.IO5, U1.IO18, U1.IO19, U1.IO23, U1.NC, U3.NC, U4.NC, "U4.~{CTS}", "U4.~{DSR}",
-     "U4.~{RI}", "U4.~{DCD}", U4.R232, U8.NC]
+     "U4.~{RI}", "U4.~{DCD}", U4.R232, U8.NC, U9.STAT]

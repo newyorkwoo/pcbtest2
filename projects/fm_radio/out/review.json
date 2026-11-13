@@ -1,7 +1,27 @@
 {
  "verdict": "CONDITIONAL",
- "summary": "用目前引擎完整重建：ERC 0、DRC 0/0、幾何鋪銅檢查通過、4 個模擬全部通過。上次唯一的硬性阻擋項 RDA5807M 腳位已對照原廠 datasheet，結果發現真的錯了（1/2/4/5 腳），已修正並重建，這是本次最重要的修正。PCB 本身已可打樣。仍判定「有條件通過」，因為部分 LCSC 料號沒有逐一上網確認，且有 6 項零件沒有 LCSC 料號，需要另外採購或手焊。正式下單 SMT 組裝前，請先在 JLC 上傳 BOM 並確認料號比對結果。",
+ "summary": "依上一版審核的建議完成換件：電源路徑改為 LTC4412 + AO3401A 理想二極體（拔除 USB 時的 9 ms 掉壓消失，模擬已驗證），CR1220 電池座改為 LCSC 有貨的 Keystone 3000，其餘缺料號的零件都補上已確認的 LCSC 料號。重建結果：ERC 0、DRC 0/0、幾何檢查通過、模擬 4/4 通過。PCB 可打樣。唯一未解決的是 U6 RDA5807M 在 LCSC 沒有料，需另外採購或手焊，所以仍判定「有條件通過」。",
  "findings": [
+  {
+   "severity": "info",
+   "title": "已更換：電源路徑改用 LTC4412 理想二極體控制器",
+   "detail": "U9 LTC4412ES6#TRPBF（C514442）驅動原本的 Q3 AO3401A（4 A）；移除 R5，新增 C22 100n 作為 VIN 旁路。腳位對照原廠資料：1 VIN、2 GND、3 CTL、4 STAT、5 GATE、6 SENSE。VIN 接電池（Q3 汲極），SENSE 接 VSYS（Q3 源極），CTL 接地（自動模式），STAT 不接。模擬 01：拔除 USB 後 VSYS 最低 3.656 V（手算 3.66 V），低於 3.6 V 的時間為 0；舊電路是約 9 ms 掉到 3.0 V，ESP32 brown-out 的風險已排除。註：LTC4412 用行為模型模擬（20 mV 順向調節、約 1 µs 反應）。"
+  },
+  {
+   "severity": "info",
+   "title": "已更換：所有可採購零件都補上已上網確認的 LCSC 料號",
+   "detail": "BT1 Panasonic CR1220-VCN（LCSC 沒貨）改為 Keystone 3000 SMT 電池座（C238097，封裝 Battery:BatteryHolder_Keystone_3000_1x12mm，pad 1 = +、pad 2 = −）。D3 改為 Nexperia BAT54C,215（C37704）。J4 SM02B-SRSS-TB = C160402。SW4-6 PTS645SM43SMTR92 LFS = C221880。另外已確認：C701341、C424093、C32346、C113367、C2691448。"
+  },
+  {
+   "severity": "warning",
+   "title": "U6 RDA5807M 沒有 LCSC 料號",
+   "detail": "C82537 在 LCSC 已查無此料，RDA5807MP 是 SOP-8，無法直接替換。需自行採購 RDA5807M（MSOP-10）手焊，或用 JLC 的全球代購／寄料。腳位已對照原廠 datasheet。其餘常見的被動元件料號未逐一上網確認，上傳 BOM 時請看 JLC 的比對結果。"
+  },
+  {
+   "severity": "info",
+   "title": "已通過項目",
+   "detail": "ERC 0；DRC 0 錯誤、0 未連接、courtyard OK；幾何鋪銅檢查 GND 為單一連通；所有網路 100% 佈通、沒有未連接的 GND 腳；4 個 SPICE 測試全部通過；ESP32 天線在板緣、禁佈區淨空；USB-C CC 5.1k 與 USBLC6 都有；去耦電容都貼近腳位（含新增的 U9）。"
+  },
   {
    "severity": "info",
    "title": "已修正：RDA5807M 腳位錯誤（原本會讓 FM 完全失效）",
@@ -19,16 +39,6 @@
   },
   {
    "severity": "warning",
-   "title": "LCSC 料號：已抽查並修正，其餘以 JLC BOM 比對為準",
-   "detail": "已上網確認：C701341 ESP32-WROOM-32E-N4、C424093 MCP73831T-2ACI/OT、C32346 Epson 32.768k、C113367 PAM8302AASCR。J3 原本的 C2932 查無對應，已改為 C2691448（XFCN PZ254V-11-04P）。其餘被動元件與 IC 料號都是 JLC 常見的基礎/擴充料號，但未逐一上網確認，上傳 BOM 時請看 JLC 的料號比對結果。沒有 LCSC 料號、需自行採購或手焊：D3 BAT54C、BT1 CR1220 座、U6 RDA5807M、J4 JST-SH、SW4-6、AE1。"
-  },
-  {
-   "severity": "warning",
-   "title": "拔除 USB 時 VSYS 約有 9 ms 掉到 3.0 V（模擬 01）",
-   "detail": "ESP32 可能觸發 brown-out 而重開機。可接受；若要根除，改用理想二極體或負載開關。"
-  },
-  {
-   "severity": "warning",
    "title": "電池低於約 3.33 V 時 3.3 V 軌脫離穩壓（模擬 02）",
    "detail": "韌體應在 VBAT_SENSE 換算約 3.4 V 時關機；電池必須自帶保護板 (PCM)。"
   },
@@ -41,17 +51,12 @@
    "severity": "warning",
    "title": "VSYS 有 3.2 mm 走線縮到 0.2 mm",
    "detail": "進入細腳距焊盤時的縮頸，0.2 mm、1 oz 約可承載 0.6 A，峰值 0.5 A 屬邊界值但可用。"
-  },
-  {
-   "severity": "info",
-   "title": "已通過項目",
-   "detail": "ERC 0；DRC 0 錯誤、0 未連接、courtyard OK；幾何鋪銅檢查 GND 為單一連通；48 個網路 100% 佈通；4 個 SPICE 測試全部通過；ESP32 天線在板緣、禁佈區淨空；USB-C CC 5.1k 與 USBLC6 都有；去耦電容都緊貼腳位；按鍵、USB、電池座、喇叭座都在板緣。"
   }
  ],
- "time": "2026-11-13T10:08:21",
+ "time": "2026-11-13T10:33:53",
  "reviewer": "Claude",
  "board": {
-  "design.yaml": "36e64fd614fbe8aaae4b686e9da6fee53c3be3e2682c177bcc43bb8f26554355",
-  "fm_radio.kicad_pcb": "7b29149d0db1bf817f6401694c27a55ba7743f20cb380063200e7986cc47cad2"
+  "design.yaml": "7058cfb60603c06bf9d94474bdecd5c1c56ff422fb9f043dd7511778766ade90",
+  "fm_radio.kicad_pcb": "0cb7ef434e252f637dca8cea064ab0a7ac17d7f98da77b690869862131eb50b9"
  }
 }

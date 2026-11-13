@@ -1,7 +1,7 @@
 {
  "counts": {
   "error": 0,
-  "warning": 44,
+  "warning": 47,
   "info": 1
  },
  "auto_pass": true,
@@ -17,7 +17,7 @@
   {
    "severity": "warning",
    "category": "power-integrity",
-   "message": "power net VSYS has 3.2 mm of 30 mm necked down to 0.2 mm",
+   "message": "power net VSYS has 3.2 mm of 33 mm necked down to 0.2 mm",
    "refs": []
   },
   {
@@ -95,37 +95,37 @@
   {
    "severity": "warning",
    "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['D2 \u7684\u53c3\u8003\u6b04\u4f4d', '3 \u4e0a [/GND] \u7684\u710a\u76e4 U9 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
    "message": "silk_over_copper: Silkscreen clipped by solder mask ['C20 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/VSYS] \u7684\u710a\u76e4 Q3 F.Cu']",
    "refs": []
   },
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['Q1 \u7684\u53c3\u8003\u6b04\u4f4d', '16 \u4e0a [/+3V3] \u7684\u710a\u76e4 U4 F.Cu']",
-   "refs": []
-  },
-  {
-   "severity": "warning",
-   "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U4 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/Q1_B] \u7684\u710a\u76e4 R12 F.Cu']",
-   "refs": []
-  },
-  {
-   "severity": "warning",
-   "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R20 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/AUDIO_MIX] \u7684\u710a\u76e4 R19 F.Cu']",
-   "refs": []
-  },
-  {
-   "severity": "warning",
-   "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R20 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/FM_L] \u7684\u710a\u76e4 R19 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C22 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/VBAT] \u7684\u710a\u76e4 U9 F.Cu']",
    "refs": []
   },
   {
    "severity": "warning",
    "category": "drc",
    "message": "silk_over_copper: Silkscreen clipped by solder mask ['C17 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/VBAT_SENSE] \u7684\u710a\u76e4 R7 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C4 \u7684\u53c3\u8003\u6b04\u4f4d', '5 \u4e0a [/+3V3] \u7684\u710a\u76e4 U3 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U3 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/GND] \u7684\u710a\u76e4 C4 F.Cu']",
    "refs": []
   },
   {
@@ -185,13 +185,19 @@
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C4 \u7684\u53c3\u8003\u6b04\u4f4d', '5 \u4e0a [/+3V3] \u7684\u710a\u76e4 U3 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R20 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/AUDIO_MIX] \u7684\u710a\u76e4 R19 F.Cu']",
    "refs": []
   },
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U3 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/GND] \u7684\u710a\u76e4 C4 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R20 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/FM_L] \u7684\u710a\u76e4 R19 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U9 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/VBAT] \u7684\u710a\u76e4 C22 F.Cu']",
    "refs": []
   },
   {
@@ -257,6 +263,18 @@
   {
    "severity": "warning",
    "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['Q1 \u7684\u53c3\u8003\u6b04\u4f4d', '16 \u4e0a [/+3V3] \u7684\u710a\u76e4 U4 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U4 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/Q1_B] \u7684\u710a\u76e4 R12 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
    "message": "silk_over_copper: Silkscreen clipped by solder mask ['C12 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/I2C_SDA] \u7684\u710a\u76e4 R15 F.Cu']",
    "refs": []
   },
@@ -287,44 +305,50 @@
  "drc": {
   "ok": true,
   "errors": 0,
-  "warnings": 42,
+  "warnings": 45,
   "unconnected": 0,
   "by_type": {
-   "silk_over_copper": 42
+   "silk_over_copper": 45
   }
  },
  "simulations": [
   {
    "name": "01_power_path",
-   "title": "Power path: USB cable unplugged at 2 ms, 250 mA load on VSYS",
+   "title": "Power path: USB cable unplugged at 2 ms, 250 mA load on VSYS (LTC4412 + AO3401A)",
    "ok": true,
    "measures": {
-    "vsys_usb": 4.605334,
-    "vsys_bat": 3.668297,
-    "vsys_min": 3.000766,
-    "t_ok": 0.0113248,
-    "t_takeover": 0.00932481
+    "vsys_usb": 4.60543,
+    "vsys_bat": 3.655905,
+    "vsys_min": 3.655905,
+    "t_below_36": 0.0
    },
    "checks": [
     {
      "meas": "vsys_usb",
      "min": 4.4,
      "max": 4.9,
-     "value": 4.605334,
+     "value": 4.60543,
      "pass": true
     },
     {
      "meas": "vsys_bat",
      "min": 3.55,
      "max": 3.75,
-     "value": 3.668297,
+     "value": 3.655905,
      "pass": true
     },
     {
-     "meas": "t_takeover",
+     "meas": "vsys_min",
+     "min": 3.5,
+     "max": 3.75,
+     "value": 3.655905,
+     "pass": true
+    },
+    {
+     "meas": "t_below_36",
      "min": 0.0,
-     "max": 0.015,
-     "value": 0.00932481,
+     "max": 0.0005,
+     "value": 0.0,
      "pass": true
     }
    ]

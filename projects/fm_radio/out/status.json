@@ -1,7 +1,7 @@
 {
  "library": {
   "state": "ok",
-  "time": "2026-11-13T10:02:45",
+  "time": "2026-11-13T10:31:51",
   "summary": {
    "ok": true,
    "generated": [
@@ -11,13 +11,13 @@
  },
  "validate": {
   "state": "ok",
-  "time": "2026-11-13T10:07:20",
+  "time": "2026-11-13T10:31:55",
   "summary": {
    "project": "fm_radio",
-   "parts": 75,
-   "nets": 48,
-   "pins_connected": 212,
-   "nc_pins": 32,
+   "parts": 76,
+   "nets": 49,
+   "pins_connected": 217,
+   "nc_pins": 33,
    "errors": [],
    "warnings": [],
    "ok": true
@@ -25,7 +25,7 @@
  },
  "schematic": {
   "state": "ok",
-  "time": "2026-11-13T10:02:51",
+  "time": "2026-11-13T10:31:59",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/fm_radio.kicad_sch"
@@ -33,7 +33,7 @@
  },
  "erc": {
   "state": "ok",
-  "time": "2026-11-13T10:02:56",
+  "time": "2026-11-13T10:32:04",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -42,14 +42,14 @@
  },
  "placement": {
   "state": "ok",
-  "time": "2026-11-13T10:03:00",
+  "time": "2026-11-13T10:32:36",
   "summary": {
    "ok": true,
-   "wirelength": 918.98,
+   "wirelength": 938.5,
    "overlap": 0.0,
    "outside": 0.0,
    "near": 32.74,
-   "total": 951.72,
+   "total": 971.24,
    "problems": [],
    "locked": [
     "AE1",
@@ -108,7 +108,6 @@
     "R24",
     "R3",
     "R4",
-    "R5",
     "R7",
     "R8",
     "R9",
@@ -126,6 +125,7 @@
     "U6",
     "U7",
     "U8",
+    "U9",
     "Y1"
    ],
    "yaml_pose": {
@@ -202,22 +202,22 @@
  },
  "routing": {
   "state": "ok",
-  "time": "2026-11-13T10:03:29",
+  "time": "2026-11-13T10:33:07",
   "summary": {
    "ok": true,
    "failed": [],
-   "wirelength_mm": 959.9,
-   "seconds": 25.6,
-   "nets_total": 48,
-   "gnd_fanout_vias": 59,
-   "stitch_vias": 144,
+   "wirelength_mm": 957.5,
+   "seconds": 27.6,
+   "nets_total": 49,
+   "gnd_fanout_vias": 62,
+   "stitch_vias": 135,
    "gnd_unconnected": [],
    "pass": 1
   }
  },
  "pcb": {
   "state": "ok",
-  "time": "2026-11-13T10:03:33",
+  "time": "2026-11-13T10:33:11",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/fm_radio.kicad_pcb"
@@ -225,14 +225,14 @@
  },
  "drc": {
   "state": "ok",
-  "time": "2026-11-13T10:03:38",
+  "time": "2026-11-13T10:33:17",
   "summary": {
    "ok": true,
    "errors": 0,
    "unconnected": 0,
-   "warnings": 42,
+   "warnings": 45,
    "by_type": {
-    "silk_over_copper": 42
+    "silk_over_copper": 45
    },
    "zone_repairs": [],
    "geom": {
@@ -240,7 +240,7 @@
      {
       "net": "GND",
       "ok": true,
-      "islands": 22,
+      "islands": 23,
       "components": 1,
       "detached": []
      }
@@ -251,7 +251,7 @@
  },
  "simulation": {
   "state": "ok",
-  "time": "2026-11-13T10:03:38",
+  "time": "2026-11-13T10:33:18",
   "summary": {
    "ok": true,
    "count": 4,
@@ -260,32 +260,38 @@
      "name": "01_power_path",
      "ok": true,
      "measures": {
-      "vsys_usb": 4.605334,
-      "vsys_bat": 3.668297,
-      "vsys_min": 3.000766,
-      "t_ok": 0.0113248,
-      "t_takeover": 0.00932481
+      "vsys_usb": 4.60543,
+      "vsys_bat": 3.655905,
+      "vsys_min": 3.655905,
+      "t_below_36": 0.0
      },
      "checks": [
       {
        "meas": "vsys_usb",
        "min": 4.4,
        "max": 4.9,
-       "value": 4.605334,
+       "value": 4.60543,
        "pass": true
       },
       {
        "meas": "vsys_bat",
        "min": 3.55,
        "max": 3.75,
-       "value": 3.668297,
+       "value": 3.655905,
        "pass": true
       },
       {
-       "meas": "t_takeover",
+       "meas": "vsys_min",
+       "min": 3.5,
+       "max": 3.75,
+       "value": 3.655905,
+       "pass": true
+      },
+      {
+       "meas": "t_below_36",
        "min": 0.0,
-       "max": 0.015,
-       "value": 0.00932481,
+       "max": 0.0005,
+       "value": 0.0,
        "pass": true
       }
      ],
@@ -389,12 +395,12 @@
  },
  "checks": {
   "state": "ok",
-  "time": "2026-11-13T10:03:42",
+  "time": "2026-11-13T10:33:21",
   "summary": {
    "ok": true,
    "counts": {
     "error": 0,
-    "warning": 44,
+    "warning": 47,
     "info": 1
    },
    "auto_pass": true,
@@ -406,17 +412,17 @@
    "drc": {
     "ok": true,
     "errors": 0,
-    "warnings": 42,
+    "warnings": 45,
     "unconnected": 0,
     "by_type": {
-     "silk_over_copper": 42
+     "silk_over_copper": 45
     }
    }
   }
  },
  "previews": {
   "state": "ok",
-  "time": "2026-11-13T10:03:48",
+  "time": "2026-11-13T10:33:28",
   "summary": {
    "ok": true,
    "schematic": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/schematic.svg",
@@ -430,7 +436,7 @@
  },
  "review": {
   "state": "fail",
-  "time": "2026-11-13T10:08:21",
+  "time": "2026-11-13T10:33:53",
   "summary": {
    "ok": false,
    "verdict": "CONDITIONAL"
@@ -438,7 +444,7 @@
  },
  "fab": {
   "state": "fail",
-  "time": "2026-11-13T10:08:24",
+  "time": "2026-11-13T10:33:57",
   "summary": {
    "ok": false,
    "blocked": true,

@@ -1,13 +1,14 @@
 # AI Design Review — CONDITIONAL
 
-用目前引擎完整重建：ERC 0、DRC 0/0、幾何鋪銅檢查通過、4 個模擬全部通過。上次唯一的硬性阻擋項 RDA5807M 腳位已對照原廠 datasheet，結果發現真的錯了（1/2/4/5 腳），已修正並重建，這是本次最重要的修正。PCB 本身已可打樣。仍判定「有條件通過」，因為部分 LCSC 料號沒有逐一上網確認，且有 6 項零件沒有 LCSC 料號，需要另外採購或手焊。正式下單 SMT 組裝前，請先在 JLC 上傳 BOM 並確認料號比對結果。
+依上一版審核的建議完成換件：電源路徑改為 LTC4412 + AO3401A 理想二極體（拔除 USB 時的 9 ms 掉壓消失，模擬已驗證），CR1220 電池座改為 LCSC 有貨的 Keystone 3000，其餘缺料號的零件都補上已確認的 LCSC 料號。重建結果：ERC 0、DRC 0/0、幾何檢查通過、模擬 4/4 通過。PCB 可打樣。唯一未解決的是 U6 RDA5807M 在 LCSC 沒有料，需另外採購或手焊，所以仍判定「有條件通過」。
 
+- **[INFO] 已更換：電源路徑改用 LTC4412 理想二極體控制器** — U9 LTC4412ES6#TRPBF（C514442）驅動原本的 Q3 AO3401A（4 A）；移除 R5，新增 C22 100n 作為 VIN 旁路。腳位對照原廠資料：1 VIN、2 GND、3 CTL、4 STAT、5 GATE、6 SENSE。VIN 接電池（Q3 汲極），SENSE 接 VSYS（Q3 源極），CTL 接地（自動模式），STAT 不接。模擬 01：拔除 USB 後 VSYS 最低 3.656 V（手算 3.66 V），低於 3.6 V 的時間為 0；舊電路是約 9 ms 掉到 3.0 V，ESP32 brown-out 的風險已排除。註：LTC4412 用行為模型模擬（20 mV 順向調節、約 1 µs 反應）。
+- **[INFO] 已更換：所有可採購零件都補上已上網確認的 LCSC 料號** — BT1 Panasonic CR1220-VCN（LCSC 沒貨）改為 Keystone 3000 SMT 電池座（C238097，封裝 Battery:BatteryHolder_Keystone_3000_1x12mm，pad 1 = +、pad 2 = −）。D3 改為 Nexperia BAT54C,215（C37704）。J4 SM02B-SRSS-TB = C160402。SW4-6 PTS645SM43SMTR92 LFS = C221880。另外已確認：C701341、C424093、C32346、C113367、C2691448。
+- **[WARNING] U6 RDA5807M 沒有 LCSC 料號** — C82537 在 LCSC 已查無此料，RDA5807MP 是 SOP-8，無法直接替換。需自行採購 RDA5807M（MSOP-10）手焊，或用 JLC 的全球代購／寄料。腳位已對照原廠 datasheet。其餘常見的被動元件料號未逐一上網確認，上傳 BOM 時請看 JLC 的比對結果。
+- **[INFO] 已通過項目** — ERC 0；DRC 0 錯誤、0 未連接、courtyard OK；幾何鋪銅檢查 GND 為單一連通；所有網路 100% 佈通、沒有未連接的 GND 腳；4 個 SPICE 測試全部通過；ESP32 天線在板緣、禁佈區淨空；USB-C CC 5.1k 與 USBLC6 都有；去耦電容都貼近腳位（含新增的 U9）。
 - **[INFO] 已修正：RDA5807M 腳位錯誤（原本會讓 FM 完全失效）** — 對照 RDA5807M datasheet Rev.1.0 Fig.7-1 / Table 7-1：1 GND, 2 FM_IN, 3 GND, 4 SCLK, 5 SDIO, 6 RCLK, 7 VDD, 8 GND, 9 ROUT, 10 LOUT。舊的 AI 符號把 1/2/4/5 腳寫錯（SDA 接到 GND 腳、FMIN 接到 SCLK 腳）。舊 Gerber 若送廠會做出不能用的板子，已作廢。RCLK 由 PCF8563 CLKOUT（開汲極）供應，R17 10k 上拉 ✓；I2C 位址 0x10/0x11 與 0x51、0x3C 無衝突 ✓。
 - **[INFO] 已修正：PAM8302 料號與封裝不符** — U8 改為 PAM8302AASCR（MSOP-8），腳位與 SO-8 版本相同。
 - **[INFO] 已修正：引擎問題讓 U7.2（USBLC6 GND）沒有接上** — SOT-23-6 腳距 0.95 mm，沒被判定為夾在中間的 GND 腳（舊門檻 0.8 mm），訊號線走完後就被封死。zonefix 的取樣點判斷誤認為已經接上，是這次新增的幾何檢查抓到的。門檻改為 1.0 mm 後已預先扇出；routing 階段現在也會把未連接的 GND 腳算作失敗。
-- **[WARNING] LCSC 料號：已抽查並修正，其餘以 JLC BOM 比對為準** — 已上網確認：C701341 ESP32-WROOM-32E-N4、C424093 MCP73831T-2ACI/OT、C32346 Epson 32.768k、C113367 PAM8302AASCR。J3 原本的 C2932 查無對應，已改為 C2691448（XFCN PZ254V-11-04P）。其餘被動元件與 IC 料號都是 JLC 常見的基礎/擴充料號，但未逐一上網確認，上傳 BOM 時請看 JLC 的料號比對結果。沒有 LCSC 料號、需自行採購或手焊：D3 BAT54C、BT1 CR1220 座、U6 RDA5807M、J4 JST-SH、SW4-6、AE1。
-- **[WARNING] 拔除 USB 時 VSYS 約有 9 ms 掉到 3.0 V（模擬 01）** — ESP32 可能觸發 brown-out 而重開機。可接受；若要根除，改用理想二極體或負載開關。
 - **[WARNING] 電池低於約 3.33 V 時 3.3 V 軌脫離穩壓（模擬 02）** — 韌體應在 VBAT_SENSE 換算約 3.4 V 時關機；電池必須自帶保護板 (PCM)。
 - **[WARNING] OLED 模組腳位順序因廠商而異** — J3 依 GND-VCC-SCL-SDA 設計，購買時要確認，接反會燒毀模組。
 - **[WARNING] VSYS 有 3.2 mm 走線縮到 0.2 mm** — 進入細腳距焊盤時的縮頸，0.2 mm、1 oz 約可承載 0.6 A，峰值 0.5 A 屬邊界值但可用。
-- **[INFO] 已通過項目** — ERC 0；DRC 0 錯誤、0 未連接、courtyard OK；幾何鋪銅檢查 GND 為單一連通；48 個網路 100% 佈通；4 個 SPICE 測試全部通過；ESP32 天線在板緣、禁佈區淨空；USB-C CC 5.1k 與 USBLC6 都有；去耦電容都緊貼腳位；按鍵、USB、電池座、喇叭座都在板緣。
