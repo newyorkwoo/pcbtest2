@@ -1,12 +1,13 @@
 # AI Design Review — CONDITIONAL
 
-電路與 PCB 在自動驗證上全部通過（ERC/DRC/佈線/模擬），電源、USB、MCU、RTC、音訊的設計檢查也沒有發現錯誤。但 U6 RDA5807M 是 AI 產生的符號，腳位尚未對照原廠 datasheet 確認，LCSC 料號也需要人工核對，所以判定為「有條件通過」：可以打樣 PCB，正式量產或交付組裝前必須先完成以下 error 項。
+用目前引擎完整重建：ERC 0、DRC 0/0、幾何鋪銅檢查通過、4 個模擬全部通過。上次唯一的硬性阻擋項 RDA5807M 腳位已對照原廠 datasheet，結果發現真的錯了（1/2/4/5 腳），已修正並重建，這是本次最重要的修正。PCB 本身已可打樣。仍判定「有條件通過」，因為部分 LCSC 料號沒有逐一上網確認，且有 6 項零件沒有 LCSC 料號，需要另外採購或手焊。正式下單 SMT 組裝前，請先在 JLC 上傳 BOM 並確認料號比對結果。
 
-- **[ERROR] RDA5807M 符號為 AI 產生，腳位未經原廠 datasheet 逐腳核對** — 目前腳位(1 SDA,2 SCLK,3 GND,4 FMIN,5 GND,6 RCLK,7 VDD,8 GND,9 ROUT,10 LOUT)來自記憶，需以 RDA5807M datasheet 封裝圖逐腳確認；若有誤，FM 功能全失。這是送廠前唯一的硬性阻擋項。
-- **[WARNING] LCSC 料號需在 JLCPCB 零件庫確認** — 料號依記憶填寫，下單前需逐一搜尋確認庫存與封裝。D3 BAT54C、BT1 CR1220 座、U6 RDA5807M、J4 JST-SH、SW4-6 尚無 LCSC 料號，需補上或改為自行焊接。
-- **[WARNING] 拔除 USB 時 VSYS 約有 9 ms 掉到 3.0 V** — 模擬 01：P-MOS 閘極要等 VBUS 經 R5 放電才導通（R5 已由 100k 改為 10k，原本約 90 ms）。這段期間 3.3 V 軌約 2.9 V，ESP32 可能觸發 brown-out。可接受；若要根除，改用理想二極體或負載開關 IC。
-- **[WARNING] 電池電壓低於 3.33 V 時 3.3 V 軌脫離穩壓** — 模擬 02：韌體應在 VBAT_SENSE (IO34) 換算約 3.4 V 時關機。電池必須自帶保護板 (PCM)，因為板上沒有過放保護。
-- **[WARNING] OLED 模組腳位順序因廠商而異** — J3 依 GND-VCC-SCL-SDA 設計。部分 SSD1306 模組是 VCC-GND，下單模組時要確認，否則接反會燒毀。
-- **[WARNING] VSYS 與 +3V3 有一段走線縮到 0.2 mm** — 拆線重佈後的退讓結果。0.2 mm、1 oz 外層約可承載 0.6 A，對 ESP32 峰值 0.5 A 屬邊界值但可用。
-- **[INFO] 已通過項目** — ERC 0；DRC 0 錯誤、0 未連接（含原理圖一致性）；48 個網路 100% 佈通；4 個 SPICE 測試全部通過；去耦電容都緊貼腳位；I2C 位址無衝突 (0x10/0x11, 0x51, 0x3C)；USB-C CC 5.1k 與 USBLC6 ESD 都有；ESP32 天線在板緣，禁佈區淨空；自動燒錄時序已驗證；電池座與喇叭座改用不同規格，防止插錯。
-- **[INFO] 設計限制（非錯誤）** — 藍牙音訊經 ESP32 8-bit DAC 輸出，音質有限；若重視音質，改用 I2S 放大器（例如 MAX98357A）。CH340C 由 3.3 V 供電，所以燒錄時電源開關必須打開。
+- **[INFO] 已修正：RDA5807M 腳位錯誤（原本會讓 FM 完全失效）** — 對照 RDA5807M datasheet Rev.1.0 Fig.7-1 / Table 7-1：1 GND, 2 FM_IN, 3 GND, 4 SCLK, 5 SDIO, 6 RCLK, 7 VDD, 8 GND, 9 ROUT, 10 LOUT。舊的 AI 符號把 1/2/4/5 腳寫錯（SDA 接到 GND 腳、FMIN 接到 SCLK 腳）。舊 Gerber 若送廠會做出不能用的板子，已作廢。RCLK 由 PCF8563 CLKOUT（開汲極）供應，R17 10k 上拉 ✓；I2C 位址 0x10/0x11 與 0x51、0x3C 無衝突 ✓。
+- **[INFO] 已修正：PAM8302 料號與封裝不符** — U8 改為 PAM8302AASCR（MSOP-8），腳位與 SO-8 版本相同。
+- **[INFO] 已修正：引擎問題讓 U7.2（USBLC6 GND）沒有接上** — SOT-23-6 腳距 0.95 mm，沒被判定為夾在中間的 GND 腳（舊門檻 0.8 mm），訊號線走完後就被封死。zonefix 的取樣點判斷誤認為已經接上，是這次新增的幾何檢查抓到的。門檻改為 1.0 mm 後已預先扇出；routing 階段現在也會把未連接的 GND 腳算作失敗。
+- **[WARNING] LCSC 料號：已抽查並修正，其餘以 JLC BOM 比對為準** — 已上網確認：C701341 ESP32-WROOM-32E-N4、C424093 MCP73831T-2ACI/OT、C32346 Epson 32.768k、C113367 PAM8302AASCR。J3 原本的 C2932 查無對應，已改為 C2691448（XFCN PZ254V-11-04P）。其餘被動元件與 IC 料號都是 JLC 常見的基礎/擴充料號，但未逐一上網確認，上傳 BOM 時請看 JLC 的料號比對結果。沒有 LCSC 料號、需自行採購或手焊：D3 BAT54C、BT1 CR1220 座、U6 RDA5807M、J4 JST-SH、SW4-6、AE1。
+- **[WARNING] 拔除 USB 時 VSYS 約有 9 ms 掉到 3.0 V（模擬 01）** — ESP32 可能觸發 brown-out 而重開機。可接受；若要根除，改用理想二極體或負載開關。
+- **[WARNING] 電池低於約 3.33 V 時 3.3 V 軌脫離穩壓（模擬 02）** — 韌體應在 VBAT_SENSE 換算約 3.4 V 時關機；電池必須自帶保護板 (PCM)。
+- **[WARNING] OLED 模組腳位順序因廠商而異** — J3 依 GND-VCC-SCL-SDA 設計，購買時要確認，接反會燒毀模組。
+- **[WARNING] VSYS 有 3.2 mm 走線縮到 0.2 mm** — 進入細腳距焊盤時的縮頸，0.2 mm、1 oz 約可承載 0.6 A，峰值 0.5 A 屬邊界值但可用。
+- **[INFO] 已通過項目** — ERC 0；DRC 0 錯誤、0 未連接、courtyard OK；幾何鋪銅檢查 GND 為單一連通；48 個網路 100% 佈通；4 個 SPICE 測試全部通過；ESP32 天線在板緣、禁佈區淨空；USB-C CC 5.1k 與 USBLC6 都有；去耦電容都緊貼腳位；按鍵、USB、電池座、喇叭座都在板緣。

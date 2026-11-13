@@ -43,19 +43,19 @@ custom_symbols:
     RDA5807M:
       ref: U
       footprint: Package_SO:MSOP-10_3x3mm_P0.5mm
-      description: "Single-chip broadcast FM stereo radio tuner, I2C, MSOP-10"
-      datasheet: "https://www.voti.nl/docs/RDA5807M.pdf"
+      description: "Single-chip broadcast FM stereo radio tuner, I2C, MSOP-10. Pinout verified 2026-11-13 against RDA5807M datasheet Rev.1.0 Fig.7-1 / Table 7-1: 1 GND, 2 FM_IN, 3 GND, 4 SCLK, 5 SDIO, 6 RCLK, 7 VDD, 8 GND, 9 ROUT, 10 LOUT (the earlier AI pinout had pins 1/2/4/5 wrong)."
+      datasheet: "https://cdn-shop.adafruit.com/product-files/5651/5651_tuner84_RDA5807M_datasheet_v1.pdf"
       keywords: "FM radio tuner I2C"
       pins:
-        - [1, SDA, bidirectional, left]
-        - [2, SCLK, input, left]
-        - [4, FMIN, input, left]
+        - [5, SDIO, bidirectional, left]
+        - [4, SCLK, input, left]
+        - [2, FMIN, input, left]
         - [6, RCLK, input, left]
         - [7, VDD, power_in, right]
         - [10, LOUT, output, right]
         - [9, ROUT, output, right]
-        - [3, GND, power_in, bottom]
-        - [5, GND, passive, bottom]
+        - [1, GND, power_in, bottom]
+        - [3, GND, passive, bottom]
         - [8, GND, passive, bottom]
 
 parts:
@@ -124,7 +124,7 @@ parts:
   R15: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 4.7k, mpn: "0603WAF4701T5E", lcsc: C23162, block: i2c}
   R16: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 4.7k, mpn: "0603WAF4701T5E", lcsc: C23162, block: i2c}
   J3: {symbol: "Connector_Generic:Conn_01x04", footprint: "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
-       value: "OLED SSD1306 0.96in", mpn: "PZ254V-11-04P", lcsc: C2932, block: i2c, description: "GND VCC SCL SDA"}
+       value: "OLED SSD1306 0.96in", mpn: "PZ254V-11-04P", lcsc: C2691448, block: i2c, description: "GND VCC SCL SDA"}
 
   # ---------------------------------------------------------------- RTC
   U5: {symbol: "Timer_RTC:PCF8563T", footprint: "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm", value: PCF8563T,
@@ -207,7 +207,7 @@ nets:
   RTS: ["U4.~{RTS}", R13.1, Q1.E]
   Q1_B: [Q1.B, R12.2]
   Q2_B: [Q2.B, R13.2]
-  I2C_SDA: [U1.IO21, R15.2, J3.4, U5.SDA, U6.SDA]
+  I2C_SDA: [U1.IO21, R15.2, J3.4, U5.SDA, U6.SDIO]
   I2C_SCL: [U1.IO22, R16.2, J3.3, U5.SCL, U6.SCLK]
   RTC_INT: ["U5.~{INT}", R18.2, U1.IO4]
   RCLK_32K: [U5.CLKO, R17.2, U6.RCLK]

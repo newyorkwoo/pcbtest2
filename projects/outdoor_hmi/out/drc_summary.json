@@ -1270,7 +1270,7 @@
    {
     "net": "GND",
     "ok": true,
-    "islands": 36,
+    "islands": 35,
     "components": 1,
     "detached": []
    }

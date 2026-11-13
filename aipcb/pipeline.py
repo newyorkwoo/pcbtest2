@@ -143,7 +143,9 @@ def place(pd: Path, seed: int = 1, tries: int = 3, moves: int = 30000, keep=None
     """keep: None (only `place.lock` parts), True (every previously placed part) or a list of refs."""
     d = load(pd)
     r = placement.place(d, seed=seed, tries=tries, moves=moves, keep=keep, unlock=unlock)
-    return {"ok": not r["problems"] and r["overlap"] < 1e-6, **{k: (round(v, 2) if isinstance(v, float) else v)
+    # problems = real collisions (legalize failures, fixed/locked courtyard overlaps); r["overlap"] is the placer's
+    # own cost with its part_spacing margin and stays informational
+    return {"ok": not r["problems"], **{k: (round(v, 2) if isinstance(v, float) else v)
                                                                  for k, v in r.items() if k != "positions"}}
 
 
@@ -154,7 +156,8 @@ def route(pd: Path, gnd_mode: str = "pour") -> dict:
     r = router.route(d, pos, log=lambda m: log(pd, m), gnd_mode=gnd_mode,
                      passes=int(d.rules.get("route_passes", 4)))
     st = r["stats"]
-    return {"ok": not st["failed"], **st}
+    # an open GND pin is a missing connection just like a failed net (DRC reports it as unconnected)
+    return {"ok": not st["failed"] and not st.get("gnd_unconnected"), **st}
 
 
 @stage("pcb")

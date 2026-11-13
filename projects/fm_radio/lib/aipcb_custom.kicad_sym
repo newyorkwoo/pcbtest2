@@ -34,7 +34,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.voti.nl/docs/RDA5807M.pdf"
+		(property "Datasheet" "https://cdn-shop.adafruit.com/product-files/5651/5651_tuner84_RDA5807M_datasheet_v1.pdf"
 			(at 0 0 0)
 			(effects
 				(font
@@ -43,7 +43,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Single-chip broadcast FM stereo radio tuner, I2C, MSOP-10"
+		(property "Description" "Single-chip broadcast FM stereo radio tuner, I2C, MSOP-10. Pinout verified 2026-11-13 against RDA5807M datasheet Rev.1.0 Fig.7-1 / Table 7-1: 1 GND, 2 FM_IN, 3 GND, 4 SCLK, 5 SDIO, 6 RCLK, 7 VDD, 8 GND, 9 ROUT, 10 LOUT (the earlier AI pinout had pins 1/2/4/5 wrong)."
 			(at 0 0 0)
 			(effects
 				(font
@@ -78,14 +78,14 @@
 			(pin bidirectional line
 				(at -12.7 5.08 0)
 				(length 2.54)
-				(name "SDA"
+				(name "SDIO"
 					(effects
 						(font
 							(size 1.27 1.27)
 						)
 					)
 				)
-				(number "1"
+				(number "5"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -103,7 +103,7 @@
 						)
 					)
 				)
-				(number "2"
+				(number "4"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -121,7 +121,7 @@
 						)
 					)
 				)
-				(number "4"
+				(number "2"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -211,7 +211,7 @@
 						)
 					)
 				)
-				(number "3"
+				(number "1"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -229,7 +229,7 @@
 						)
 					)
 				)
-				(number "5"
+				(number "3"
 					(effects
 						(font
 							(size 1.27 1.27)

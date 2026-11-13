@@ -6120,7 +6120,7 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "https://www.voti.nl/docs/RDA5807M.pdf"
+			(property "Datasheet" "https://cdn-shop.adafruit.com/product-files/5651/5651_tuner84_RDA5807M_datasheet_v1.pdf"
 				(at 0 0 0)
 				(effects
 					(font
@@ -6129,7 +6129,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Single-chip broadcast FM stereo radio tuner, I2C, MSOP-10"
+			(property "Description" "Single-chip broadcast FM stereo radio tuner, I2C, MSOP-10. Pinout verified 2026-11-13 against RDA5807M datasheet Rev.1.0 Fig.7-1 / Table 7-1: 1 GND, 2 FM_IN, 3 GND, 4 SCLK, 5 SDIO, 6 RCLK, 7 VDD, 8 GND, 9 ROUT, 10 LOUT (the earlier AI pinout had pins 1/2/4/5 wrong)."
 				(at 0 0 0)
 				(effects
 					(font
@@ -6164,14 +6164,14 @@
 				(pin bidirectional line
 					(at -12.7 5.08 0)
 					(length 2.54)
-					(name "SDA"
+					(name "SDIO"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number "1"
+					(number "5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -6189,7 +6189,7 @@
 							)
 						)
 					)
-					(number "2"
+					(number "4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -6207,7 +6207,7 @@
 							)
 						)
 					)
-					(number "4"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -6297,7 +6297,7 @@
 							)
 						)
 					)
-					(number "3"
+					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -6315,7 +6315,7 @@
 							)
 						)
 					)
-					(number "5"
+					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -15016,7 +15016,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.voti.nl/docs/RDA5807M.pdf"
+		(property "Datasheet" "https://cdn-shop.adafruit.com/product-files/5651/5651_tuner84_RDA5807M_datasheet_v1.pdf"
 			(at 231.14 274.32 0)
 			(effects
 				(font
@@ -15025,7 +15025,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Single-chip broadcast FM stereo radio tuner, I2C, MSOP-10"
+		(property "Description" "Single-chip broadcast FM stereo radio tuner, I2C, MSOP-10. Pinout verified 2026-11-13 against RDA5807M datasheet Rev.1.0 Fig.7-1 / Table 7-1: 1 GND, 2 FM_IN, 3 GND, 4 SCLK, 5 SDIO, 6 RCLK, 7 VDD, 8 GND, 9 ROUT, 10 LOUT (the earlier AI pinout had pins 1/2/4/5 wrong)."
 			(at 231.14 274.32 0)
 			(effects
 				(font
@@ -15052,14 +15052,14 @@
 				(hide yes)
 			)
 		)
-		(pin "1"
-			(uuid "dc749afb-a6d0-5fd1-a734-4dd2ebe2c83a")
-		)
-		(pin "2"
-			(uuid "d1333189-c671-59f4-a12b-4e7887e8ad84")
+		(pin "5"
+			(uuid "318cf500-3e0d-578e-aa03-52b2e2f64ae1")
 		)
 		(pin "4"
 			(uuid "16b59d89-0281-5af6-8490-e36751a8035f")
+		)
+		(pin "2"
+			(uuid "d1333189-c671-59f4-a12b-4e7887e8ad84")
 		)
 		(pin "6"
 			(uuid "3d0ca1c9-575f-5e6c-acc1-1554a20fbd45")
@@ -15073,11 +15073,11 @@
 		(pin "9"
 			(uuid "01535fd4-dfbb-5257-8cf2-e21880fe4036")
 		)
+		(pin "1"
+			(uuid "dc749afb-a6d0-5fd1-a734-4dd2ebe2c83a")
+		)
 		(pin "3"
 			(uuid "24c7a747-bdb2-5590-9b9c-49c5816f997e")
-		)
-		(pin "5"
-			(uuid "318cf500-3e0d-578e-aa03-52b2e2f64ae1")
 		)
 		(pin "8"
 			(uuid "3605223a-fad8-520d-88b7-c498cc5cb71b")
@@ -15100,7 +15100,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "1739329f-f3bb-5483-808a-acd81e3799dc")
+		(uuid "37519e57-bd59-5b85-bc34-6b0d89e2d32d")
 	)
 	(label "I2C_SCL"
 		(at 218.44 271.78 180)
@@ -15111,7 +15111,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "2d94f2f0-8447-5c19-a310-407b0ec8fd3f")
+		(uuid "9fb8ff06-d796-50cb-bd0f-ab6a1d9d7dd0")
 	)
 	(label "FM_IN"
 		(at 218.44 274.32 180)
@@ -15122,7 +15122,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "9fb8ff06-d796-50cb-bd0f-ab6a1d9d7dd0")
+		(uuid "2d94f2f0-8447-5c19-a310-407b0ec8fd3f")
 	)
 	(label "RCLK_32K"
 		(at 218.44 276.86 180)
@@ -15177,7 +15177,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "7f53fcee-22b5-510c-91a4-7e3ae434a640")
+		(uuid "1739329f-f3bb-5483-808a-acd81e3799dc")
 	)
 	(label "GND"
 		(at 231.14 284.48 270)
@@ -15188,7 +15188,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "37519e57-bd59-5b85-bc34-6b0d89e2d32d")
+		(uuid "7f53fcee-22b5-510c-91a4-7e3ae434a640")
 	)
 	(label "GND"
 		(at 233.68 284.48 270)

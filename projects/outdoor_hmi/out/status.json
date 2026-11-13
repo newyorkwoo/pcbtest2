@@ -1,7 +1,7 @@
 {
  "validate": {
   "state": "ok",
-  "time": "2026-11-13T09:30:41",
+  "time": "2026-11-13T10:04:00",
   "summary": {
    "project": "outdoor_hmi",
    "parts": 100,
@@ -15,7 +15,7 @@
  },
  "simulation": {
   "state": "ok",
-  "time": "2026-11-13T09:33:34",
+  "time": "2026-11-13T10:06:48",
   "summary": {
    "ok": true,
    "count": 4,
@@ -222,7 +222,7 @@
  },
  "library": {
   "state": "ok",
-  "time": "2026-11-13T09:30:38",
+  "time": "2026-11-13T10:03:57",
   "summary": {
    "ok": true,
    "generated": [
@@ -233,7 +233,7 @@
  },
  "schematic": {
   "state": "ok",
-  "time": "2026-11-13T09:30:44",
+  "time": "2026-11-13T10:04:03",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/outdoor_hmi.kicad_sch"
@@ -241,7 +241,7 @@
  },
  "erc": {
   "state": "ok",
-  "time": "2026-11-13T09:30:49",
+  "time": "2026-11-13T10:04:07",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -249,10 +249,10 @@
   }
  },
  "placement": {
-  "state": "fail",
-  "time": "2026-11-13T09:30:53",
+  "state": "ok",
+  "time": "2026-11-13T10:07:14",
   "summary": {
-   "ok": false,
+   "ok": true,
    "wirelength": 1338.94,
    "overlap": 1.38,
    "outside": 0.9,
@@ -582,12 +582,12 @@
  },
  "routing": {
   "state": "ok",
-  "time": "2026-11-13T09:33:24",
+  "time": "2026-11-13T10:06:38",
   "summary": {
    "ok": true,
    "failed": [],
-   "wirelength_mm": 1315.3,
-   "seconds": 11.7,
+   "wirelength_mm": 1314.0,
+   "seconds": 11.4,
    "nets_total": 59,
    "gnd_fanout_vias": 71,
    "stitch_vias": 142,
@@ -597,7 +597,7 @@
  },
  "pcb": {
   "state": "ok",
-  "time": "2026-11-13T09:33:28",
+  "time": "2026-11-13T10:06:42",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/outdoor_hmi.kicad_pcb"
@@ -605,7 +605,7 @@
  },
  "drc": {
   "state": "ok",
-  "time": "2026-11-13T09:33:34",
+  "time": "2026-11-13T10:06:48",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -620,7 +620,7 @@
      {
       "net": "GND",
       "ok": true,
-      "islands": 36,
+      "islands": 35,
       "components": 1,
       "detached": []
      }
@@ -631,7 +631,7 @@
  },
  "checks": {
   "state": "ok",
-  "time": "2026-11-13T09:33:37",
+  "time": "2026-11-13T10:06:52",
   "summary": {
    "ok": true,
    "counts": {
@@ -658,7 +658,7 @@
  },
  "previews": {
   "state": "ok",
-  "time": "2026-11-13T09:33:44",
+  "time": "2026-11-13T10:06:58",
   "summary": {
    "ok": true,
    "schematic": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/schematic.svg",
@@ -672,10 +672,24 @@
  },
  "review": {
   "state": "fail",
-  "time": "2026-11-13T04:51:10",
+  "time": "2026-11-13T10:08:21",
   "summary": {
    "ok": false,
    "verdict": "CONDITIONAL"
+  }
+ },
+ "fab": {
+  "state": "fail",
+  "time": "2026-11-13T10:08:28",
+  "summary": {
+   "ok": false,
+   "blocked": true,
+   "gate": {
+    "review": "CONDITIONAL",
+    "auto_pass": true,
+    "review_current": true
+   },
+   "message": "Fab export requires auto checks with 0 errors AND an AI review verdict of PASS on the current board (a rebuild after the review makes it STALE) (use force=True to override for a prototype)."
   }
  }
 }

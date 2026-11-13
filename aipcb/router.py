@@ -581,13 +581,15 @@ class Router:
         return float(self._dist(o, X, Y)[0, 0]) <= self.halo_r() + self.via_d
 
     def _flanked(self, n: int) -> list[dict]:
-        """GND SMD pads sitting between two non-GND pads of the same part (fine-pitch pin rows)."""
+        """GND SMD pads sitting between two non-GND pads of the same part (fine-pitch pin rows).
+        1.0 mm catches SOT-23-6 / SOT-363 rows (0.95 / 0.65 pitch): a GND pin in the middle of such a row is
+        boxed in as soon as its neighbours' signals are routed, so it must be fanned out before them."""
         out = []
         for p in self.net_pads(n):
             if p["tht"]:
                 continue
             nb = [q for q in self.pads if q["ref"] == p["ref"] and q is not p
-                  and math.hypot(q["x"] - p["x"], q["y"] - p["y"]) < 0.8]
+                  and math.hypot(q["x"] - p["x"], q["y"] - p["y"]) < 1.0]
             if len(nb) >= 2 and all(q["net"] != n for q in nb):
                 out.append(p)
         return out
