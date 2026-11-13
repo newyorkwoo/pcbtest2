@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from . import checks, config, fab, library, pcb, placement, router, schematic, simulate, spec, zonefix
+from . import checks, config, fab, library, pcb, placement, router, schematic, simulate, spec, wiring, zonefix
 
 STAGES = ["library", "validate", "schematic", "erc", "placement", "routing", "pcb", "drc", "simulation",
           "checks", "previews", "review", "fab"]
@@ -169,7 +169,11 @@ def make_pcb(pd: Path) -> dict:
     rp = _out(pd) / "routes.json"
     routes = json.loads(rp.read_text()) if rp.exists() else None
     p = pcb.generate(d, pos, routes)
-    return {"ok": True, "file": str(p)}
+    # physical wiring diagram / pin-to-pin wire list for the GUI and hand-wired prototypes
+    wd = wiring.wire_list(d, p)
+    (_out(pd) / "wiring.json").write_text(json.dumps(wd, ensure_ascii=False))
+    wiring.write_csv(d, wd)
+    return {"ok": True, "file": str(p), "wires": len(wd["wires"])}
 
 
 @stage("drc")

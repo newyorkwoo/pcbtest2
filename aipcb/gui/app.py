@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGraphicsScene, 
 from .. import config
 from ..pipeline import STAGES
 from .wiring import WiringTab
+from .wiring_diagram import WiringDiagramTab
 
 STAGE_LABEL = {
     "library": "元件庫 Library", "validate": "規格驗證 Validate", "schematic": "原理圖 Schematic",
@@ -146,7 +147,8 @@ class Dashboard(QMainWindow):
         # ---------------- tabs
         self.tabs = QTabWidget()
         self.sch_view = SvgView(); self.tabs.addTab(self.sch_view, "原理圖 Schematic")
-        self.wiring = WiringTab(); self.tabs.addTab(self.wiring, "接線圖 Wiring")
+        self.wdiag = WiringDiagramTab(); self.tabs.addTab(self.wdiag, "實體接線圖 Wiring Diagram")
+        self.wiring = WiringTab(); self.tabs.addTab(self.wiring, "網路追蹤 Nets")
         pcbw = QWidget(); pv = QVBoxLayout(pcbw)
         self.pcb_layer = QComboBox(); self.pcb_layer.addItems(["pcb_all", "pcb_top", "pcb_bottom"])
         self.pcb_layer.currentTextChanged.connect(self.refresh_previews)
@@ -211,7 +213,7 @@ class Dashboard(QMainWindow):
     def poll(self):
         """Refresh whatever changed on disk (Claude may be driving the flow through MCP)."""
         watch = ["status.json", "checks.json", "review.md", "preview/index.json", "sim/summary.json", "pipeline.log",
-                 "schematic_map.json"]
+                 "schematic_map.json", "wiring.json"]
         changed = False
         for rel in watch:
             p = self.out / rel
@@ -252,6 +254,7 @@ class Dashboard(QMainWindow):
         idx = self._json("preview/index.json", {}) or {}
         self.sch_view.load(idx.get("schematic"))
         self.wiring.load(self.out)
+        self.wdiag.load(self.out)
         self.pcb_view.load(idx.get(self.pcb_layer.currentText()))
         self.img3d.load(idx.get(self.view3d.currentText()))
 

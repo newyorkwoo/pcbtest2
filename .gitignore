@@ -25,3 +25,4 @@ projects/*/out/fab/*.step
 .DS_Store
 .claude/
 projects/*/out/schematic_map.json
+projects/*/out/wiring.json
