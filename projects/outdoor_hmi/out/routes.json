@@ -8440,7 +8440,7 @@
 "segments": 663,
 "vias": 347,
 "wirelength_mm": 1315.3,
-"seconds": 11.3,
+"seconds": 11.7,
 "nets_total": 59,
 "gnd_fanout_vias": 71,
 "stitch_vias": 142,

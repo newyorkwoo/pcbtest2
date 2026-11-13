@@ -80,7 +80,7 @@ class Comp:
 
 
 class Placer:
-    def __init__(self, d: Design, seed: int = 1, locked: dict | None = None):
+    def __init__(self, d: Design, seed: int = 1, locked: dict | None = None, prev_yaml: dict | None = None):
         self.d = d
         self.rng = random.Random(seed)
         b = d.board
@@ -122,8 +122,13 @@ class Placer:
                 r, p = str(pl["near"]).split(".", 1)
                 c.near = (r, p)
                 c.near_dist = float(pl.get("near_dist", 2.0))
-            explicit_xy = "x" in pl and "y" in pl
-            if locked and ref in locked and not explicit_xy:
+            # an explicit place.x/y wins over a lock -- unless it is the very pose the previous run already
+            # snapped (unchanged design.yaml), so that a kept board is reproduced bit for bit
+            has_pose = "x" in pl or "y" in pl
+            if has_pose and locked and ref in locked and prev_yaml is not None \
+                    and prev_yaml.get(ref) != self.yaml_pose(pl):
+                pass
+            elif locked and ref in locked:
                 prev = locked[ref]
                 c.x, c.y, c.rot = float(prev["x"]), float(prev["y"]), int(prev.get("rot", 0)) % 360
                 c.fixed = c.rot_fixed = c.locked = True
@@ -150,6 +155,10 @@ class Placer:
                             self.near_target[ref] = (tr, idx)
                             break
         self.movable = [c for c in self.comps.values() if not c.fixed]
+
+    @staticmethod
+    def yaml_pose(pl: dict) -> list:
+        return [pl.get("x"), pl.get("y"), pl.get("rot"), pl.get("edge"), pl.get("edge_offset")]
 
     # -------------------------------------------------------------- edges
     def apply_edge(self, c: Comp) -> None:
@@ -465,14 +474,23 @@ class Placer:
         self.snap_pads(float(self.d.rules["grid"]))
         res = self.total_cost()
         locked = [c for c in self.comps.values() if c.locked]
-        for i, a in enumerate(locked):      # legalize never moves fixed parts: report what a lock leaves behind
-            if self.outside(a) > 1e-6:
-                problems.append(f"{a.ref}: locked position is outside the board")
+        fixed = [c for c in self.comps.values() if c.fixed]
+        def hard_overlap(a: Comp, b: Comp) -> bool:     # real courtyard intersection, no spacing margin
+            return any(min(ax1, bx1) > max(ax0, bx0) + 1e-6 and min(ay1, by1) > max(ay0, by0) + 1e-6
+                       for ax0, ay0, ax1, ay1 in a.rects() for bx0, by0, bx1, by1 in b.rects())
+        for a in fixed:     # legalize never moves fixed / locked parts: report real collisions they leave behind
+            kind = "locked" if a.locked else "fixed (design.yaml)"
+            x0, y0, x1, y1 = a.rect()
+            if not a.edge and (x0 < ORIGIN - 1e-6 or y0 < ORIGIN - 1e-6 or x1 > ORIGIN + self.W + 1e-6
+                               or y1 > ORIGIN + self.H + 1e-6):
+                problems.append(f"{a.ref}: {kind} courtyard crosses the board edge")
             for b in self.comps.values():
-                if b is not a and (not b.locked or b.ref > a.ref) and self.overlap(a, b) > 1e-6:
-                    problems.append(f"{a.ref}: locked position overlaps {b.ref}")
+                if b is not a and (not b.fixed or b.ref > a.ref) and hard_overlap(a, b):
+                    problems.append(f"{a.ref}: {kind} courtyard overlaps {b.ref}")
         res["problems"] = problems
         res["locked"] = sorted(c.ref for c in locked)
+        res["yaml_pose"] = {r: self.yaml_pose(self.d.parts[r].place or {}) for r in self.comps
+                            if "x" in (self.d.parts[r].place or {}) or "y" in (self.d.parts[r].place or {})}
         res["positions"] = {r: {"x": round(c.x, 3), "y": round(c.y, 3), "rot": c.rot} for r, c in self.comps.items()}
         return res
 
@@ -495,12 +513,13 @@ def lock_set(d: Design, prev: dict, keep=None, unlock=()) -> dict:
 def place(d: Design, seed: int = 1, iters: int = 400, moves: int = 30000, tries: int = 3,
           out: Path | None = None, keep=None, unlock=()) -> dict:
     out = Path(out or d.project_dir / "out" / "placement.json")
-    prev = json.loads(out.read_text())["positions"] if out.exists() else {}
+    prev_all = json.loads(out.read_text()) if out.exists() else {}
+    prev = prev_all.get("positions", {})
     locked = lock_set(d, prev, keep, unlock)
     missing = sorted(set(keep) - set(prev)) if keep not in (None, True, "all") else []
     best = None
     for t in range(tries):
-        p = Placer(d, seed=seed + t, locked=locked)
+        p = Placer(d, seed=seed + t, locked=locked, prev_yaml=prev_all.get("yaml_pose"))
         r = p.run(iters, moves)
         score = r["total"] + 1000 * len(r["problems"])
         if best is None or score < best[0]:

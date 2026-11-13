@@ -2,7 +2,7 @@
 	(version 20241229)
 	(generator "aipcb")
 	(layer "F.Cu")
-	(descr "Alps EC12D (push-on switch, vertical) PC-board holes per Alps catalog p.289 drawing No.5, viewed from mounting side. Origin = shaft centre. A/B 11.1 apart, A-C 8.3, D (5.95, 3.45), E 6.85 above centre, 5x d1.05 holes; lugs 2.05 x 2.15 at 13.3 outer span.")
+	(descr "Alps EC12D (push-on switch, vertical) PC-board holes per Alps catalog p.289 drawing No.5, viewed from mounting side. Origin = shaft centre. A/B 11.1 apart, A-C 8.3, D (5.95, 3.45), E 6.85 above centre, 5x d1.05 holes; lugs 2.05 x 2.15 at 13.3 outer span. Re-verified 2026-11-13 against the Alps EC12E/EC12D catalog sheet (drawing No.5, all hole coordinates match); body 12.5 x 11.7 per the same sheet. Lug holes are drawn rectangular, here oval 2.05 x 2.15: check the lug fit on the 1:1 print.")
 	(attr through_hole)
 	(property "Reference" "REF**"
 		(at 0 -9.5 0)
@@ -61,8 +61,8 @@
 		(layer "F.CrtYd")
 	)
 	(fp_line
-		(start -6.25 -6.6)
-		(end 6.25 -6.6)
+		(start -6.25 -5.85)
+		(end 6.25 -5.85)
 		(stroke
 			(width 0.1)
 			(type solid)
@@ -70,8 +70,8 @@
 		(layer "F.Fab")
 	)
 	(fp_line
-		(start -6.25 -6.6)
-		(end 6.25 -6.6)
+		(start -6.25 -5.85)
+		(end 6.25 -5.85)
 		(stroke
 			(width 0.12)
 			(type solid)
@@ -79,8 +79,8 @@
 		(layer "F.SilkS")
 	)
 	(fp_line
-		(start 6.25 -6.6)
-		(end 6.25 6.6)
+		(start 6.25 -5.85)
+		(end 6.25 5.85)
 		(stroke
 			(width 0.1)
 			(type solid)
@@ -88,8 +88,8 @@
 		(layer "F.Fab")
 	)
 	(fp_line
-		(start 6.25 -6.6)
-		(end 6.25 6.6)
+		(start 6.25 -5.85)
+		(end 6.25 5.85)
 		(stroke
 			(width 0.12)
 			(type solid)
@@ -97,8 +97,8 @@
 		(layer "F.SilkS")
 	)
 	(fp_line
-		(start 6.25 6.6)
-		(end -6.25 6.6)
+		(start 6.25 5.85)
+		(end -6.25 5.85)
 		(stroke
 			(width 0.1)
 			(type solid)
@@ -106,8 +106,8 @@
 		(layer "F.Fab")
 	)
 	(fp_line
-		(start 6.25 6.6)
-		(end -6.25 6.6)
+		(start 6.25 5.85)
+		(end -6.25 5.85)
 		(stroke
 			(width 0.12)
 			(type solid)
@@ -115,8 +115,8 @@
 		(layer "F.SilkS")
 	)
 	(fp_line
-		(start -6.25 6.6)
-		(end -6.25 -6.6)
+		(start -6.25 5.85)
+		(end -6.25 -5.85)
 		(stroke
 			(width 0.1)
 			(type solid)
@@ -124,8 +124,8 @@
 		(layer "F.Fab")
 	)
 	(fp_line
-		(start -6.25 6.6)
-		(end -6.25 -6.6)
+		(start -6.25 5.85)
+		(end -6.25 -5.85)
 		(stroke
 			(width 0.12)
 			(type solid)

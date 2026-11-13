@@ -2,7 +2,7 @@
 	(version 20241229)
 	(generator "aipcb")
 	(layer "F.Cu")
-	(descr "Broadcom CSMW-Lx00 0.5 W 2835 DFN2 recommended land pattern (datasheet Fig.12): 4.50 total, anode pad 2.49 x 2.10, cathode pad 1.42 x 2.10, gap 0.59. Pad 2 = A (large, heat), pad 1 = K - matches Device:LED.")
+	(descr "Broadcom CSMW-Lx00 0.5 W 2835 DFN2 recommended land pattern (datasheet Fig.12): 4.50 total, anode pad 2.49 x 2.10, cathode pad 1.42 x 2.10, gap 0.59. Pad 2 = A (large, heat), pad 1 = K - matches Device:LED. Re-verified 2026-11-13 against CSMW-Lx00-AxxxE-DS100 Fig.1 (anode = wide 2.06 terminal) and Fig.12.")
 	(attr smd)
 	(property "Reference" "REF**"
 		(at 0 -2.85 0)

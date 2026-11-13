@@ -99,9 +99,9 @@ custom_footprints:
   parts:
     Alps_EC12D_Switch_Vertical:
       type: tht
-      description: "Alps EC12D (push-on switch, vertical) PC-board holes per Alps catalog p.289 drawing No.5, viewed from mounting side. Origin = shaft centre. A/B 11.1 apart, A-C 8.3, D (5.95, 3.45), E 6.85 above centre, 5x d1.05 holes; lugs 2.05 x 2.15 at 13.3 outer span."
+      description: "Alps EC12D (push-on switch, vertical) PC-board holes per Alps catalog p.289 drawing No.5, viewed from mounting side. Origin = shaft centre. A/B 11.1 apart, A-C 8.3, D (5.95, 3.45), E 6.85 above centre, 5x d1.05 holes; lugs 2.05 x 2.15 at 13.3 outer span. Re-verified 2026-11-13 against the Alps EC12E/EC12D catalog sheet (drawing No.5, all hole coordinates match); body 12.5 x 11.7 per the same sheet. Lug holes are drawn rectangular, here oval 2.05 x 2.15: check the lug fit on the 1:1 print."
       courtyard: [-7.4, -8.3, 7.4, 7.0]
-      body: [-6.25, -6.6, 6.25, 6.6]
+      body: [-6.25, -5.85, 6.25, 5.85]
       pads:
         - {number: A,  x: -5.55, y: -4.15, drill: 1.05, size: 1.7}
         - {number: B,  x: 5.55,  y: -4.15, drill: 1.05, size: 1.7}
@@ -112,7 +112,7 @@ custom_footprints:
         - {number: MP, x: 5.625,  y: 0.0, drill: [2.05, 2.15], size: [2.75, 2.85], shape: rect}
     LED_Broadcom_2835_DFN2:
       type: pads
-      description: "Broadcom CSMW-Lx00 0.5 W 2835 DFN2 recommended land pattern (datasheet Fig.12): 4.50 total, anode pad 2.49 x 2.10, cathode pad 1.42 x 2.10, gap 0.59. Pad 2 = A (large, heat), pad 1 = K - matches Device:LED."
+      description: "Broadcom CSMW-Lx00 0.5 W 2835 DFN2 recommended land pattern (datasheet Fig.12): 4.50 total, anode pad 2.49 x 2.10, cathode pad 1.42 x 2.10, gap 0.59. Pad 2 = A (large, heat), pad 1 = K - matches Device:LED. Re-verified 2026-11-13 against CSMW-Lx00-AxxxE-DS100 Fig.1 (anode = wide 2.06 terminal) and Fig.12."
       courtyard: [-2.5, -1.65, 2.5, 1.65]
       body: [-1.75, -1.4, 1.75, 1.4]
       pads:

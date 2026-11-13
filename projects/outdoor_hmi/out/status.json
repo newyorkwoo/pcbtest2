@@ -1,7 +1,7 @@
 {
  "validate": {
   "state": "ok",
-  "time": "2026-11-13T04:46:57",
+  "time": "2026-11-13T09:30:41",
   "summary": {
    "project": "outdoor_hmi",
    "parts": 100,
@@ -15,7 +15,7 @@
  },
  "simulation": {
   "state": "ok",
-  "time": "2026-11-13T04:50:21",
+  "time": "2026-11-13T09:33:34",
   "summary": {
    "ok": true,
    "count": 4,
@@ -222,7 +222,7 @@
  },
  "library": {
   "state": "ok",
-  "time": "2026-11-13T04:46:55",
+  "time": "2026-11-13T09:30:38",
   "summary": {
    "ok": true,
    "generated": [
@@ -233,7 +233,7 @@
  },
  "schematic": {
   "state": "ok",
-  "time": "2026-11-13T04:47:00",
+  "time": "2026-11-13T09:30:44",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/outdoor_hmi.kicad_sch"
@@ -241,7 +241,7 @@
  },
  "erc": {
   "state": "ok",
-  "time": "2026-11-13T04:47:04",
+  "time": "2026-11-13T09:30:49",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -250,7 +250,7 @@
  },
  "placement": {
   "state": "fail",
-  "time": "2026-11-13T04:47:49",
+  "time": "2026-11-13T09:30:53",
   "summary": {
    "ok": false,
    "wirelength": 1338.94,
@@ -259,6 +259,320 @@
    "near": 325.79,
    "total": 1773.8,
    "problems": [],
+   "locked": [
+    "C1",
+    "C10",
+    "C11",
+    "C12",
+    "C13",
+    "C14",
+    "C15",
+    "C16",
+    "C17",
+    "C18",
+    "C19",
+    "C2",
+    "C20",
+    "C21",
+    "C22",
+    "C23",
+    "C24",
+    "C25",
+    "C26",
+    "C27",
+    "C28",
+    "C29",
+    "C3",
+    "C4",
+    "C5",
+    "C6",
+    "C7",
+    "C8",
+    "C9",
+    "D1",
+    "D2",
+    "D3",
+    "D4",
+    "D5",
+    "FB1",
+    "FB2",
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "J1",
+    "J2",
+    "J3",
+    "J4",
+    "L1",
+    "Q1",
+    "R1",
+    "R10",
+    "R11",
+    "R12",
+    "R13",
+    "R14",
+    "R15",
+    "R16",
+    "R17",
+    "R18",
+    "R19",
+    "R2",
+    "R20",
+    "R21",
+    "R22",
+    "R23",
+    "R24",
+    "R25",
+    "R26",
+    "R27",
+    "R28",
+    "R29",
+    "R3",
+    "R30",
+    "R31",
+    "R32",
+    "R33",
+    "R34",
+    "R35",
+    "R36",
+    "R37",
+    "R38",
+    "R39",
+    "R4",
+    "R40",
+    "R5",
+    "R6",
+    "R7",
+    "R8",
+    "R9",
+    "SW1",
+    "SW2",
+    "SW3",
+    "SW4",
+    "SW5",
+    "SW6",
+    "SW7",
+    "U1",
+    "U2",
+    "U3",
+    "U4",
+    "U5",
+    "U6",
+    "U7"
+   ],
+   "yaml_pose": {
+    "J1": [
+     null,
+     23.25,
+     270,
+     "left",
+     null
+    ],
+    "C18": [
+     6,
+     11,
+     0,
+     null,
+     null
+    ],
+    "C29": [
+     10.5,
+     11,
+     0,
+     null,
+     null
+    ],
+    "U3": [
+     50,
+     26,
+     null,
+     null,
+     null
+    ],
+    "U4": [
+     38,
+     33,
+     null,
+     null,
+     null
+    ],
+    "U1": [
+     62,
+     22,
+     null,
+     null,
+     null
+    ],
+    "J2": [
+     null,
+     24,
+     90,
+     "right",
+     null
+    ],
+    "U2": [
+     62,
+     34,
+     null,
+     null,
+     null
+    ],
+    "J3": [
+     null,
+     34,
+     90,
+     "right",
+     null
+    ],
+    "SW1": [
+     13,
+     null,
+     0,
+     "bottom",
+     null
+    ],
+    "SW2": [
+     26.5,
+     null,
+     0,
+     "bottom",
+     null
+    ],
+    "SW3": [
+     40,
+     null,
+     0,
+     "bottom",
+     null
+    ],
+    "SW4": [
+     53.5,
+     null,
+     0,
+     "bottom",
+     null
+    ],
+    "SW5": [
+     67,
+     null,
+     0,
+     "bottom",
+     null
+    ],
+    "SW6": [
+     57,
+     null,
+     null,
+     "top",
+     null
+    ],
+    "SW7": [
+     11,
+     null,
+     0,
+     "top",
+     null
+    ],
+    "U5": [
+     19,
+     6,
+     null,
+     null,
+     null
+    ],
+    "D4": [
+     36,
+     3.5,
+     null,
+     null,
+     null
+    ],
+    "U6": [
+     24,
+     16,
+     180,
+     null,
+     null
+    ],
+    "L1": [
+     28.2,
+     16.3,
+     180,
+     null,
+     null
+    ],
+    "U7": [
+     16,
+     34,
+     null,
+     null,
+     null
+    ],
+    "C25": [
+     11,
+     27,
+     0,
+     null,
+     null
+    ],
+    "C26": [
+     11,
+     30,
+     0,
+     null,
+     null
+    ],
+    "R35": [
+     15.5,
+     27,
+     0,
+     null,
+     null
+    ],
+    "R36": [
+     15.5,
+     30,
+     0,
+     null,
+     null
+    ],
+    "J4": [
+     null,
+     38.2,
+     270,
+     "left",
+     null
+    ],
+    "H1": [
+     3.0,
+     3.0,
+     null,
+     null,
+     null
+    ],
+    "H2": [
+     77.0,
+     3.0,
+     null,
+     null,
+     null
+    ],
+    "H3": [
+     3.0,
+     45.5,
+     null,
+     null,
+     null
+    ],
+    "H4": [
+     77.0,
+     45.5,
+     null,
+     null,
+     null
+    ]
+   },
    "board": {
     "width": 80,
     "height": 48,
@@ -268,12 +582,12 @@
  },
  "routing": {
   "state": "ok",
-  "time": "2026-11-13T09:08:42",
+  "time": "2026-11-13T09:33:24",
   "summary": {
    "ok": true,
    "failed": [],
    "wirelength_mm": 1315.3,
-   "seconds": 11.3,
+   "seconds": 11.7,
    "nets_total": 59,
    "gnd_fanout_vias": 71,
    "stitch_vias": 142,
@@ -283,7 +597,7 @@
  },
  "pcb": {
   "state": "ok",
-  "time": "2026-11-13T09:08:47",
+  "time": "2026-11-13T09:33:28",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/outdoor_hmi.kicad_pcb"
@@ -291,14 +605,14 @@
  },
  "drc": {
   "state": "ok",
-  "time": "2026-11-13T09:16:34",
+  "time": "2026-11-13T09:33:34",
   "summary": {
    "ok": true,
    "errors": 0,
    "unconnected": 0,
-   "warnings": 67,
+   "warnings": 66,
    "by_type": {
-    "silk_over_copper": 67
+    "silk_over_copper": 66
    },
    "zone_repairs": [],
    "geom": {
@@ -317,12 +631,12 @@
  },
  "checks": {
   "state": "ok",
-  "time": "2026-11-13T09:16:40",
+  "time": "2026-11-13T09:33:37",
   "summary": {
    "ok": true,
    "counts": {
     "error": 0,
-    "warning": 69,
+    "warning": 68,
     "info": 0
    },
    "auto_pass": true,
@@ -334,17 +648,17 @@
    "drc": {
     "ok": true,
     "errors": 0,
-    "warnings": 67,
+    "warnings": 66,
     "unconnected": 0,
     "by_type": {
-     "silk_over_copper": 67
+     "silk_over_copper": 66
     }
    }
   }
  },
  "previews": {
   "state": "ok",
-  "time": "2026-11-13T04:50:30",
+  "time": "2026-11-13T09:33:44",
   "summary": {
    "ok": true,
    "schematic": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/schematic.svg",
