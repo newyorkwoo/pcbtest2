@@ -53,21 +53,39 @@ class SvgView(QGraphicsView):
         mt = Path(path).stat().st_mtime
         if str(path) == str(self._path) and mt == self._mtime:
             return
-        first = self._path is None
+        old_rect = self.scene().sceneRect() if self._path else None
         self._path, self._mtime = path, mt
         self.scene().clear()
         item = QGraphicsSvgItem(str(path))
         self.scene().addItem(item)
         self.scene().setSceneRect(item.boundingRect())
-        if first:
-            self.fitInView(item, Qt.KeepAspectRatio)
+        # Keep the user's zoom on a plain refresh, but re-fit on first load or when the sheet size changed —
+        # otherwise the old zoom/scroll can leave the view on empty paper.
+        if old_rect is None or old_rect != item.boundingRect():
+            self._fit()
+
+    def _fit(self):
+        self._zoomed = False                # follow the window size until the user zooms
+        self.resetTransform()
+        self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        if self._path and not getattr(self, "_zoomed", False):
+            self._fit()
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        if self._path and not getattr(self, "_zoomed", False):
+            self._fit()
 
     def wheelEvent(self, e):
         f = 1.2 if e.angleDelta().y() > 0 else 1 / 1.2
         self.scale(f, f)
+        self._zoomed = True
 
     def mouseDoubleClickEvent(self, e):
-        self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
+        self._fit()
 
 
 class ImageView(QLabel):
