@@ -116,7 +116,7 @@ class WiringDiagramTab(QWidget):
         right = QSplitter(Qt.Vertical)
         top = QWidget(); tv = QVBoxLayout(top); tv.setContentsMargins(0, 0, 0, 0)
         bar = QHBoxLayout()
-        self.title = QLabel("實體接線圖：元件依板上實際位置，彩色線 = 腳對腳的接線")
+        self.title = QLabel("實體接線圖：元件依板上實際位置，彩色線繞過元件、腳對腳接線")
         self.title.setFont(QFont("", 13, QFont.Bold))
         bar.addWidget(self.title, 1)
         for text, fn in (("全圖", lambda: self.view.fit()), ("清除標示", self.clear),
@@ -127,7 +127,7 @@ class WiringDiagramTab(QWidget):
         tv.addWidget(self.view, 1)
         right.addWidget(top)
         self.table = QTableWidget(0, 8)
-        self.table.setHorizontalHeaderLabels(["線號", "線色", "網路", "起點", "起點腳名", "終點", "終點腳名", "長度 mm"])
+        self.table.setHorizontalHeaderLabels(["線號", "線色", "網路", "起點", "起點腳名", "終點", "終點腳名", "走線長度 mm"])
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.verticalHeader().setVisible(False)
@@ -215,7 +215,7 @@ class WiringDiagramTab(QWidget):
         f_pin = QFont(); f_pin.setPixelSize(max(1, int(0.55 * U)))
         sel_parts = hi.get("parts", set())
         for ref, p in self.data["parts"].items():
-            x0, y0, x1, y1 = p["bbox"]
+            x0, y0, x1, y1 = p.get("body") or p["bbox"]
             on = ref in sel_parts
             pen = QPen(QColor("#1e6fd9") if on else QColor("#8a8f98"), (0.3 if on else 0.12) * U,
                        Qt.SolidLine if p["side"] == "F" else Qt.DashLine)
@@ -251,13 +251,16 @@ class WiringDiagramTab(QWidget):
                 continue
             col = QColor(w["color"])
             width = 0.55 if lit else 0.32
-            path = QPainterPath(QPointF(w["x1"] * U, w["y1"] * U))
-            path.lineTo(w["x2"] * U, w["y2"] * U)
-            casing = sc.addPath(path, QPen(QColor(255, 255, 255, 230), (width + 0.25) * U, Qt.SolidLine, Qt.RoundCap))
-            line = sc.addPath(path, QPen(col, width * U, Qt.SolidLine, Qt.RoundCap))
+            pts = w.get("path") or [[w["x1"], w["y1"]], [w["x2"], w["y2"]]]
+            path = QPainterPath(QPointF(pts[0][0] * U, pts[0][1] * U))
+            for x, y in pts[1:]:
+                path.lineTo(x * U, y * U)
+            casing = sc.addPath(path, QPen(QColor(255, 255, 255, 230), (width + 0.22) * U, Qt.SolidLine, Qt.RoundCap,
+                                           Qt.RoundJoin))
+            line = sc.addPath(path, QPen(col, width * U, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             tip = (f"線 #{w['no']} · {w['color_name']} · 網路 {w['net']}\n"
                    f"{w['from']} {_pretty(w['from_name'])}  →  {w['to']} {_pretty(w['to_name'])}\n"
-                   f"直線長度 {w['length']} mm")
+                   f"走線長度 {w['length']} mm（直線 {w.get('straight', w['length'])} mm）")
             line.setToolTip(tip); casing.setToolTip(tip)
             z = 20 if lit else 10
             casing.setZValue(z); line.setZValue(z + 1)
@@ -331,11 +334,14 @@ class WiringDiagramTab(QWidget):
         kind, name = self.sel
         if kind == "net":
             ws = [w for w in self.data["wires"] if w["net"] == name]
-            xs = [w["x1"] for w in ws] + [w["x2"] for w in ws]; ys = [w["y1"] for w in ws] + [w["y2"] for w in ws]
+            xs = [q[0] for w in ws for q in w.get("path", [])] or [w["x1"] for w in ws]
+            ys = [q[1] for w in ws for q in w.get("path", [])] or [w["y1"] for w in ws]
         elif kind == "part":
             b = self.data["parts"][name]["bbox"]; xs, ys = [b[0], b[2]], [b[1], b[3]]
         else:
-            w = self.by_no[name]; xs, ys = [w["x1"], w["x2"]], [w["y1"], w["y2"]]
+            w = self.by_no[name]
+            xs = [q[0] for q in w.get("path", [[w["x1"], w["y1"]], [w["x2"], w["y2"]]])]
+            ys = [q[1] for q in w.get("path", [[w["x1"], w["y1"]], [w["x2"], w["y2"]]])]
         if not xs:
             return
         pad = 6
@@ -359,7 +365,8 @@ class WiringDiagramTab(QWidget):
         for w in self.data["wires"]:
             if not self._visible(w) and not (self.sel and self.sel == ("net", w["net"])):
                 continue
-            d = _seg_dist(x, y, w["x1"], w["y1"], w["x2"], w["y2"])
+            pts = w.get("path") or [[w["x1"], w["y1"]], [w["x2"], w["y2"]]]
+            d = min(_seg_dist(x, y, *pts[i], *pts[i + 1]) for i in range(len(pts) - 1))
             if d < best[0]:
                 best = (d, w)
         if best[1]:
@@ -413,7 +420,7 @@ class WiringDiagramTab(QWidget):
 
     def clear(self):
         self.sel = None
-        self.title.setText("實體接線圖：元件依板上實際位置，彩色線 = 腳對腳的接線")
+        self.title.setText("實體接線圖：元件依板上實際位置，彩色線繞過元件、腳對腳接線")
         self.net_list.clearSelection()
         if self.data:
             self.redraw()
@@ -427,7 +434,7 @@ class WiringDiagramTab(QWidget):
         path = self.out_dir / "wiring_list.csv"
         with path.open("w", newline="", encoding="utf-8-sig") as f:
             wr = csv.writer(f)
-            wr.writerow(["線號", "線色", "網路", "起點 (元件.腳)", "起點腳名", "終點 (元件.腳)", "終點腳名", "直線長度 mm"])
+            wr.writerow(["線號", "線色", "網路", "起點 (元件.腳)", "起點腳名", "終點 (元件.腳)", "終點腳名", "走線長度 mm"])
             for w in self.data["wires"]:
                 wr.writerow([w["no"], w["color_name"], w["net"], w["from"], _pretty(w["from_name"]), w["to"],
                              _pretty(w["to_name"]), w["length"]])
