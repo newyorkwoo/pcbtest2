@@ -1,0 +1,33 @@
+Differential audio input network into PAM8302A (C25/C26, R35/R36, C23/C24)
+* @title Amp input: 80 Hz high-pass, ~300 kHz low-pass, FRS 467 MHz rejection
+* @plot vdb(vd)
+* @bandwidth vd
+* Hand calc (per leg, PAM8302 input modelled as 10k to its bias, as in fm_radio sim 03 - verify Ri):
+*   passband vd/vin = Ri/(Rsrc+R35+Ri) = 10k/20.1k -> -6.1 dB
+*   high-pass  f = 1/(2*pi*20.1k*100n) = 79 Hz
+*   low-pass   Thevenin (10.1k || 10k) = 5.0k with C23 100p -> 315 kHz
+*   467 MHz: ideal RC -> ~ -6 - 20*log10(467M/315k) = -69 dB. Real 0603 C0G ESL (~0.6 nH, SRF ~650 MHz)
+*   limits this to roughly -45..-55 dB in hardware; the sim is the ideal bound.
+* @expect gain_1k -7 -5
+* @expect f_low 50 120
+* @expect f_high 200e3 500e3
+* @expect att_467m -90 -55
+VIN in 0 DC 0 AC 1
+EP audio_p 0 in 0 0.5
+EN audio_n 0 in 0 -0.5
+RSP audio_p sp 50
+RSN audio_n sn 50
+* exactly design.yaml
+C25 sp amp_inp_c 100n
+R35 amp_inp_c amp_inp 10k
+C23 amp_inp 0 100p
+C26 sn amp_inn_c 100n
+R36 amp_inn_c amp_inn 10k
+C24 amp_inn 0 100p
+RIP amp_inp 0 10k
+RIN amp_inn 0 10k
+EVD vd 0 amp_inp amp_inn 1
+.ac dec 40 1 1G
+.meas ac gain_1k FIND vdb(vd) AT=1k
+.meas ac att_467m FIND vdb(vd) AT=467e6
+.end

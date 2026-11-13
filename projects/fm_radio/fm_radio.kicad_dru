@@ -1,0 +1,7 @@
+(version 1)
+(rule "fine_pitch_J1"
+  (constraint clearance (min 0.127mm))
+  (condition "A.Type == 'Pad' && B.Type == 'Pad' && A.memberOfFootprint('J1') && B.memberOfFootprint('J1')"))
+(rule "fine_pitch_U6"
+  (constraint clearance (min 0.145mm))
+  (condition "A.Type == 'Pad' && B.Type == 'Pad' && A.memberOfFootprint('U6') && B.memberOfFootprint('U6')"))

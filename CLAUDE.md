@@ -1,0 +1,45 @@
+# aipcb — Claude-driven local EDA
+
+Claude is the circuit designer **and** the design reviewer. KiCad 10 (local) is the file format,
+ERC/DRC and Gerber engine; `aipcb/` adds the parts KiCad does not automate.
+Everything runs offline on this machine.
+
+## Layout
+- `aipcb/` engine: `spec.py` (design.yaml model + validation), `library.py` (KiCad libs, custom part generator),
+  `schematic.py`, `placement.py` (physics placer), `router.py` (2-layer A* router, rip-up & reroute, GND fan-out),
+  `pcb.py`, `zonefix.py` (closed-loop pour repair), `simulate.py` (KiCad's libngspice), `checks.py`, `fab.py`,
+  `pipeline.py` (stages + out/status.json), `mcp_server.py`, `gui/app.py`.
+- `projects/<name>/design.yaml` — **the single source of truth**. Never hand-edit generated `.kicad_*` files;
+  change design.yaml and rebuild.
+- `projects/<name>/sim/*.cir` — SPICE decks; `out/` — every generated report/preview/fab file.
+
+## Commands
+```
+.venv/bin/python -m aipcb build <project>       # full flow (library→…→previews), 1–4 min
+.venv/bin/python -m aipcb <stage> <project>     # library validate schematic erc place route pcb drc sim checks previews
+.venv/bin/python -m aipcb review-package <p>    # data for the AI review
+.venv/bin/python -m aipcb fab <p> [--force]     # gated on checks + review PASS
+.venv/bin/python -m aipcb gui [project]         # desktop dashboard
+```
+MCP server `aipcb` (see .mcp.json) exposes the same flow as tools.
+
+## Designing (Claude as designer)
+1. Pick parts: `search_symbols`, `get_symbol_pins`, `search_footprints`, `get_footprint_pads`. Prefer KiCad stock
+   symbols/footprints. A missing chip goes in `custom_symbols:` (pins `[number, name, type, side]`) with a stock
+   footprint where possible — and its pinout must be cross-checked against the datasheet in the review.
+2. Nets are `REF.PIN` (pin number, or a pin name — a name shared by several pins selects all, e.g. `U1.GND`).
+   Quote tokens containing braces: `"U2.V_{DD}"`. Every pin must be on a net or listed in `nc:`.
+3. Placement hints in `place:` — `edge: top|bottom|left|right` (+`edge_offset`), `x`/`y` (board-relative mm),
+   `rot`, `near: REF.PIN` (+`near_dist`) for decoupling / crystals / ESD. Use `block:` to group functions.
+4. `rules.power_nets` get `power_track` width; `route_first` for critical nets.
+5. Write SPICE decks that **mirror design.yaml exactly** (same topology/values) and state expectations with
+   `* @expect`. Derive expected values by hand first; when a sim disagrees, decide whether the design or the
+   expectation is wrong and say which.
+6. `build_board` → read `checks`, `erc`, `drc`; fix design.yaml (or placement hints) and rebuild until DRC has
+   0 errors / 0 unconnected.
+
+## Reviewing (Claude as reviewer) — before any fab export
+Call `get_review_package`, go through every item of `review_checklist`, verify each IC pin against its datasheet
+knowledge, then `submit_review` with PASS / CONDITIONAL / FAIL and concrete findings. Only PASS unlocks
+`export_fab` (`force` is for prototypes and is recorded in the manifest). Be honest: unverifiable items
+(e.g. AI-generated pinouts, LCSC numbers) are CONDITIONAL, not PASS.

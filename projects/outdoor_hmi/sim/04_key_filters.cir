@@ -1,0 +1,31 @@
+Key and encoder RC deglitch filters (front key: R12 10k / R17 100k / C8 10n ; encoder: R22 10k / R25 10k / C13 10n)
+* @title Key/encoder filter edge timing seen by TCA9554 / AP (VIL 0.3*VCC = 0.99 V, VIH 0.7*VCC = 2.31 V)
+* @plot v(btn) v(enc)
+* Hand calc: key press  tau = 100k*10n = 1.0 ms -> t(<0.99 V) = 1.0m*ln(3.3/0.99) = 1.2 ms
+*            key release tau = 110k*10n = 1.1 ms -> t(>2.31 V) = 1.1m*ln(1/0.3) = 1.32 ms
+*            encoder press tau = 0.1 ms -> 0.12 ms ; release tau 0.2 ms -> 0.24 ms (OK to ~1 kHz edge rate)
+* A 50 us contact bounce must not reach VIL on the key line (the encoder line dips to ~2.0 V, also above VIL).
+* @expect t_key_press 0.8e-3 1.6e-3
+* @expect t_key_release 0.9e-3 1.8e-3
+* @expect t_enc_press 0.08e-3 0.2e-3
+* @expect t_enc_release 0.15e-3 0.35e-3
+* @expect v_bounce_min 2.0 3.3
+V33 v33 0 3.3
+* contact: a 50 us bounce at 1 ms, then a real press 5..15 ms
+VC ctl 0 PWL(0 0 1m 0 1.001m 1 1.05m 1 1.051m 0 5m 0 5.001m 1 15m 1 15.001m 0)
+SK braw 0 ctl 0 SWK
+SE eraw 0 ctl 0 SWK
+.model SWK SW(Ron=0.05 Roff=1e10 Vt=0.5 Vh=0.1)
+R12 v33 braw 10k
+R17 braw btn 100k
+C8 btn 0 10n
+R22 v33 eraw 10k
+R25 eraw enc 10k
+C13 enc 0 10n
+.tran 2u 25m
+.meas tran t_key_press   TRIG v(ctl) VAL=0.5 RISE=2 TARG v(btn) VAL=0.99 FALL=1
+.meas tran t_key_release TRIG v(ctl) VAL=0.5 FALL=2 TARG v(btn) VAL=2.31 RISE=1
+.meas tran t_enc_press   TRIG v(ctl) VAL=0.5 RISE=2 TARG v(enc) VAL=0.99 FALL=1
+.meas tran t_enc_release TRIG v(ctl) VAL=0.5 FALL=2 TARG v(enc) VAL=2.31 RISE=2
+.meas tran v_bounce_min MIN v(btn) FROM=0.9m TO=3m
+.end

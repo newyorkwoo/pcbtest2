@@ -1,0 +1,300 @@
+{
+ "library": {
+  "state": "ok",
+  "time": "2026-11-12T20:09:49",
+  "summary": {
+   "ok": true,
+   "generated": [
+    "symbol aipcb_custom:RDA5807M"
+   ]
+  }
+ },
+ "validate": {
+  "state": "ok",
+  "time": "2026-11-12T20:09:52",
+  "summary": {
+   "project": "fm_radio",
+   "parts": 75,
+   "nets": 48,
+   "pins_connected": 212,
+   "nc_pins": 32,
+   "errors": [],
+   "warnings": [],
+   "ok": true
+  }
+ },
+ "schematic": {
+  "state": "ok",
+  "time": "2026-11-12T20:09:56",
+  "summary": {
+   "ok": true,
+   "file": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/fm_radio.kicad_sch"
+  }
+ },
+ "erc": {
+  "state": "ok",
+  "time": "2026-11-12T20:10:01",
+  "summary": {
+   "ok": true,
+   "errors": 0,
+   "warnings": 0
+  }
+ },
+ "placement": {
+  "state": "ok",
+  "time": "2026-11-12T20:10:36",
+  "summary": {
+   "ok": true,
+   "wirelength": 902.15,
+   "overlap": 0.0,
+   "outside": 0.0,
+   "near": 44.57,
+   "total": 946.73,
+   "problems": [],
+   "board": {
+    "width": 80,
+    "height": 60,
+    "origin": 100.0
+   }
+  }
+ },
+ "routing": {
+  "state": "ok",
+  "time": "2026-11-12T20:11:41",
+  "summary": {
+   "ok": true,
+   "failed": [],
+   "wirelength_mm": 982.4,
+   "seconds": 40.4,
+   "nets_total": 48,
+   "gnd_fanout_vias": 59,
+   "stitch_vias": 146,
+   "gnd_unconnected": [],
+   "pass": 2
+  }
+ },
+ "pcb": {
+  "state": "ok",
+  "time": "2026-11-12T20:11:44",
+  "summary": {
+   "ok": true,
+   "file": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/fm_radio.kicad_pcb"
+  }
+ },
+ "drc": {
+  "state": "ok",
+  "time": "2026-11-12T20:11:50",
+  "summary": {
+   "ok": true,
+   "errors": 0,
+   "unconnected": 0,
+   "warnings": 33,
+   "by_type": {
+    "silk_over_copper": 33
+   },
+   "zone_repairs": []
+  }
+ },
+ "simulation": {
+  "state": "ok",
+  "time": "2026-11-12T20:11:50",
+  "summary": {
+   "ok": true,
+   "count": 4,
+   "results": [
+    {
+     "name": "01_power_path",
+     "ok": true,
+     "measures": {
+      "vsys_usb": 4.605334,
+      "vsys_bat": 3.668297,
+      "vsys_min": 3.000766,
+      "t_ok": 0.0113248,
+      "t_takeover": 0.00932481
+     },
+     "checks": [
+      {
+       "meas": "vsys_usb",
+       "min": 4.4,
+       "max": 4.9,
+       "value": 4.605334,
+       "pass": true
+      },
+      {
+       "meas": "vsys_bat",
+       "min": 3.55,
+       "max": 3.75,
+       "value": 3.668297,
+       "pass": true
+      },
+      {
+       "meas": "t_takeover",
+       "min": 0.0,
+       "max": 0.015,
+       "value": 0.00932481,
+       "pass": true
+      }
+     ],
+     "error": null
+    },
+    {
+     "name": "02_ldo_dropout",
+     "ok": true,
+     "measures": {
+      "v3v3_at_37": 3.297,
+      "vbat_brownout": 3.3281
+     },
+     "checks": [
+      {
+       "meas": "v3v3_at_37",
+       "min": 3.25,
+       "max": 3.35,
+       "value": 3.297,
+       "pass": true
+      },
+      {
+       "meas": "vbat_brownout",
+       "min": 3.0,
+       "max": 3.35,
+       "value": 3.3281,
+       "pass": true
+      }
+     ],
+     "error": null
+    },
+    {
+     "name": "03_audio_mixer",
+     "ok": true,
+     "measures": {
+      "gain_1k": -16.88463,
+      "gmax": -16.879970901880235,
+      "f_low": 6.832549574783425,
+      "f_high": 25202.069010113573
+     },
+     "checks": [
+      {
+       "meas": "f_high",
+       "min": 15000.0,
+       "max": 40000.0,
+       "value": 25202.069010113573,
+       "pass": true
+      },
+      {
+       "meas": "f_low",
+       "min": 1.0,
+       "max": 60.0,
+       "value": 6.832549574783425,
+       "pass": true
+      },
+      {
+       "meas": "gain_1k",
+       "min": -19.0,
+       "max": -14.0,
+       "value": -16.88463,
+       "pass": true
+      }
+     ],
+     "error": null
+    },
+    {
+     "name": "04_auto_reset",
+     "ok": true,
+     "measures": {
+      "en_low": 0.03072329,
+      "t_en_rise": 0.119216,
+      "io0_at_en_rise": 0.03070935,
+      "en_final": 3.299993
+     },
+     "checks": [
+      {
+       "meas": "en_low",
+       "min": 0.0,
+       "max": 0.4,
+       "value": 0.03072329,
+       "pass": true
+      },
+      {
+       "meas": "io0_at_en_rise",
+       "min": 0.0,
+       "max": 0.6,
+       "value": 0.03070935,
+       "pass": true
+      },
+      {
+       "meas": "en_final",
+       "min": 3.0,
+       "max": 3.35,
+       "value": 3.299993,
+       "pass": true
+      }
+     ],
+     "error": null
+    }
+   ]
+  }
+ },
+ "checks": {
+  "state": "ok",
+  "time": "2026-11-12T20:11:54",
+  "summary": {
+   "ok": true,
+   "counts": {
+    "error": 0,
+    "warning": 36,
+    "info": 0
+   },
+   "auto_pass": true,
+   "erc": {
+    "ok": true,
+    "errors": 0,
+    "warnings": 0
+   },
+   "drc": {
+    "ok": true,
+    "errors": 0,
+    "warnings": 33,
+    "unconnected": 0,
+    "by_type": {
+     "silk_over_copper": 33
+    }
+   }
+  }
+ },
+ "previews": {
+  "state": "ok",
+  "time": "2026-11-12T20:12:01",
+  "summary": {
+   "ok": true,
+   "schematic": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/schematic.svg",
+   "pcb_top": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/pcb_top.svg",
+   "pcb_bottom": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/pcb_bottom.svg",
+   "pcb_all": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/pcb_all.svg",
+   "render_top": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/render_top.png",
+   "render_iso": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/render_iso.png",
+   "render_bottom": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/render_bottom.png"
+  }
+ },
+ "review": {
+  "state": "fail",
+  "time": "2026-11-11T23:02:49",
+  "summary": {
+   "ok": false,
+   "verdict": "CONDITIONAL"
+  }
+ },
+ "fab": {
+  "state": "ok",
+  "time": "2026-11-11T23:03:14",
+  "summary": {
+   "ok": true,
+   "dir": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/fab",
+   "gerber_log": "",
+   "gate": {
+    "review": "CONDITIONAL",
+    "auto_pass": true
+   },
+   "forced": true,
+   "note": "JLCPCB CPL rotations may need per-footprint offsets; check in their preview before ordering."
+  }
+ }
+}

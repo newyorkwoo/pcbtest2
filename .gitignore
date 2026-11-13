@@ -1,0 +1,25 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# KiCad local state / auto-backups
+*.kicad_prl
+fp-info-cache
+*-backups/
+.history/
+*.lck
+\#auto_saved_files#
+_autosave-*
+
+# Regenerable pipeline outputs (rebuild from design.yaml)
+projects/*/out/preview/
+projects/*/out/sim/
+projects/*/out/check.net
+projects/*/out/pipeline.log
+projects/*/out/fab/gerbers/
+projects/*/out/fab/*.step
+
+# OS / editor
+.DS_Store
+.claude/

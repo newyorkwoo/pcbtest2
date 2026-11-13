@@ -1,0 +1,31 @@
+{
+ "ok": true,
+ "dir": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/fab",
+ "files": [
+  "fm_radio.step",
+  "fm_radio_BOM.csv",
+  "fm_radio_CPL.csv",
+  "fm_radio_gerbers.zip",
+  "fm_radio_schematic.pdf",
+  "gerbers/fm_radio-B_Cu.gbl",
+  "gerbers/fm_radio-B_Mask.gbs",
+  "gerbers/fm_radio-B_Paste.gbp",
+  "gerbers/fm_radio-B_Silkscreen.gbo",
+  "gerbers/fm_radio-Edge_Cuts.gm1",
+  "gerbers/fm_radio-F_Cu.gtl",
+  "gerbers/fm_radio-F_Mask.gts",
+  "gerbers/fm_radio-F_Paste.gtp",
+  "gerbers/fm_radio-F_Silkscreen.gto",
+  "gerbers/fm_radio-drl_map.gbr",
+  "gerbers/fm_radio-job.gbrjob",
+  "gerbers/fm_radio.drl",
+  "pos_kicad.csv"
+ ],
+ "gerber_log": "",
+ "gate": {
+  "review": "CONDITIONAL",
+  "auto_pass": true
+ },
+ "forced": true,
+ "note": "JLCPCB CPL rotations may need per-footprint offsets; check in their preview before ordering."
+}

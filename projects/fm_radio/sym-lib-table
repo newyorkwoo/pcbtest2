@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "aipcb_custom")(type "KiCad")(uri "${KIPRJMOD}/lib/aipcb_custom.kicad_sym")(options "")(descr "aipcb project lib"))
+)

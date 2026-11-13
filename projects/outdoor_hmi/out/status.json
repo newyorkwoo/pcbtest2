@@ -1,0 +1,355 @@
+{
+ "validate": {
+  "state": "ok",
+  "time": "2026-11-13T04:46:57",
+  "summary": {
+   "project": "outdoor_hmi",
+   "parts": 100,
+   "nets": 59,
+   "pins_connected": 280,
+   "nc_pins": 9,
+   "errors": [],
+   "warnings": [],
+   "ok": true
+  }
+ },
+ "simulation": {
+  "state": "ok",
+  "time": "2026-11-13T04:50:21",
+  "summary": {
+   "ok": true,
+   "count": 4,
+   "results": [
+    {
+     "name": "01_sos_long_press",
+     "ok": true,
+     "measures": {
+      "t_trip": 2.961657,
+      "t_trip_lo": 2.139906,
+      "t_trip_hi": 3.979766,
+      "v_res": 0.2000477,
+      "v_short_max": 0.7998572,
+      "v_press_on": 3.299967
+     },
+     "checks": [
+      {
+       "meas": "t_trip",
+       "min": 2.7,
+       "max": 3.3,
+       "value": 2.961657,
+       "pass": true
+      },
+      {
+       "meas": "t_trip_lo",
+       "min": 1.9,
+       "max": 3.0,
+       "value": 2.139906,
+       "pass": true
+      },
+      {
+       "meas": "t_trip_hi",
+       "min": 3.4,
+       "max": 4.3,
+       "value": 3.979766,
+       "pass": true
+      },
+      {
+       "meas": "v_res",
+       "min": 0.0,
+       "max": 0.6,
+       "value": 0.2000477,
+       "pass": true
+      },
+      {
+       "meas": "v_short_max",
+       "min": 0.0,
+       "max": 1.25,
+       "value": 0.7998572,
+       "pass": true
+      },
+      {
+       "meas": "v_press_on",
+       "min": 3.0,
+       "max": 3.35,
+       "value": 3.299967,
+       "pass": true
+      }
+     ],
+     "error": null
+    },
+    {
+     "name": "02_amp_input_filter",
+     "ok": true,
+     "measures": {
+      "gain_1k": -6.071757,
+      "att_467m": -69.39072,
+      "gmax": -6.046618586185801,
+      "f_low": 79.51031597591206,
+      "f_high": 316981.6659952432
+     },
+     "checks": [
+      {
+       "meas": "gain_1k",
+       "min": -7.0,
+       "max": -5.0,
+       "value": -6.071757,
+       "pass": true
+      },
+      {
+       "meas": "f_low",
+       "min": 50.0,
+       "max": 120.0,
+       "value": 79.51031597591206,
+       "pass": true
+      },
+      {
+       "meas": "f_high",
+       "min": 200000.0,
+       "max": 500000.0,
+       "value": 316981.6659952432,
+       "pass": true
+      },
+      {
+       "meas": "att_467m",
+       "min": -90.0,
+       "max": -55.0,
+       "value": -69.39072,
+       "pass": true
+      }
+     ],
+     "error": null
+    },
+    {
+     "name": "03_sos_led_current",
+     "ok": true,
+     "measures": {
+      "i_30": 0.05843003,
+      "i_37": 0.09676366,
+      "i_435": 0.1328058,
+      "i_435_lowvf": 0.1535061,
+      "p_r37_435": 0.1455059
+     },
+     "checks": [
+      {
+       "meas": "i_30",
+       "min": 0.035,
+       "max": 0.07,
+       "value": 0.05843003,
+       "pass": true
+      },
+      {
+       "meas": "i_37",
+       "min": 0.08,
+       "max": 0.11,
+       "value": 0.09676366,
+       "pass": true
+      },
+      {
+       "meas": "i_435",
+       "min": 0.115,
+       "max": 0.145,
+       "value": 0.1328058,
+       "pass": true
+      },
+      {
+       "meas": "p_r37_435",
+       "min": 0.0,
+       "max": 0.2,
+       "value": 0.1455059,
+       "pass": true
+      },
+      {
+       "meas": "i_435_lowvf",
+       "min": 0.13,
+       "max": 0.18,
+       "value": 0.1535061,
+       "pass": true
+      }
+     ],
+     "error": null
+    },
+    {
+     "name": "04_key_filters",
+     "ok": true,
+     "measures": {
+      "t_key_press": 0.001202694,
+      "t_key_release": 0.001324365,
+      "t_enc_press": 0.0001204549,
+      "t_enc_release": 0.0002408402,
+      "v_bounce_min": 3.139065
+     },
+     "checks": [
+      {
+       "meas": "t_key_press",
+       "min": 0.0008,
+       "max": 0.0016,
+       "value": 0.001202694,
+       "pass": true
+      },
+      {
+       "meas": "t_key_release",
+       "min": 0.0009,
+       "max": 0.0018,
+       "value": 0.001324365,
+       "pass": true
+      },
+      {
+       "meas": "t_enc_press",
+       "min": 8e-05,
+       "max": 0.0002,
+       "value": 0.0001204549,
+       "pass": true
+      },
+      {
+       "meas": "t_enc_release",
+       "min": 0.00015,
+       "max": 0.00035,
+       "value": 0.0002408402,
+       "pass": true
+      },
+      {
+       "meas": "v_bounce_min",
+       "min": 2.0,
+       "max": 3.3,
+       "value": 3.139065,
+       "pass": true
+      }
+     ],
+     "error": null
+    }
+   ]
+  }
+ },
+ "library": {
+  "state": "ok",
+  "time": "2026-11-13T04:46:55",
+  "summary": {
+   "ok": true,
+   "generated": [
+    "footprint aipcb_custom:Alps_EC12D_Switch_Vertical",
+    "footprint aipcb_custom:LED_Broadcom_2835_DFN2"
+   ]
+  }
+ },
+ "schematic": {
+  "state": "ok",
+  "time": "2026-11-13T04:47:00",
+  "summary": {
+   "ok": true,
+   "file": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/outdoor_hmi.kicad_sch"
+  }
+ },
+ "erc": {
+  "state": "ok",
+  "time": "2026-11-13T04:47:04",
+  "summary": {
+   "ok": true,
+   "errors": 0,
+   "warnings": 0
+  }
+ },
+ "placement": {
+  "state": "fail",
+  "time": "2026-11-13T04:47:49",
+  "summary": {
+   "ok": false,
+   "wirelength": 1338.94,
+   "overlap": 1.38,
+   "outside": 0.9,
+   "near": 325.79,
+   "total": 1773.8,
+   "problems": [],
+   "board": {
+    "width": 80,
+    "height": 48,
+    "origin": 100.0
+   }
+  }
+ },
+ "routing": {
+  "state": "ok",
+  "time": "2026-11-13T04:50:12",
+  "summary": {
+   "ok": true,
+   "failed": [],
+   "wirelength_mm": 1315.3,
+   "seconds": 11.2,
+   "nets_total": 59,
+   "gnd_fanout_vias": 71,
+   "stitch_vias": 142,
+   "gnd_unconnected": [],
+   "pass": 5
+  }
+ },
+ "pcb": {
+  "state": "ok",
+  "time": "2026-11-13T04:50:15",
+  "summary": {
+   "ok": true,
+   "file": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/outdoor_hmi.kicad_pcb"
+  }
+ },
+ "drc": {
+  "state": "ok",
+  "time": "2026-11-13T04:50:20",
+  "summary": {
+   "ok": true,
+   "errors": 0,
+   "unconnected": 0,
+   "warnings": 67,
+   "by_type": {
+    "silk_over_copper": 67
+   },
+   "zone_repairs": []
+  }
+ },
+ "checks": {
+  "state": "ok",
+  "time": "2026-11-13T04:50:24",
+  "summary": {
+   "ok": true,
+   "counts": {
+    "error": 0,
+    "warning": 69,
+    "info": 0
+   },
+   "auto_pass": true,
+   "erc": {
+    "ok": true,
+    "errors": 0,
+    "warnings": 0
+   },
+   "drc": {
+    "ok": true,
+    "errors": 0,
+    "warnings": 67,
+    "unconnected": 0,
+    "by_type": {
+     "silk_over_copper": 67
+    }
+   }
+  }
+ },
+ "previews": {
+  "state": "ok",
+  "time": "2026-11-13T04:50:30",
+  "summary": {
+   "ok": true,
+   "schematic": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/schematic.svg",
+   "pcb_top": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/pcb_top.svg",
+   "pcb_bottom": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/pcb_bottom.svg",
+   "pcb_all": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/pcb_all.svg",
+   "render_top": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/render_top.png",
+   "render_iso": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/render_iso.png",
+   "render_bottom": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/render_bottom.png"
+  }
+ },
+ "review": {
+  "state": "fail",
+  "time": "2026-11-13T04:51:10",
+  "summary": {
+   "ok": false,
+   "verdict": "CONDITIONAL"
+  }
+ }
+}

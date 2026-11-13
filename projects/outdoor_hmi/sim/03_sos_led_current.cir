@@ -1,0 +1,34 @@
+SOS beacon LED drive: VSYS -> D4 (red 2835) -> R37||R38 (33R each) -> Q1 DMG2302U
+* @title SOS LED current over the battery range
+* @plot i(vs)
+* Hand calc: Vf(red, 100 mA) ~ 2.1 V, R = 16.5 ohm, Q1 Rds(on) ~0.08 ohm at Vgs 3.3 V
+*   3.0 V -> ~52 mA ; 3.7 V -> ~95 mA ; 4.35 V -> ~135 mA (LED rated 150 mA)
+*   per-resistor dissipation at 4.35 V: (0.135/2)^2*33 = 0.15 W < 0.25 W (1206)
+* @expect i_30 0.035 0.070
+* @expect i_37 0.080 0.110
+* @expect i_435 0.115 0.145
+* @expect p_r37_435 0 0.2
+* Broadcom CSMW-LR00-ATV0E Vf spread 1.8/2.1/2.9 V @150 mA: low-Vf corner at 4.35 V must stay < 200 mA (abs max DC)
+*   hand calc: (4.35 - 1.8 - ~0.15) / 16.6 = ~0.150 A
+* @expect i_435_lowvf 0.130 0.180
+VSYS vsys 0 DC 3.7
+D4 vsys led_k DRED
+.model DRED D(Is=1.6e-18 N=2 Rs=1.0)
+R37 led_k led_d 33
+R38 led_k led_d 33
+VS led_d q1d 0
+RQ1 q1d 0 0.08
+* low-Vf corner branch (identical resistors/FET, LED with Vf = 1.8 V @ 150 mA)
+D4L vsys led_kl DREDLO
+.model DREDLO D(Is=2.1e-15 N=2 Rs=1.0)
+R37L led_kl led_dl 33
+R38L led_kl led_dl 33
+VSL led_dl q1dl 0
+RQ1L q1dl 0 0.08
+.dc VSYS 2.8 4.5 0.01
+.meas dc i_30 FIND i(vs) AT=3.0
+.meas dc i_37 FIND i(vs) AT=3.7
+.meas dc i_435 FIND i(vs) AT=4.35
+.meas dc i_435_lowvf FIND i(vsl) AT=4.35
+.meas dc p_r37_435 FIND par('(i(vs)/2)*(i(vs)/2)*33') AT=4.35
+.end

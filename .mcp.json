@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "aipcb": {
+      "command": ".venv/bin/python",
+      "args": ["-m", "aipcb.mcp_server"]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+Power path: USB unplug -> battery takeover (D2 B5819W + Q3 AO3401A, R5 gate pull-down)
+* @title Power path: USB cable unplugged at 2 ms, 250 mA load on VSYS
+* @plot v(vsys) v(vbus) v(vbat)
+* @expect vsys_usb 4.4 4.9
+* @expect vsys_bat 3.55 3.75
+* @expect t_takeover 0 0.015
+* After unplug VBUS floats: only C1 (4.7u) discharging through R5 holds the P-FET gate.
+* While VBUS > VBAT - |Vth| the FET is off and VSYS is fed through its body diode (~3.0 V).
+VUSB src 0 5
+SUSB src vbus ctl 0 SWMOD
+VCTL ctl 0 PWL(0 1 2m 1 2.001m 0)
+.model SWMOD SW(Ron=0.2 Roff=1e9 Vt=0.5 Vh=0.1)
+C1 vbus 0 4.7u
+R5 vbus 0 10k
+VB bat_i 0 3.7
+RB bat_i vbat 0.08
+C2 vbat 0 4.7u
+D2 vbus vsys DSCH
+.model DSCH D(Is=3u N=1.05 Rs=0.06 Cjo=110p)
+M3 vbat vbus vsys vsys PMOD W=1 L=1
+.model PMOD PMOS(Level=1 Vto=-0.9 Kp=12 Lambda=0.01)
+DB3 vbat vsys DBODY
+.model DBODY D(Is=1e-12 N=1.0 Rs=0.05)
+C3 vsys 0 10u
+C4 vsys 0 1u
+RLOAD vsys 0 14.8
+.tran 10u 60m
+.meas tran vsys_usb FIND v(vsys) AT=1.5m
+.meas tran vsys_bat FIND v(vsys) AT=55m
+.meas tran vsys_min MIN v(vsys) FROM=2m TO=60m
+.meas tran t_ok WHEN v(vsys)=3.5 RISE=1 FROM=2.1m
+.meas tran t_takeover PARAM='t_ok-2m'
+.end

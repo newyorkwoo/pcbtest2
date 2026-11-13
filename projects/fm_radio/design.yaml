@@ -1,0 +1,236 @@
+# FM radio + Bluetooth speaker with OLED (channel + local time), USB-C charging.
+# Single source of truth: written/edited by Claude, compiled by aipcb into schematic + PCB.
+project: fm_radio
+title: "FM/BT Pocket Radio"
+rev: A
+company: aipcb
+notes: |
+  Architecture
+  - ESP32-WROOM-32E: Bluetooth Classic A2DP sink (phone -> speaker), WiFi NTP time sync, UI, I2C master.
+  - RDA5807M FM tuner on I2C (0x10/0x11). Reference clock = 32.768 kHz from PCF8563 CLKOUT (open drain, 10k pull-up).
+  - PCF8563 RTC (0x51) keeps local time; backed by CR1220 through BAT54C diode-OR. Time is set by NTP when WiFi is available.
+  - 0.96" SSD1306 OLED module (0x3C) on a 4-pin header: shows frequency / BT state + clock.
+  - Audio: FM L+R and ESP32 DAC1 (IO25, BT audio) are summed by 10k resistors, RC-filtered (fc ~22 kHz),
+    AC-coupled into a PAM8302 class-D mono amplifier driving an 8 ohm / 1 W speaker. AMP_SD (IO26) mutes/powers down the amp.
+  - Power: USB-C (5.1k CC pull-downs = 5 V sink) -> MCP73831 1S Li-ion charger, 500 mA (Rprog 2k).
+    Load sharing: VBUS via Schottky to VSYS; battery via AO3401A P-FET (off while VBUS present).
+    VSYS -> AP2112K-3.3 (600 mA) -> +3V3. Slide switch drives the LDO enable (power on/off). PAM8302 runs from VSYS.
+  - Programming: CH340C USB-UART at 3.3 V with classic DTR/RTS auto-reset transistors; RESET and BOOT buttons.
+  - User controls: UP / DOWN / MODE buttons (ESP32 internal pull-ups). Battery voltage on IO34 via 100k/100k divider.
+
+board:
+  width: 80
+  height: 60
+  corner_radius: 3
+  layers: 2
+  thickness: 1.6
+  fab: jlcpcb
+
+rules:
+  track: 0.2
+  power_track: 0.4
+  clearance: 0.2
+  via: [0.6, 0.3]
+  grid: 0.1
+  edge_clearance: 0.4
+  part_spacing: 0.4
+  power_nets: [VBUS, VBAT, VSYS, "+3V3", SPK_P, SPK_N]
+  route_first: [USB_DP, USB_DN]
+
+custom_symbols:
+  lib: aipcb_custom
+  parts:
+    RDA5807M:
+      ref: U
+      footprint: Package_SO:MSOP-10_3x3mm_P0.5mm
+      description: "Single-chip broadcast FM stereo radio tuner, I2C, MSOP-10"
+      datasheet: "https://www.voti.nl/docs/RDA5807M.pdf"
+      keywords: "FM radio tuner I2C"
+      pins:
+        - [1, SDA, bidirectional, left]
+        - [2, SCLK, input, left]
+        - [4, FMIN, input, left]
+        - [6, RCLK, input, left]
+        - [7, VDD, power_in, right]
+        - [10, LOUT, output, right]
+        - [9, ROUT, output, right]
+        - [3, GND, power_in, bottom]
+        - [5, GND, passive, bottom]
+        - [8, GND, passive, bottom]
+
+parts:
+  # ---------------------------------------------------------------- USB-C / ESD
+  J1: {symbol: "Connector:USB_C_Receptacle_USB2.0_16P", footprint: "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12",
+       value: "USB-C", mpn: "TYPE-C-31-M-12", manufacturer: "Korean Hroparts", lcsc: C165948, block: usb_power,
+       place: {edge: bottom, x: 40, rot: 0}}
+  R1: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 5.1k, mpn: "0603WAF5101T5E", lcsc: C23186, block: usb_power, place: {near: J1.CC1}}
+  R2: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 5.1k, mpn: "0603WAF5101T5E", lcsc: C23186, block: usb_power, place: {near: J1.CC2}}
+  U7: {symbol: "Power_Protection:USBLC6-2SC6", footprint: "Package_TO_SOT_SMD:SOT-23-6", value: USBLC6-2SC6,
+       mpn: USBLC6-2SC6, manufacturer: STMicroelectronics, lcsc: C7519, block: usb_power, place: {near: J1.A6, near_dist: 4}}
+
+  # ---------------------------------------------------------------- charger / power path
+  U2: {symbol: "Battery_Management:MCP73831-2-OT", footprint: "Package_TO_SOT_SMD:SOT-23-5", value: MCP73831-2,
+       mpn: MCP73831T-2ACI/OT, manufacturer: Microchip, lcsc: C424093, block: charger}
+  C1: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 4.7u, mpn: "CL10A475KO8NNNC", lcsc: C19666, block: charger, place: {near: "U2.V_{DD}"}}
+  C2: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 4.7u, mpn: "CL10A475KO8NNNC", lcsc: C19666, block: charger, place: {near: "U2.V_{BAT}"}}
+  R3: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 2k, mpn: "0603WAF2001T5E", lcsc: C22975, block: charger, description: "PROG: Ichg = 1000/R = 500 mA", place: {near: U2.PROG}}
+  R4: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 1k, mpn: "0603WAF1001T5E", lcsc: C21190, block: charger}
+  D1: {symbol: "Device:LED", footprint: "LED_SMD:LED_0603_1608Metric", value: "CHG red", mpn: "KT-0603R", lcsc: C2286, block: charger}
+  J2: {symbol: "Connector_Generic:Conn_01x02", footprint: "Connector_JST:JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal",
+       value: "LiPo 3.7V", mpn: S2B-PH-K-S, manufacturer: JST, lcsc: C173752, block: charger, description: "pin1 = +BAT", place: {edge: bottom, rot: 0}}
+  D2: {symbol: "Device:D_Schottky", footprint: "Diode_SMD:D_SOD-123", value: B5819W, mpn: B5819W, lcsc: C8598, block: charger}
+  Q3: {symbol: "Transistor_FET:AO3401A", footprint: "Package_TO_SOT_SMD:SOT-23", value: AO3401A, mpn: AO3401A,
+       manufacturer: AOS, lcsc: C15127, block: charger}
+  R5: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: charger, description: "Q3 gate pull-down: 10k so VBUS bleeds fast after unplug (sim 01)"}
+  C3: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: 10u, mpn: "CL21A106KAYNNNE", lcsc: C15850, block: charger}
+  R7: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "0603WAF1003T5E", lcsc: C25803, block: charger}
+  R8: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "0603WAF1003T5E", lcsc: C25803, block: charger}
+  C7: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: charger}
+
+  # ---------------------------------------------------------------- 3.3 V regulator
+  U3: {symbol: "Regulator_Linear:AP2112K-3.3", footprint: "Package_TO_SOT_SMD:SOT-23-5", value: AP2112K-3.3,
+       mpn: AP2112K-3.3TRG1, manufacturer: Diodes Inc, lcsc: C51118, block: regulator}
+  C4: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 1u, mpn: "CL10A105KB8NNNC", lcsc: C15849, block: regulator, place: {near: U3.VIN}}
+  C5: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: 10u, mpn: "CL21A106KAYNNNE", lcsc: C15850, block: regulator, place: {near: U3.VOUT}}
+  SW1: {symbol: "Switch:SW_SPDT", footprint: "Button_Switch_SMD:SW_SPDT_PCM12", value: "POWER", mpn: PCM12SMTR,
+        manufacturer: C&K, lcsc: C221841, block: regulator, place: {edge: left, rot: 270}}
+  D4: {symbol: "Device:LED", footprint: "LED_SMD:LED_0603_1608Metric", value: "PWR green", mpn: "KT-0603G", lcsc: C12624, block: regulator}
+  R24: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 2k, mpn: "0603WAF2001T5E", lcsc: C22975, block: regulator}
+
+  # ---------------------------------------------------------------- MCU
+  U1: {symbol: "RF_Module:ESP32-WROOM-32E", footprint: "RF_Module:ESP32-WROOM-32E", value: ESP32-WROOM-32E-N4,
+       mpn: ESP32-WROOM-32E-N4, manufacturer: Espressif, lcsc: C701341, block: mcu,
+       place: {edge: top, edge_offset: 15.25, x: 40, rot: 0}}
+  C8: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: 10u, mpn: "CL21A106KAYNNNE", lcsc: C15850, block: mcu, place: {near: U1.VDD}}
+  C9: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: mcu, place: {near: U1.VDD}}
+  R9: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: mcu, place: {near: U1.EN, near_dist: 3}}
+  C10: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 1u, mpn: "CL10A105KB8NNNC", lcsc: C15849, block: mcu, place: {near: U1.EN, near_dist: 3}}
+  R10: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: mcu}
+  SW2: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_B3U-1000P", value: RESET, mpn: B3U-1000P, manufacturer: Omron, lcsc: C231329, block: mcu}
+  SW3: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_B3U-1000P", value: BOOT, mpn: B3U-1000P, manufacturer: Omron, lcsc: C231329, block: mcu}
+
+  # ---------------------------------------------------------------- USB-UART + auto reset
+  U4: {symbol: "Interface_USB:CH340C", footprint: "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm", value: CH340C,
+       mpn: CH340C, manufacturer: WCH, lcsc: C84681, block: usb_uart}
+  C11: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: usb_uart, place: {near: U4.VCC}}
+  C21: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: usb_uart, place: {near: U4.V3}}
+  R14: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: "0", mpn: "0603WAF0000T5E", lcsc: C21189, block: usb_uart, description: "ties CH340C V3 to VCC (3.3 V operation)"}
+  Q1: {symbol: "Transistor_BJT:MMBT3904", footprint: "Package_TO_SOT_SMD:SOT-23", value: MMBT3904, mpn: MMBT3904, lcsc: C20526, block: usb_uart}
+  Q2: {symbol: "Transistor_BJT:MMBT3904", footprint: "Package_TO_SOT_SMD:SOT-23", value: MMBT3904, mpn: MMBT3904, lcsc: C20526, block: usb_uart}
+  R12: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: usb_uart}
+  R13: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: usb_uart}
+
+  # ---------------------------------------------------------------- I2C peripherals
+  R15: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 4.7k, mpn: "0603WAF4701T5E", lcsc: C23162, block: i2c}
+  R16: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 4.7k, mpn: "0603WAF4701T5E", lcsc: C23162, block: i2c}
+  J3: {symbol: "Connector_Generic:Conn_01x04", footprint: "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+       value: "OLED SSD1306 0.96in", mpn: "PZ254V-11-04P", lcsc: C2932, block: i2c, description: "GND VCC SCL SDA"}
+
+  # ---------------------------------------------------------------- RTC
+  U5: {symbol: "Timer_RTC:PCF8563T", footprint: "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm", value: PCF8563T,
+       mpn: PCF8563T/5, manufacturer: NXP, lcsc: C7440, block: rtc}
+  Y1: {symbol: "Device:Crystal", footprint: "Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm", value: 32.768k,
+       mpn: "Q13FC1350000400", lcsc: C32346, block: rtc, place: {near: U5.OSCI, near_dist: 2}}
+  C12: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: rtc, place: {near: U5.VDD}}
+  D3: {symbol: "Diode:BAT54C", footprint: "Package_TO_SOT_SMD:SOT-23", value: BAT54C, mpn: BAT54C, block: rtc}
+  BT1: {symbol: "Device:Battery_Cell", footprint: "Battery:Battery_Panasonic_CR1220-VCN_Vertical_CircularHoles",
+        value: CR1220, mpn: "CR1220-VCN", manufacturer: Panasonic, block: rtc}
+  R17: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: rtc}
+  R18: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: rtc}
+
+  # ---------------------------------------------------------------- FM tuner
+  U6: {symbol: "aipcb_custom:RDA5807M", footprint: "Package_SO:MSOP-10_3x3mm_P0.5mm", value: RDA5807M,
+       mpn: RDA5807M, manufacturer: RDA Microelectronics, block: fm}
+  C13: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: fm, place: {near: U6.VDD}}
+  C14: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: 10u, mpn: "CL21A106KAYNNNE", lcsc: C15850, block: fm, place: {near: U6.VDD, near_dist: 3}}
+  C15: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100p, mpn: "0603CG101J500NT", lcsc: C14858, block: fm, place: {near: U6.FMIN}}
+  AE1: {symbol: "Connector_Generic:Conn_01x01", footprint: "Connector_Wire:SolderWire-0.127sqmm_1x01_D0.48mm_OD1mm",
+        value: "FM wire antenna ~75cm", block: fm, dnp: false, mpn: "wire"}
+
+  # ---------------------------------------------------------------- audio mixer + amplifier
+  R19: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: audio}
+  R20: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: audio}
+  R21: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: audio}
+  C17: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 2.2n, mpn: "CL10B222KB8NNNC", lcsc: C1604, block: audio, description: "mixer RC low-pass ~22 kHz"}
+  C16: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 1u, mpn: "CL10A105KB8NNNC", lcsc: C15849, block: audio}
+  R22: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: audio}
+  R23: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: audio}
+  C18: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 1u, mpn: "CL10A105KB8NNNC", lcsc: C15849, block: audio}
+  U8: {symbol: "Amplifier_Audio:PAM8302AAD", footprint: "Package_SO:MSOP-8_3x3mm_P0.65mm", value: PAM8302A,
+       mpn: PAM8302AADCR, manufacturer: Diodes Inc, lcsc: C113367, block: audio}
+  C19: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: 10u, mpn: "CL21A106KAYNNNE", lcsc: C15850, block: audio, place: {near: U8.VDD, near_dist: 3}}
+  C20: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: audio, place: {near: U8.VDD}}
+  R11: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "0603WAF1003T5E", lcsc: C25803, block: audio, description: "amp off by default"}
+  J4: {symbol: "Connector_Generic:Conn_01x02", footprint: "Connector_JST:JST_SH_SM02B-SRSS-TB_1x02-1MP_P1.00mm_Horizontal",
+       value: "Speaker 8R 1W", mpn: "SM02B-SRSS-TB(LF)(SN)", manufacturer: JST, block: audio,
+       description: "JST-SH 1.0 mm: deliberately different from the battery JST-PH so the cells cannot be swapped in",
+       place: {edge: bottom, rot: 0}}
+
+  # ---------------------------------------------------------------- user interface
+  SW4: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_PTS645Sx43SMTR92", value: UP, mpn: PTS645SM43SMTR92, manufacturer: C&K, block: ui, place: {edge: right, y: 24, rot: 0}}
+  SW5: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_PTS645Sx43SMTR92", value: DOWN, mpn: PTS645SM43SMTR92, manufacturer: C&K, block: ui, place: {edge: right, y: 35, rot: 0}}
+  SW6: {symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_SPST_PTS645Sx43SMTR92", value: MODE, mpn: PTS645SM43SMTR92, manufacturer: C&K, block: ui, place: {edge: right, y: 46, rot: 0}}
+
+  # ---------------------------------------------------------------- mechanical
+  H1: {symbol: "Mechanical:MountingHole", footprint: "MountingHole:MountingHole_2.7mm_M2.5", value: M2.5, block: mechanical, place: {x: 3.5, y: 3.5}}
+  H2: {symbol: "Mechanical:MountingHole", footprint: "MountingHole:MountingHole_2.7mm_M2.5", value: M2.5, block: mechanical, place: {x: 76.5, y: 3.5}}
+  H3: {symbol: "Mechanical:MountingHole", footprint: "MountingHole:MountingHole_2.7mm_M2.5", value: M2.5, block: mechanical, place: {x: 3.5, y: 56.5}}
+  H4: {symbol: "Mechanical:MountingHole", footprint: "MountingHole:MountingHole_2.7mm_M2.5", value: M2.5, block: mechanical, place: {x: 76.5, y: 56.5}}
+
+nets:
+  GND: [J1.GND, J1.SHIELD, R1.2, R2.2, U7.GND, "U2.V_{SS}", R3.2, J2.2, R5.2, R8.2, C7.2, C1.2, C2.2, C3.2,
+        U3.GND, C4.2, C5.2, SW1.C, D4.K, U1.GND, C8.2, C9.2, C10.2, SW2.2, SW3.2, U4.GND, C11.2, C21.2,
+        J3.1, U5.VSS, C12.2, BT1.-, U6.GND, C13.2, C14.2, C17.2, C18.2, U8.GND, C19.2, C20.2, R11.2,
+        SW4.2, SW5.2, SW6.2]
+  VBUS: [J1.VBUS, U7.VBUS, "U2.V_{DD}", C1.1, D1.A, D2.A, Q3.G, R5.1]
+  USB_DP: [J1.D+, U7.I/O1, U4.UD+]
+  USB_DN: [J1.D-, U7.I/O2, U4.UD-]
+  CC1: [J1.CC1, R1.1]
+  CC2: [J1.CC2, R2.1]
+  VBAT: ["U2.V_{BAT}", C2.1, J2.1, Q3.D, R7.1]
+  CHG_STAT: [U2.STAT, R4.2]
+  CHG_LED: [R4.1, D1.K]
+  PROG: [U2.PROG, R3.1]
+  VSYS: [D2.K, Q3.S, C3.1, U3.VIN, C4.1, SW1.A, U8.VDD, C19.1, C20.1]
+  LDO_EN: [U3.EN, SW1.B]
+  VBAT_SENSE: [R7.2, R8.1, C7.1, U1.IO34]
+  "+3V3": [U3.VOUT, C5.1, R24.2, U1.VDD, C8.1, C9.1, R9.1, R10.1, U4.VCC, C11.1, R14.1, R15.1, R16.1, J3.2,
+           D3.1, R17.1, R18.1, U6.VDD, C13.1, C14.1]
+  PWR_LED: [R24.1, D4.A]
+  ESP_EN: [U1.EN, R9.2, C10.1, SW2.1, Q1.C]
+  ESP_IO0: [U1.IO0, R10.2, SW3.1, Q2.C]
+  ESP_TX: [U1.TXD0/IO1, U4.RXD]
+  ESP_RX: [U1.RXD0/IO3, U4.TXD]
+  CH340_V3: [U4.V3, C21.1, R14.2]
+  DTR: ["U4.~{DTR}", R12.1, Q2.E]
+  RTS: ["U4.~{RTS}", R13.1, Q1.E]
+  Q1_B: [Q1.B, R12.2]
+  Q2_B: [Q2.B, R13.2]
+  I2C_SDA: [U1.IO21, R15.2, J3.4, U5.SDA, U6.SDA]
+  I2C_SCL: [U1.IO22, R16.2, J3.3, U5.SCL, U6.SCLK]
+  RTC_INT: ["U5.~{INT}", R18.2, U1.IO4]
+  RCLK_32K: [U5.CLKO, R17.2, U6.RCLK]
+  RTC_VDD: [U5.VDD, D3.3, C12.1]
+  VCOIN: [D3.2, BT1.+]
+  OSCI: [U5.OSCI, Y1.1]
+  OSCO: [U5.OSCO, Y1.2]
+  FM_ANT: [AE1.1, C15.1]
+  FM_IN: [C15.2, U6.FMIN]
+  FM_L: [U6.LOUT, R19.1]
+  FM_R: [U6.ROUT, R20.1]
+  DAC_OUT: [U1.IO25, R21.1]
+  AUDIO_MIX: [R19.2, R20.2, R21.2, C17.1, C16.1]
+  AMP_INP_C: [C16.2, R22.1]
+  AMP_INP: [R22.2, U8.IN+]
+  AMP_INN: [U8.IN-, R23.1]
+  AMP_INN_C: [R23.2, C18.1]
+  AMP_SD: ["U8.~{SD}", R11.1, U1.IO26]
+  SPK_P: [U8.OUT+, J4.1]
+  SPK_N: [U8.OUT-, J4.2]
+  BTN_UP: [SW4.1, U1.IO32]
+  BTN_DOWN: [SW5.1, U1.IO33]
+  BTN_MODE: [SW6.1, U1.IO27]
+
+nc: [J1.SBU1, J1.SBU2, U1.SENSOR_VP, U1.SENSOR_VN, U1.IO35, U1.IO14, U1.IO12, U1.IO13, U1.IO15, U1.IO2,
+     U1.IO16, U1.IO17, U1.IO5, U1.IO18, U1.IO19, U1.IO23, U1.NC, U3.NC, U4.NC, "U4.~{CTS}", "U4.~{DSR}",
+     "U4.~{RI}", "U4.~{DCD}", U4.R232, U8.NC]

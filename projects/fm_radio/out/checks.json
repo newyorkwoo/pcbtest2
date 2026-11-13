@@ -1,0 +1,372 @@
+{
+ "counts": {
+  "error": 0,
+  "warning": 36,
+  "info": 0
+ },
+ "auto_pass": true,
+ "findings": [
+  {
+   "severity": "warning",
+   "category": "library",
+   "message": "U6 uses AI-generated symbol aipcb_custom:RDA5807M: verify pin mapping against datasheet",
+   "refs": [
+    "U6"
+   ]
+  },
+  {
+   "severity": "warning",
+   "category": "power-integrity",
+   "message": "power net VSYS has necked-down track (0.2 mm)",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "power-integrity",
+   "message": "power net +3V3 has necked-down track (0.2 mm)",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C2 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/GND] \u7684\u710a\u76e4 U2 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C2 \u7684\u53c3\u8003\u6b04\u4f4d', '3 \u4e0a [/VBAT] \u7684\u710a\u76e4 U2 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C2 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/CHG_STAT] \u7684\u710a\u76e4 U2 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U2 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/PROG] \u7684\u710a\u76e4 R3 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['SW1 \u7684\u53c3\u8003\u6b04\u4f4d', '3 \u4e0a [/LDO_EN] \u7684\u710a\u76e4 U3 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R23 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/GND] \u7684\u710a\u76e4 C4 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C18 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/+3V3] \u7684\u710a\u76e4 C5 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C8 \u7684\u53c3\u8003\u6b04\u4f4d', '4 \u4e0a [unconnected-(U1-SENSOR_VP-Pad4)] \u7684\u710a\u76e4 U1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C8 \u7684\u53c3\u8003\u6b04\u4f4d', '3 \u4e0a [/ESP_EN] \u7684\u710a\u76e4 U1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C9 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/+3V3] \u7684\u710a\u76e4 C8 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['Q2 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/Q2_B] \u7684\u710a\u76e4 R13 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R13 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/VBAT_SENSE] \u7684\u710a\u76e4 R8 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U8 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/AMP_SD] \u7684\u710a\u76e4 R11 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['J1 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/GND] \u7684\u710a\u76e4 R2 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R1 \u7684\u53c3\u8003\u6b04\u4f4d', 'A4 \u4e0a [/VBUS] \u7684\u710a\u76e4 J1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R1 \u7684\u53c3\u8003\u6b04\u4f4d', 'B9 \u4e0a [/VBUS] \u7684\u710a\u76e4 J1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R1 \u7684\u53c3\u8003\u6b04\u4f4d', 'A1 \u4e0a [/GND] \u7684\u710a\u76e4 J1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R1 \u7684\u53c3\u8003\u6b04\u4f4d', 'B12 \u4e0a [/GND] \u7684\u710a\u76e4 J1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R2 \u7684\u53c3\u8003\u6b04\u4f4d', 'A8 \u4e0a [unconnected-(J1-SBU1-PadA8)] \u7684\u710a\u76e4 J1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R2 \u7684\u53c3\u8003\u6b04\u4f4d', 'B5 \u4e0a [/CC2] \u7684\u710a\u76e4 J1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R2 \u7684\u53c3\u8003\u6b04\u4f4d', 'B6 \u4e0a [/USB_DP] \u7684\u710a\u76e4 J1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C12 \u7684\u53c3\u8003\u6b04\u4f4d', '25 \u4e0a [/ESP_IO0] \u7684\u710a\u76e4 U1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C12 \u7684\u53c3\u8003\u6b04\u4f4d', '26 \u4e0a [/RTC_INT] \u7684\u710a\u76e4 U1 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R20 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/GND] \u7684\u710a\u76e4 C13 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R20 \u7684\u53c3\u8003\u6b04\u4f4d', '6 \u4e0a [/RCLK_32K] \u7684\u710a\u76e4 U6 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R17 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/FM_L] \u7684\u710a\u76e4 R19 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R19 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/RCLK_32K] \u7684\u710a\u76e4 R17 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C15 \u7684\u53c3\u8003\u6b04\u4f4d', '3 \u4e0a [/GND] \u7684\u710a\u76e4 U6 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C15 \u7684\u53c3\u8003\u6b04\u4f4d', '4 \u4e0a [/FM_IN] \u7684\u710a\u76e4 U6 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C15 \u7684\u53c3\u8003\u6b04\u4f4d', '5 \u4e0a [/GND] \u7684\u710a\u76e4 U6 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R17 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/AUDIO_MIX] \u7684\u710a\u76e4 R19 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R19 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/+3V3] \u7684\u710a\u76e4 R17 F.Cu']",
+   "refs": []
+  },
+  {
+   "severity": "warning",
+   "category": "drc",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask [\"B.Silkscreen \u4e0a\u7684 PCB\u6587\u5b57 'FM/BT Pocket Radio rev A'\", 'H3 \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4']",
+   "refs": []
+  }
+ ],
+ "erc": {
+  "ok": true,
+  "errors": 0,
+  "warnings": 0
+ },
+ "drc": {
+  "ok": true,
+  "errors": 0,
+  "warnings": 33,
+  "unconnected": 0,
+  "by_type": {
+   "silk_over_copper": 33
+  }
+ },
+ "simulations": [
+  {
+   "name": "01_power_path",
+   "title": "Power path: USB cable unplugged at 2 ms, 250 mA load on VSYS",
+   "ok": true,
+   "measures": {
+    "vsys_usb": 4.605334,
+    "vsys_bat": 3.668297,
+    "vsys_min": 3.000766,
+    "t_ok": 0.0113248,
+    "t_takeover": 0.00932481
+   },
+   "checks": [
+    {
+     "meas": "vsys_usb",
+     "min": 4.4,
+     "max": 4.9,
+     "value": 4.605334,
+     "pass": true
+    },
+    {
+     "meas": "vsys_bat",
+     "min": 3.55,
+     "max": 3.75,
+     "value": 3.668297,
+     "pass": true
+    },
+    {
+     "meas": "t_takeover",
+     "min": 0.0,
+     "max": 0.015,
+     "value": 0.00932481,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "name": "02_ldo_dropout",
+   "title": "+3V3 vs VBAT at 300 mA (AP2112K-3.3, 250 mV @ 600 mA dropout)",
+   "ok": true,
+   "measures": {
+    "v3v3_at_37": 3.297,
+    "vbat_brownout": 3.3281
+   },
+   "checks": [
+    {
+     "meas": "v3v3_at_37",
+     "min": 3.25,
+     "max": 3.35,
+     "value": 3.297,
+     "pass": true
+    },
+    {
+     "meas": "vbat_brownout",
+     "min": 3.0,
+     "max": 3.35,
+     "value": 3.3281,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "name": "03_audio_mixer",
+   "title": "Audio path: ESP32 DAC (BT) -> mixer -> PAM8302 input",
+   "ok": true,
+   "measures": {
+    "gain_1k": -16.88463,
+    "gmax": -16.879970901880235,
+    "f_low": 6.832549574783425,
+    "f_high": 25202.069010113573
+   },
+   "checks": [
+    {
+     "meas": "f_high",
+     "min": 15000.0,
+     "max": 40000.0,
+     "value": 25202.069010113573,
+     "pass": true
+    },
+    {
+     "meas": "f_low",
+     "min": 1.0,
+     "max": 60.0,
+     "value": 6.832549574783425,
+     "pass": true
+    },
+    {
+     "meas": "gain_1k",
+     "min": -19.0,
+     "max": -14.0,
+     "value": -16.88463,
+     "pass": true
+    }
+   ]
+  },
+  {
+   "name": "04_auto_reset",
+   "title": "Auto-program sequence: IO0 held low while EN releases",
+   "ok": true,
+   "measures": {
+    "en_low": 0.03072329,
+    "t_en_rise": 0.119216,
+    "io0_at_en_rise": 0.03070935,
+    "en_final": 3.299993
+   },
+   "checks": [
+    {
+     "meas": "en_low",
+     "min": 0.0,
+     "max": 0.4,
+     "value": 0.03072329,
+     "pass": true
+    },
+    {
+     "meas": "io0_at_en_rise",
+     "min": 0.0,
+     "max": 0.6,
+     "value": 0.03070935,
+     "pass": true
+    },
+    {
+     "meas": "en_final",
+     "min": 3.0,
+     "max": 3.35,
+     "value": 3.299993,
+     "pass": true
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,339 @@
+# Outdoor Hub — Board 2: HMI & Alarm board.
+# Connects to Board 1 (AP + GNSS + RF) through a 26-pin 0.5 mm FPC.
+# Single source of truth: written/edited by Claude, compiled by aipcb into schematic + PCB.
+project: outdoor_hmi
+title: "Outdoor Hub — HMI & Alarm Board (Board 2)"
+rev: A
+company: aipcb
+notes: |
+  Scope
+  - Board 2 of the All-in-One Outdoor Hub: 5 front keys, encoder (rotate + push), SOS key with a hardware
+    3-second long-press qualifier, SOS beacon LED, 2 x LRA haptic drivers, 2.5 W class-D speaker amp.
+    Board 1 (AP, GNSS, DAB+/FM, FRS/APRS, PMIC, display) is out of scope: it needs a >=4-layer RF stack-up,
+    which this 2-layer flow cannot produce.
+  - Operating range target: -40..+85 C. All ICs are -40..+85 C (or wider) grades; resistors are AEC-Q200
+    thick film (Yageo AC series); timing / RC / RF caps are C0G, decoupling caps X8R, bulk caps X7R
+    (-55..+125 C; X8R is not offered at 10-22 uF). No X5R anywhere. Board gets conformal coating
+    (IPC-CC-830 acrylic/urethane) with keep-outs on FPC contacts, switch domes, encoder and JST contacts.
+
+  FPC (J1, Hirose FH12-26S-0.5SH, 0.5 A/contact)
+  - VSYS on 4 contacts (2 A budget): worst case SOS = amp 2.5 W (~1.1 A from VSYS at 3.0 V through the boost)
+    + LED 0.14 A + 2 x LRA ~0.2 A. GND on 7 contacts + MP; the audio pair is guarded by GND contacts.
+  - +3V3 is the always-on logic rail from Board 1 (key expander, I2C switch, SOS timer, pull-ups).
+  - Logic I/O are 3.3 V. Every input from Board 1 has a default-safe pull resistor here
+    (amp muted, boost off, haptics off, LED off) so a floating FPC/unpowered AP keeps the board silent.
+
+  I2C (single bus, 3.3 V, 400 kHz)
+  - 0x21 TCA9554 key expander (A0=1). 0x70 TCA9546A I2C switch (A2..A0=0).
+  - The two DRV2605L share the fixed address 0x5A, so each sits on its own TCA9546A channel
+    (CH0 = haptic A, CH1 = haptic B). Both IN/TRIG pins share HAPTIC_TRIG so the AP fires both LRAs
+    in the same edge (symmetric vibration); both EN pins share HAPTIC_EN (expander P5).
+  - Upstream pull-ups R1/R2 4.7k are fitted here; DNP them if Board 1 already pulls the bus up.
+
+  Keys
+  - 5 front keys (BACK, MENU, FN, MARK=waymark, PAGE): C&K KSC sealed (IP67) tact switches to GND,
+    10k pull-up -> 100k series -> 10 nF C0G (tau ~1 ms RC deglitch + RF filter) -> TCA9554 P0..P4.
+    TCA9554 ~INT (open-drain, 10k pull-up) -> KEY_INT_N wakes the AP. Firmware still debounces.
+  - Encoder A/B/push go straight to the AP (A/B to a timer in quadrature-decoder mode, x4) through the
+    Bourns-recommended 10k pull-up / 10k series / 10 nF filter (tau 0.1 ms; fine up to ~1 kHz edge rate).
+  - ESD: SP0504BAHT 4-ch TVS arrays sit on the raw (switch-side) node of every key/encoder line.
+
+  SOS
+  - SW7 to +3V3. SOS_RAW has a 10k pull-down; SOS_PRESS (1k + 10 nF) goes to the AP for instant feedback.
+  - Long-press qualifier: SOS_RAW -> 910k -> SOS_TMR with 4.7 uF X8R -> 74AUP1G17 Schmitt -> SOS_LONG.
+    Trips after ~3 s held (sim 01). On release 1N4148WS dumps SOS_TMR into the 10k pull-down, so short
+    presses never accumulate. SOS_LONG is an independent wake/IRQ for the AP/PMIC; firmware also times
+    SOS_PRESS, so either path alone can raise the alarm.
+  - SOS beacon LED: red 2835 0.5 W, VSYS -> LED -> 2 x 33R (1206, parallel) -> DMG2302U, PWM from AP
+    (Morse). ~95 mA at 3.7 V, ~133 mA at 4.35 V; ~150 mA with a min-Vf (1.8 V) part at 4.35 V,
+    inside the 200 mA DC rating (sim 03).
+
+  Haptics: 2 x DRV2605L (closed-loop LRA resonance tracking + auto-calibration, compensates temperature drift),
+    VDD = VSYS (2..5.2 V), REG and VDD 1 uF each; LRA leads on JST-SH 2-pin.
+
+  Audio (2.5 W / 4 ohm alarm & radio speaker)
+  - A 3.0-4.35 V cell cannot reach 2.5 W into 4 ohm BTL without a boost (~1.3 W max), so TPS61022 boosts
+    VSYS to AMP_5V (5.0 V, 732k/100k on FB, Vref 0.6 V) and PAM8302A (2.5 W/4 ohm @ 5 V) drives the speaker.
+    Chosen over the single-chip TPA2013D1 because every pinout here comes from the stock KiCad library
+    (no AI-generated symbols); the TPA2013D1 swap is a possible rev B size optimisation.
+  - BOOST_EN (100k pull-down) gates the boost. TPS61022 has true load disconnect (datasheet 7.3.x): with EN low
+    AMP_5V = 0 V and PAM8302 is unpowered. AMP_SD_N therefore enters through R40 (10k) so the AP driving it high
+    while the amp is unpowered only pushes <0.3 mA into the ~SD ESD diode; R40/R34 = 3.0 V high when powered.
+    Firmware order: BOOST_EN high -> wait 2 ms -> AMP_SD_N high; reverse on mute. Hardware mute = AMP_SD_N.
+  - TPS61022 verified against TI SLVSF19-class datasheet: pins 1 GND 2 SW 3 VOUT 4 FB 5 EN 6 MODE 7 VIN;
+    VREF 585/600/615 mV -> AMP_5V 4.87..5.12 V; MODE low = auto PFM; L 0.33-2.9 uH; COUT >= 10 uF effective
+    (IOUT <= 1.5 A); CIN >= 4.7 uF effective; R2 < 300k. 732k/100k is TI's own typical-application divider.
+  - Differential input AUDIO_P/N from the AP codec: 100 nF C0G DC block -> 10k -> 100 pF C0G at the amp pins.
+    RC low-pass 159 kHz per leg: >60 dB ideal rejection of FRS 467 MHz that couples onto the FPC pair (sim 02).
+    High-pass ~80 Hz (protects the small speaker and kills plop).
+  - Filterless outputs: ferrite bead + 470 pF C0G per leg against EMI into the GNSS/DAB antennas.
+
+board:
+  width: 80
+  height: 48
+  corner_radius: 3
+  layers: 2
+  thickness: 1.0
+  fab: jlcpcb
+
+rules:
+  track: 0.15
+  power_track: 0.4
+  clearance: 0.15
+  via: [0.6, 0.3]
+  grid: 0.1
+  edge_clearance: 0.4
+  part_spacing: 0.4
+  # LRA leads stay at 0.2 mm: DRV2605L LRA drive is < 0.1 A rms
+  power_nets: [VSYS, AMP_5V, BST_SW, AMP_OUTP, AMP_OUTN, SPK_P, SPK_N, LED_K, LED_D]
+  # TPS61022 SW/VOUT pads are 0.2/0.35 mm tall: 0.4 mm cannot enter them, 0.3 mm can (BST_SW is 2 mm long;
+  # AMP_5V ~0.7 A avg, 1.1 A peak at 2.5 W). VSYS lands on 0.3 mm FPC pads (0.5 mm pitch): 0.3 mm; the heavy
+  # load (boost, ~1 A at 2.5 W / 3.0 V) is ~20 mm from J1 -> ~33 mOhm / 33 mV; other VSYS loads < 0.5 A.
+  net_widths: {BST_SW: 0.3, AMP_5V: 0.3, VSYS: 0.3}
+  route_passes: 10
+  stitch_pitch: 2.5      # denser GND stitching ties the narrow pour fingers between dense signal runs
+  route_first: [AUDIO_P, AUDIO_N, AMP_INP_C, AMP_INN_C, AMP_INP, AMP_INN]
+
+custom_footprints:
+  lib: aipcb_custom
+  parts:
+    Alps_EC12D_Switch_Vertical:
+      type: tht
+      description: "Alps EC12D (push-on switch, vertical) PC-board holes per Alps catalog p.289 drawing No.5, viewed from mounting side. Origin = shaft centre. A/B 11.1 apart, A-C 8.3, D (5.95, 3.45), E 6.85 above centre, 5x d1.05 holes; lugs 2.05 x 2.15 at 13.3 outer span."
+      courtyard: [-7.4, -8.3, 7.4, 7.0]
+      body: [-6.25, -6.6, 6.25, 6.6]
+      pads:
+        - {number: A,  x: -5.55, y: -4.15, drill: 1.05, size: 1.7}
+        - {number: B,  x: 5.55,  y: -4.15, drill: 1.05, size: 1.7}
+        - {number: C,  x: -5.55, y: 4.15,  drill: 1.05, size: 1.7}
+        - {number: S2, x: 5.95,  y: 3.45,  drill: 1.05, size: 1.7}
+        - {number: S1, x: 0.0,   y: -6.85, drill: 1.05, size: 1.7}
+        - {number: MP, x: -5.625, y: 0.0, drill: [2.05, 2.15], size: [2.75, 2.85], shape: rect}
+        - {number: MP, x: 5.625,  y: 0.0, drill: [2.05, 2.15], size: [2.75, 2.85], shape: rect}
+    LED_Broadcom_2835_DFN2:
+      type: pads
+      description: "Broadcom CSMW-Lx00 0.5 W 2835 DFN2 recommended land pattern (datasheet Fig.12): 4.50 total, anode pad 2.49 x 2.10, cathode pad 1.42 x 2.10, gap 0.59. Pad 2 = A (large, heat), pad 1 = K - matches Device:LED."
+      courtyard: [-2.5, -1.65, 2.5, 1.65]
+      body: [-1.75, -1.4, 1.75, 1.4]
+      pads:
+        - {number: 2, x: -1.005, y: 0, size: [2.49, 2.10], smd: true}
+        - {number: 1, x: 1.54, y: 0, size: [1.42, 2.10], smd: true}
+
+parts:
+  # ---------------------------------------------------------------- FPC to Board 1
+  J1: {symbol: "Connector_Generic_MountingPin:Conn_01x26_MountingPin",
+       footprint: "Connector_FFC-FPC:Hirose_FH12-26S-0.5SH_1x26-1MP_P0.50mm_Horizontal",
+       value: "FPC 26p 0.5mm", mpn: "FH12-26S-0.5SH(55)", manufacturer: Hirose, block: fpc,
+       description: "1 GND, 2-5 VSYS, 6-7 GND, 8 +3V3, 9 GND, 10 SCL, 11 SDA, 12 KEY_INT_N, 13 ENC_A, 14 ENC_B, 15 ENC_SW_N, 16 SOS_PRESS, 17 SOS_LONG, 18 HAPTIC_TRIG, 19 BOOST_EN, 20 AMP_SD_N, 21 SOS_LED_PWM, 22 GND, 23 AUDIO_P, 24 AUDIO_N, 25-26 GND. -40..+85 C. Not stocked by LCSC (24/28-pin are): source from DigiKey/Mouser or consign",
+       place: {edge: left, y: 23.25, rot: 270}}
+  C18: {symbol: "Device:C", footprint: "Capacitor_SMD:C_1206_3216Metric", value: "10u X7R 16V", mpn: "CGA5L1X7R1C106K160AC", manufacturer: TDK, block: fpc, description: "VSYS entry bulk", place: {x: 6, y: 11, rot: 0}}
+  C29: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: "1u X8R 25V", mpn: CGA4J1X8R1E105K125AC, manufacturer: TDK, block: fpc, description: "+3V3 entry", place: {x: 10.5, y: 11, rot: 0}}
+
+  # ---------------------------------------------------------------- I2C: switch + key expander
+  R1: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 4.7k, mpn: "AC0603FR-074K7L", manufacturer: Yageo, block: i2c, description: "upstream SCL pull-up (DNP if Board 1 pulls up)"}
+  R2: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 4.7k, mpn: "AC0603FR-074K7L", manufacturer: Yageo, block: i2c, description: "upstream SDA pull-up (DNP if Board 1 pulls up)"}
+  U3: {lcsc: C201653, symbol: "Interface_Expansion:TCA9546APW", footprint: "Package_SO:TSSOP-16_4.4x5mm_P0.65mm", value: TCA9546A,
+       mpn: TCA9546APWR, manufacturer: Texas Instruments, block: i2c, description: "I2C switch 0x70: CH0 haptic A, CH1 haptic B", place: {x: 50, y: 26}}
+  C5: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "100n X8R", mpn: CGA3E2X8R1E104K080AA, manufacturer: TDK, block: i2c, place: {near: U3.VCC}}
+  R7: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: i2c, description: "TCA9546A ~RESET pull-up", place: {near: "U3.~{RESET}", near_dist: 3}}
+  U4: {lcsc: C477924, symbol: "Interface_Expansion:TCA9554PW", footprint: "Package_SO:TSSOP-16_4.4x5mm_P0.65mm", value: TCA9554,
+       mpn: TCA9554PWR, manufacturer: Texas Instruments, block: keys, description: "key expander 0x21, ~INT -> KEY_INT_N", place: {x: 38, y: 33}}
+  C6: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "100n X8R", mpn: CGA3E2X8R1E104K080AA, manufacturer: TDK, block: keys, place: {near: U4.VDD}}
+  R8: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: keys, description: "KEY_INT_N open-drain pull-up", place: {near: "U4.~{INT}", near_dist: 3}}
+  R9: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: keys, description: "HAPTIC_EN pull-down: haptics off until P5 is driven", place: {near: U4.P5, near_dist: 3}}
+  R10: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: keys, description: "P6/P7 spare inputs tied low", place: {near: U4.P6, near_dist: 3}}
+
+  # ---------------------------------------------------------------- haptic A
+  U1: {lcsc: C527464, symbol: "Driver:DRV2605LDGS", footprint: "Package_SO:TSSOP-10_3x3mm_P0.5mm", value: DRV2605L,
+       mpn: DRV2605LDGSR, manufacturer: Texas Instruments, block: haptic_a, place: {x: 62, y: 22}}
+  C1: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: "1u X8R 25V", mpn: CGA4J1X8R1E105K125AC, manufacturer: TDK, block: haptic_a, place: {near: U1.10}}
+  C2: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: "1u X8R 25V", mpn: CGA4J1X8R1E105K125AC, manufacturer: TDK, block: haptic_a, description: "REG", place: {near: U1.REG}}
+  R3: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 4.7k, mpn: "AC0603FR-074K7L", manufacturer: Yageo, block: haptic_a, description: "CH0 SCL pull-up", place: {near: U1.2, near_dist: 3}}
+  R4: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 4.7k, mpn: "AC0603FR-074K7L", manufacturer: Yageo, block: haptic_a, description: "CH0 SDA pull-up", place: {near: U1.3, near_dist: 3}}
+  J2: {symbol: "Connector_Generic:Conn_01x02", footprint: "Connector_Molex:Molex_PicoBlade_53261-0271_1x02-1MP_P1.25mm_Horizontal",
+       value: "LRA A", mpn: "53261-0271", manufacturer: Molex, block: haptic_a, place: {edge: right, y: 24, rot: 90}}
+  R11: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: haptic_a, description: "HAPTIC_TRIG default low", place: {near: U1.4, near_dist: 4}}
+
+  # ---------------------------------------------------------------- haptic B
+  U2: {lcsc: C527464, symbol: "Driver:DRV2605LDGS", footprint: "Package_SO:TSSOP-10_3x3mm_P0.5mm", value: DRV2605L,
+       mpn: DRV2605LDGSR, manufacturer: Texas Instruments, block: haptic_b, place: {x: 62, y: 34}}
+  C3: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: "1u X8R 25V", mpn: CGA4J1X8R1E105K125AC, manufacturer: TDK, block: haptic_b, place: {near: U2.10}}
+  C4: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: "1u X8R 25V", mpn: CGA4J1X8R1E105K125AC, manufacturer: TDK, block: haptic_b, description: "REG", place: {near: U2.REG}}
+  R5: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 4.7k, mpn: "AC0603FR-074K7L", manufacturer: Yageo, block: haptic_b, description: "CH1 SCL pull-up", place: {near: U2.2, near_dist: 3}}
+  R6: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 4.7k, mpn: "AC0603FR-074K7L", manufacturer: Yageo, block: haptic_b, description: "CH1 SDA pull-up", place: {near: U2.3, near_dist: 3}}
+  J3: {symbol: "Connector_Generic:Conn_01x02", footprint: "Connector_Molex:Molex_PicoBlade_53261-0271_1x02-1MP_P1.25mm_Horizontal",
+       value: "LRA B", mpn: "53261-0271", manufacturer: Molex, block: haptic_b, place: {edge: right, y: 34, rot: 90}}
+
+  # ---------------------------------------------------------------- front keys
+  SW1: {lcsc: C221766, symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC7xxJ", value: BACK, mpn: "KSC741J LFS", manufacturer: "C&K", block: keys, place: {edge: bottom, x: 13, rot: 0}}
+  SW2: {lcsc: C221766, symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC7xxJ", value: MENU, mpn: "KSC741J LFS", manufacturer: "C&K", block: keys, place: {edge: bottom, x: 26.5, rot: 0}}
+  SW3: {lcsc: C221766, symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC7xxJ", value: FN, mpn: "KSC741J LFS", manufacturer: "C&K", block: keys, place: {edge: bottom, x: 40, rot: 0}}
+  SW4: {lcsc: C221766, symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC7xxJ", value: MARK, mpn: "KSC741J LFS", manufacturer: "C&K", block: keys, place: {edge: bottom, x: 53.5, rot: 0}}
+  SW5: {lcsc: C221766, symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC7xxJ", value: PAGE, mpn: "KSC741J LFS", manufacturer: "C&K", block: keys, place: {edge: bottom, x: 67, rot: 0}}
+  R12: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: keys}
+  R13: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: keys}
+  R14: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: keys}
+  R15: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: keys}
+  R16: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: keys}
+  R17: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: keys}
+  R18: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: keys}
+  R19: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: keys}
+  R20: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: keys}
+  R21: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: keys}
+  C8: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "10n C0G", mpn: "GCM1885C1H103JA16D", manufacturer: Murata, block: keys, place: {near: U4.P0, near_dist: 2.5}}
+  C9: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "10n C0G", mpn: "GCM1885C1H103JA16D", manufacturer: Murata, block: keys}
+  C10: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "10n C0G", mpn: "GCM1885C1H103JA16D", manufacturer: Murata, block: keys}
+  C11: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "10n C0G", mpn: "GCM1885C1H103JA16D", manufacturer: Murata, block: keys}
+  C12: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "10n C0G", mpn: "GCM1885C1H103JA16D", manufacturer: Murata, block: keys}
+  D1: {lcsc: C10675, symbol: "Power_Protection:SP0504BAHT", footprint: "Package_TO_SOT_SMD:SOT-23-5", value: SP0504BAHT,
+       mpn: SP0504BAHTG, manufacturer: Littelfuse, block: keys, description: "TVS: BACK MENU FN MARK"}
+  D2: {lcsc: C10675, symbol: "Power_Protection:SP0504BAHT", footprint: "Package_TO_SOT_SMD:SOT-23-5", value: SP0504BAHT,
+       mpn: SP0504BAHTG, manufacturer: Littelfuse, block: encoder, description: "TVS: PAGE ENC_A ENC_B ENC_SW", place: {near: SW6.C, near_dist: 6}}
+
+  # ---------------------------------------------------------------- encoder (top right)
+  SW6: {lcsc: C112349, symbol: "Device:RotaryEncoder_Switch_MP", footprint: "aipcb_custom:Alps_EC12D_Switch_Vertical",
+        value: "EC12D 15p/30det +push", mpn: EC12D1524403, manufacturer: Alps Alpine, block: encoder,
+        description: "-40..+85 C (automotive EC12D), 15 pulse / 30 detent, 5+-3 mN.m, push 3 N; switch rated 1 mA 5 V (circuit: 0.33 mA). Stainless knob on 17.5 mm insulated shaft. A/B -> AP timer quadrature decoder; S1/S2 = Alps E/D switch terminals",
+        place: {edge: top, x: 57}}
+  R22: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: encoder, place: {near: SW6.A, near_dist: 5}}
+  R23: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: encoder, place: {near: SW6.B, near_dist: 5}}
+  R24: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: encoder, place: {near: SW6.S1, near_dist: 5}}
+  R25: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: encoder, place: {near: SW6.A, near_dist: 6}}
+  R26: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: encoder, place: {near: SW6.B, near_dist: 6}}
+  R27: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: encoder, place: {near: SW6.S1, near_dist: 6}}
+  C13: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "10n C0G", mpn: "GCM1885C1H103JA16D", manufacturer: Murata, block: encoder, place: {near: SW6.A, near_dist: 7}}
+  C14: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "10n C0G", mpn: "GCM1885C1H103JA16D", manufacturer: Murata, block: encoder, place: {near: SW6.B, near_dist: 7}}
+  C15: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "10n C0G", mpn: "GCM1885C1H103JA16D", manufacturer: Murata, block: encoder, place: {near: SW6.S1, near_dist: 7}}
+
+  # ---------------------------------------------------------------- SOS key + 3 s hardware qualifier
+  SW7: {lcsc: C221766, symbol: "Switch:SW_Push", footprint: "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC7xxJ", value: SOS, mpn: "KSC741J LFS", manufacturer: "C&K", block: sos,
+        description: "under flip cover, orange cap", place: {edge: top, x: 11, rot: 0}}
+  D3: {lcsc: C10675, symbol: "Power_Protection:SP0504BAHT", footprint: "Package_TO_SOT_SMD:SOT-23-5", value: SP0504BAHT,
+       mpn: SP0504BAHTG, manufacturer: Littelfuse, block: sos, description: "TVS: SOS (3 spare channels)", place: {near: SW7.2, near_dist: 4}}
+  R28: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: sos, description: "SOS_RAW pull-down / timer discharge", place: {near: SW7.2, near_dist: 5}}
+  R29: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 1k, mpn: "AC0603FR-071KL", manufacturer: Yageo, block: sos, place: {near: SW7.2, near_dist: 5}}
+  C16: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "10n C0G", mpn: "GCM1885C1H103JA16D", manufacturer: Murata, block: sos, place: {near: R29.2, near_dist: 3}}
+  R30: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 910k, mpn: "AC0603FR-07910KL", manufacturer: Yageo, block: sos, description: "long-press timer R", place: {near: SW7.2, near_dist: 6}}
+  C17: {symbol: "Device:C", footprint: "Capacitor_SMD:C_1206_3216Metric", value: "4.7u X8R 16V", mpn: CGA5L3X8R1C475K160AE, manufacturer: TDK, block: sos, description: "long-press timer C (X8R)", place: {near: U5.2, near_dist: 4}}
+  D5: {lcsc: C60580, symbol: "Diode:1N4148WS", footprint: "Diode_SMD:D_SOD-323", value: 1N4148WS, mpn: "1N4148WS-7-F", manufacturer: Diodes Inc, block: sos, description: "fast timer reset on release", place: {near: SW7.2, near_dist: 6}}
+  U5: {lcsc: C2652099, symbol: "74xGxx:74AUP1G17", footprint: "Package_TO_SOT_SMD:SOT-353_SC-70-5", value: "74AUP1G17",
+       mpn: SN74AUP1G17DCKR, manufacturer: "Texas Instruments", block: sos, description: "Schmitt buffer SC70-5 (pin 1 NC, 2 A, 3 GND, 4 Y, 5 VCC), -40..85 C; Nexperia 74AUP1G17GW is the pin-compatible second source", place: {x: 19, y: 6}}
+  C7: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "100n X8R", mpn: CGA3E2X8R1E104K080AA, manufacturer: TDK, block: sos, place: {near: U5.VCC}}
+
+  # ---------------------------------------------------------------- SOS beacon LED
+  D4: {description: "Broadcom 0.5 W 2835 DFN2 red, 200 mA max DC, Vf 1.8/2.1/2.9 V @150 mA, -40..+100 C. Large pad = ANODE (datasheet Fig.12)", manufacturer: Broadcom, symbol: "Device:LED", footprint: "aipcb_custom:LED_Broadcom_2835_DFN2", value: "SOS red 0.5W", mpn: CSMW-LR00-ATV0E, block: led, place: {x: 36, y: 3.5}}
+  R37: {symbol: "Device:R", footprint: "Resistor_SMD:R_1206_3216Metric", value: 33, mpn: "AC1206FR-0733RL", manufacturer: Yageo, block: led, place: {near: D4.K, near_dist: 4}}
+  R38: {symbol: "Device:R", footprint: "Resistor_SMD:R_1206_3216Metric", value: 33, mpn: "AC1206FR-0733RL", manufacturer: Yageo, block: led, place: {near: D4.K, near_dist: 4}}
+  Q1: {lcsc: C96613, symbol: "Transistor_FET:DMG2302U", footprint: "Package_TO_SOT_SMD:SOT-23", value: DMG2302U, mpn: DMG2302U-7, manufacturer: Diodes Inc, block: led, place: {near: D4.K, near_dist: 6}}
+  R39: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: led, description: "LED off by default", place: {near: Q1.G, near_dist: 2.5}}
+
+  # ---------------------------------------------------------------- boost VSYS -> 5 V for the amplifier
+  U6: {lcsc: C915088, symbol: "Converter_DCDC:TPS61022", footprint: "Package_DFN_QFN:Texas_RWU0007A_VQFN-7_2x2mm_P0.5mm", value: TPS61022,
+       mpn: TPS61022RWUR, manufacturer: Texas Instruments, block: boost, place: {x: 24, y: 16, rot: 180}}
+  L1: {description: "1 uH, Isat 8.7 A (30 % drop), DCR 14.6 mOhm max; peak in this design ~2.6 A", symbol: "Device:L", footprint: "Inductor_SMD:L_Coilcraft_XAL4020-XXX", value: 1u, mpn: XAL4020-102MEC, manufacturer: Coilcraft, block: boost, place: {x: 28.2, y: 16.3, rot: 180}}
+  C19: {symbol: "Device:C", footprint: "Capacitor_SMD:C_1206_3216Metric", value: "10u X7R 16V", mpn: "CGA5L1X7R1C106K160AC", manufacturer: TDK, block: boost, place: {near: U6.VIN}}
+  C20: {lcsc: C126598, symbol: "Device:C", footprint: "Capacitor_SMD:C_1206_3216Metric", value: "22u X7R 10V", mpn: "GCM31CR71A226KE02L", manufacturer: Murata, block: boost, place: {near: U6.VOUT}}
+  C21: {lcsc: C126598, symbol: "Device:C", footprint: "Capacitor_SMD:C_1206_3216Metric", value: "22u X7R 10V", mpn: "GCM31CR71A226KE02L", manufacturer: Murata, block: boost, place: {near: U6.VOUT, near_dist: 3}}
+  R31: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 732k, mpn: "AC0603FR-07732KL", manufacturer: Yageo, block: boost, description: "FB top: 0.6*(1+732/100) = 4.99 V", place: {near: U6.FB, near_dist: 2.5}}
+  R32: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: boost, place: {near: U6.FB, near_dist: 2.5}}
+  R33: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: boost, description: "boost off by default", place: {near: U6.EN, near_dist: 3}}
+
+  # ---------------------------------------------------------------- class-D amplifier
+  U7: {description: "MSOP-8 variant (PAM8302AADCR is SO-8)", lcsc: C113367, symbol: "Amplifier_Audio:PAM8302AAS", footprint: "Package_SO:MSOP-8_3x3mm_P0.65mm", value: PAM8302A,
+       mpn: PAM8302AASCR, manufacturer: Diodes Inc, block: amp, place: {x: 16, y: 34}}
+  C22: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "100n X8R", mpn: CGA3E2X8R1E104K080AA, manufacturer: TDK, block: amp, place: {near: U7.VDD}}
+  R40: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: amp, description: "~SD series: limits current into an unpowered PAM8302 (boost has true disconnect)", place: {near: "U7.~{SD}", near_dist: 3}}
+  R34: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "AC0603FR-07100KL", manufacturer: Yageo, block: amp, description: "amp muted by default", place: {near: "U7.~{SD}", near_dist: 3}}
+  C25: {symbol: "Device:C", footprint: "Capacitor_SMD:C_1206_3216Metric", value: "100n C0G", mpn: GRM3195C1H104JA05D, manufacturer: Murata, block: amp, description: "DC block P", place: {x: 11, y: 27, rot: 0}}
+  C26: {symbol: "Device:C", footprint: "Capacitor_SMD:C_1206_3216Metric", value: "100n C0G", mpn: GRM3195C1H104JA05D, manufacturer: Murata, block: amp, description: "DC block N", place: {x: 11, y: 30, rot: 0}}
+  R35: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: amp, place: {x: 15.5, y: 27, rot: 0}}
+  R36: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "AC0603FR-0710KL", manufacturer: Yageo, block: amp, place: {x: 15.5, y: 30, rot: 0}}
+  C23: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "100p C0G", mpn: "GCM1885C1H101JA16D", manufacturer: Murata, block: amp, description: "RF shunt at IN+", place: {near: "U7.IN+", near_dist: 2}}
+  C24: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "100p C0G", mpn: "GCM1885C1H101JA16D", manufacturer: Murata, block: amp, description: "RF shunt at IN-", place: {near: "U7.IN-", near_dist: 2}}
+  FB1: {lcsc: C80165, symbol: "Device:FerriteBead_Small", footprint: "Inductor_SMD:L_0603_1608Metric", value: "220R@100M 1.4A", mpn: BLM18PG221SN1D, manufacturer: Murata, block: amp, place: {near: J4.1, near_dist: 5}}
+  FB2: {lcsc: C80165, symbol: "Device:FerriteBead_Small", footprint: "Inductor_SMD:L_0603_1608Metric", value: "220R@100M 1.4A", mpn: BLM18PG221SN1D, manufacturer: Murata, block: amp, place: {near: J4.2, near_dist: 5}}
+  C27: {lcsc: C3907937, symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "470p C0G 1%", mpn: GCM1885C1H471FA16D, manufacturer: Murata, block: amp, place: {near: J4.1, near_dist: 4}}
+  C28: {lcsc: C3907937, symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: "470p C0G 1%", mpn: GCM1885C1H471FA16D, manufacturer: Murata, block: amp, place: {near: J4.2, near_dist: 4}}
+  J4: {symbol: "Connector_Generic:Conn_01x02", footprint: "Connector_Molex:Molex_PicoBlade_53261-0271_1x02-1MP_P1.25mm_Horizontal",
+       value: "Speaker 4R 2.5W", mpn: "53261-0271", manufacturer: Molex, block: amp, place: {edge: left, y: 38.2, rot: 270}}
+
+  # ---------------------------------------------------------------- mechanical
+  H1: {symbol: "Mechanical:MountingHole", footprint: "MountingHole:MountingHole_2.2mm_M2", value: M2, block: mechanical, place: {x: 3.0, y: 3.0}}
+  H2: {symbol: "Mechanical:MountingHole", footprint: "MountingHole:MountingHole_2.2mm_M2", value: M2, block: mechanical, place: {x: 77.0, y: 3.0}}
+  H3: {symbol: "Mechanical:MountingHole", footprint: "MountingHole:MountingHole_2.2mm_M2", value: M2, block: mechanical, place: {x: 3.0, y: 45.5}}
+  H4: {symbol: "Mechanical:MountingHole", footprint: "MountingHole:MountingHole_2.2mm_M2", value: M2, block: mechanical, place: {x: 77.0, y: 45.5}}
+
+nets:
+  GND: [J1.1, J1.6, J1.7, J1.9, J1.22, J1.25, J1.26, J1.MP, C18.2, C29.2,
+        U3.1, U3.2, U3.13, U3.8, C5.2, U4.2, U4.3, U4.8, C6.2, R9.2, R10.2,
+        U1.8, C1.2, C2.2, R11.2, U2.8, C3.2, C4.2,
+        SW1.2, SW2.2, SW3.2, SW4.2, SW5.2, C8.2, C9.2, C10.2, C11.2, C12.2, D1.2, D2.2,
+        SW6.C, SW6.S2, SW6.MP, C13.2, C14.2, C15.2,
+        D3.2, R28.2, C16.2, C17.2, U5.3, C7.2, Q1.S, R39.2,
+        U6.1, U6.6, C19.2, C20.2, C21.2, R32.2, R33.2,
+        U7.7, C22.2, R34.2, C23.2, C24.2, C27.2, C28.2]
+  VSYS: [J1.2, J1.3, J1.4, J1.5, C18.1, U1.6, U1.10, C1.1, U2.6, U2.10, C3.1, D4.A, U6.7, L1.1, C19.1]
+  "+3V3": [J1.8, C29.1, R1.2, R2.2, U3.VCC, C5.1, R7.2, U4.VDD, U4.A0, C6.1, R8.2, R3.2, R4.2, R5.2, R6.2,
+           R12.2, R13.2, R14.2, R15.2, R16.2, R22.2, R23.2, R24.2, SW7.1, U5.VCC, C7.1]
+  I2C_SCL: [J1.10, R1.1, U3.SCL, U4.SCL]
+  I2C_SDA: [J1.11, R2.1, U3.SDA, U4.SDA]
+  MUX_RST_N: ["U3.~{RESET}", R7.1]
+  HA_SCL: [U3.SC0, U1.2, R3.1]
+  HA_SDA: [U3.SD0, U1.3, R4.1]
+  HB_SCL: [U3.SC1, U2.2, R5.1]
+  HB_SDA: [U3.SD1, U2.3, R6.1]
+  KEY_INT_N: [J1.12, "U4.~{INT}", R8.1]
+  HAPTIC_EN: [U4.P5, R9.1, U1.5, U2.5]
+  EXP_SPARE: [U4.P6, U4.P7, R10.1]
+  HAPTIC_TRIG: [J1.18, U1.4, U2.4, R11.1]
+  HA_REG: [U1.1, C2.1]
+  HB_REG: [U2.1, C4.1]
+  LRA_A_P: [U1.7, J2.1]
+  LRA_A_N: [U1.9, J2.2]
+  LRA_B_P: [U2.7, J3.1]
+  LRA_B_N: [U2.9, J3.2]
+  # keys: raw node (switch, pull-up, TVS) -> 100k -> filtered node (10n C0G) -> expander
+  BACK_RAW: [SW1.1, R12.1, R17.1, D1.1]
+  MENU_RAW: [SW2.1, R13.1, R18.1, D1.3]
+  FN_RAW: [SW3.1, R14.1, R19.1, D1.4]
+  MARK_RAW: [SW4.1, R15.1, R20.1, D1.5]
+  PAGE_RAW: [SW5.1, R16.1, R21.1, D2.1]
+  BTN_BACK: [R17.2, C8.1, U4.P0]
+  BTN_MENU: [R18.2, C9.1, U4.P1]
+  BTN_FN: [R19.2, C10.1, U4.P2]
+  BTN_MARK: [R20.2, C11.1, U4.P3]
+  BTN_PAGE: [R21.2, C12.1, U4.P4]
+  # encoder
+  ENC_A_RAW: [SW6.A, R22.1, R25.1, D2.3]
+  ENC_B_RAW: [SW6.B, R23.1, R26.1, D2.4]
+  ENC_SW_RAW: [SW6.S1, R24.1, R27.1, D2.5]
+  ENC_A: [R25.2, C13.1, J1.13]
+  ENC_B: [R26.2, C14.1, J1.14]
+  ENC_SW_N: [R27.2, C15.1, J1.15]
+  # SOS
+  SOS_RAW: [SW7.2, D3.1, R28.1, R29.1, R30.1, D5.K]
+  SOS_PRESS: [R29.2, C16.1, J1.16]
+  SOS_TMR: [R30.2, C17.1, D5.A, U5.2]
+  SOS_LONG: [U5.4, J1.17]
+  SOS_LED_PWM: [J1.21, Q1.G, R39.1]
+  LED_K: [D4.K, R37.1, R38.1]
+  LED_D: [R37.2, R38.2, Q1.D]
+  # boost + amp
+  BOOST_EN: [J1.19, U6.EN, R33.1]
+  BST_SW: [U6.SW, L1.2]
+  BST_FB: [U6.FB, R31.2, R32.1]
+  AMP_5V: [U6.VOUT, C20.1, C21.1, R31.1, U7.VDD, C22.1]
+  AMP_SD_N: [J1.20, R40.1]
+  AMP_SD: [R40.2, "U7.~{SD}", R34.1]
+  AUDIO_P: [J1.23, C25.1]
+  AUDIO_N: [J1.24, C26.1]
+  AMP_INP_C: [C25.2, R35.1]
+  AMP_INN_C: [C26.2, R36.1]
+  AMP_INP: [R35.2, C23.1, "U7.IN+"]
+  AMP_INN: [R36.2, C24.1, "U7.IN-"]
+  AMP_OUTP: ["U7.OUT+", FB1.1]
+  AMP_OUTN: ["U7.OUT-", FB2.1]
+  SPK_P: [FB1.2, C27.1, J4.1]
+  SPK_N: [FB2.2, C28.1, J4.2]
+
+nc: [U3.SD2, U3.SC2, U3.SD3, U3.SC3, D3.3, D3.4, D3.5, U5.1, U7.NC]

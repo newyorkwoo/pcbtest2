@@ -1,0 +1,110 @@
+{
+  "board": {
+    "design_settings": {
+      "defaults": {
+        "board_outline_line_width": 0.1,
+        "copper_line_width": 0.2,
+        "silk_line_width": 0.12,
+        "silk_text_size_h": 1.0,
+        "silk_text_size_v": 1.0,
+        "silk_text_thickness": 0.15
+      },
+      "rules": {
+        "min_clearance": 0.127,
+        "min_track_width": 0.127,
+        "min_via_diameter": 0.5,
+        "min_via_annular_width": 0.13,
+        "min_through_hole_diameter": 0.2,
+        "min_copper_edge_clearance": 0.3,
+        "min_hole_to_hole": 0.25,
+        "min_hole_clearance": 0.25,
+        "min_silk_clearance": 0.0,
+        "min_text_height": 0.8,
+        "min_text_thickness": 0.15,
+        "solder_mask_to_copper_clearance": 0.0,
+        "min_microvia_diameter": 0.2,
+        "min_microvia_drill": 0.1
+      },
+      "track_widths": [
+        0.0,
+        0.15,
+        0.3,
+        0.4
+      ],
+      "via_dimensions": [
+        {
+          "diameter": 0.0,
+          "drill": 0.0
+        },
+        {
+          "diameter": 0.6,
+          "drill": 0.3
+        }
+      ],
+      "rule_severities": {
+        "silk_overlap": "ignore",
+        "silk_over_copper": "warning",
+        "silk_edge_clearance": "ignore",
+        "lib_footprint_mismatch": "ignore",
+        "lib_footprint_issues": "ignore",
+        "text_height": "warning",
+        "text_thickness": "warning",
+        "courtyards_overlap": "error",
+        "footprint_type_mismatch": "ignore",
+        "isolated_copper": "warning",
+        "starved_thermal": "ignore",
+        "via_dangling": "warning",
+        "track_dangling": "warning"
+      }
+    }
+  },
+  "meta": {
+    "filename": "outdoor_hmi.kicad_pro",
+    "version": 3
+  },
+  "net_settings": {
+    "classes": [
+      {
+        "name": "Default",
+        "clearance": 0.15,
+        "track_width": 0.15,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "diff_pair_width": 0.2,
+        "diff_pair_gap": 0.25,
+        "wire_width": 6,
+        "bus_width": 12,
+        "line_style": 0,
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 2147483647
+      }
+    ],
+    "meta": {
+      "version": 4
+    }
+  },
+  "schematic": {
+    "drawing": {
+      "default_line_thickness": 6.0
+    },
+    "legacy_lib_dir": "",
+    "legacy_lib_list": []
+  },
+  "erc": {
+    "rule_severities": {
+      "lib_symbol_issues": "ignore",
+      "lib_symbol_mismatch": "ignore",
+      "footprint_link_issues": "ignore",
+      "simulation_model_issue": "ignore"
+    }
+  },
+  "sheets": [
+    [
+      "0d54bd8d-a0a2-5aa8-860e-090dc012fb38",
+      "Root"
+    ]
+  ]
+}

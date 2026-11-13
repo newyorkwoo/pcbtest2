@@ -1,0 +1,24 @@
+Audio mixer + RC filter + AC coupling into PAM8302 (frequency response)
+* @title Audio path: ESP32 DAC (BT) -> mixer -> PAM8302 input
+* @plot v(amp_inp) v(audio_mix)
+* @bandwidth amp_inp
+* @expect f_high 15e3 40e3
+* @expect f_low 1 60
+* @expect gain_1k -19 -14
+* gain: mixer node 4k/(10k+4k) = -10.9 dB, then R22 / amp Rin 1:2 = -6.0 dB -> -16.9 dB.
+* Full-scale DAC 1.4 Vpk -> 0.2 Vpk at the amp input: enough for PAM8302 (~24 dB) near full output.
+* DAC1 (IO25) as AC source; FM L/R outputs are low-impedance (AC ground) while BT plays
+VDAC dac 0 AC 1
+R21 dac audio_mix 10k
+R19 audio_mix fml 10k
+R20 audio_mix fmr 10k
+RFML fml 0 50
+RFMR fmr 0 50
+C17 audio_mix 0 2.2n
+C16 audio_mix inp_c 1u
+R22 inp_c amp_inp 10k
+* PAM8302 input modelled as 10k to its internal bias (datasheet: Ri ~ 10k class; verify)
+RIN amp_inp 0 10k
+.ac dec 40 1 200k
+.meas ac gain_1k FIND vdb(amp_inp) AT=1k
+.end

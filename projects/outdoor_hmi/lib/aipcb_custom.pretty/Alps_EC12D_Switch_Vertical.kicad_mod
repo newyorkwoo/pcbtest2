@@ -1,0 +1,177 @@
+(footprint "Alps_EC12D_Switch_Vertical"
+	(version 20241229)
+	(generator "aipcb")
+	(layer "F.Cu")
+	(descr "Alps EC12D (push-on switch, vertical) PC-board holes per Alps catalog p.289 drawing No.5, viewed from mounting side. Origin = shaft centre. A/B 11.1 apart, A-C 8.3, D (5.95, 3.45), E 6.85 above centre, 5x d1.05 holes; lugs 2.05 x 2.15 at 13.3 outer span.")
+	(attr through_hole)
+	(property "Reference" "REF**"
+		(at 0 -9.5 0)
+		(layer "F.SilkS")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "Alps_EC12D_Switch_Vertical"
+		(at 0 8.2 0)
+		(layer "F.Fab")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(fp_line
+		(start -7.4 -8.3)
+		(end 7.4 -8.3)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+	)
+	(fp_line
+		(start 7.4 -8.3)
+		(end 7.4 7)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+	)
+	(fp_line
+		(start 7.4 7)
+		(end -7.4 7)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+	)
+	(fp_line
+		(start -7.4 7)
+		(end -7.4 -8.3)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+	)
+	(fp_line
+		(start -6.25 -6.6)
+		(end 6.25 -6.6)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+	)
+	(fp_line
+		(start -6.25 -6.6)
+		(end 6.25 -6.6)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+	)
+	(fp_line
+		(start 6.25 -6.6)
+		(end 6.25 6.6)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+	)
+	(fp_line
+		(start 6.25 -6.6)
+		(end 6.25 6.6)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+	)
+	(fp_line
+		(start 6.25 6.6)
+		(end -6.25 6.6)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+	)
+	(fp_line
+		(start 6.25 6.6)
+		(end -6.25 6.6)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+	)
+	(fp_line
+		(start -6.25 6.6)
+		(end -6.25 -6.6)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+	)
+	(fp_line
+		(start -6.25 6.6)
+		(end -6.25 -6.6)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+	)
+	(pad "A" thru_hole circle
+		(at -5.55 -4.15)
+		(size 1.7 1.7)
+		(drill 1.05)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "B" thru_hole circle
+		(at 5.55 -4.15)
+		(size 1.7 1.7)
+		(drill 1.05)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "C" thru_hole circle
+		(at -5.55 4.15)
+		(size 1.7 1.7)
+		(drill 1.05)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "S2" thru_hole circle
+		(at 5.95 3.45)
+		(size 1.7 1.7)
+		(drill 1.05)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "S1" thru_hole circle
+		(at 0 -6.85)
+		(size 1.7 1.7)
+		(drill 1.05)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "MP" thru_hole rect
+		(at -5.625 0)
+		(size 2.75 2.85)
+		(drill oval 2.05 2.15)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "MP" thru_hole rect
+		(at 5.625 0)
+		(size 2.75 2.85)
+		(drill oval 2.05 2.15)
+		(layers "*.Cu" "*.Mask")
+	)
+)

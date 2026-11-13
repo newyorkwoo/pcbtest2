@@ -1,0 +1,16 @@
+3.3 V rail vs battery voltage (AP2112K dropout), 300 mA ESP32 BT peak
+* @title +3V3 vs VBAT at 300 mA (AP2112K-3.3, 250 mV @ 600 mA dropout)
+* @plot v(v3v3) v(vsys)
+* @expect v3v3_at_37 3.25 3.35
+* @expect vbat_brownout 3.0 3.35
+VBAT vsys 0 DC 3.7
+* behavioural LDO: regulates to 3.3 V, dropout = 0.417 ohm * I (250 mV @ 600 mA)
+BLDO vreg 0 V = min(3.3, v(vsys) - 0.417*0.3)
+RO vreg v3v3 0.01
+C5 v3v3 0 10u
+ILOAD v3v3 0 DC 0.3
+.dc VBAT 2.8 4.3 0.005
+.meas dc v3v3_at_37 FIND v(v3v3) AT=3.7
+* battery level at which the rail falls below 3.2 V -> firmware low-battery cut-off point
+.meas dc vbat_brownout WHEN v(v3v3)=3.2 RISE=1
+.end

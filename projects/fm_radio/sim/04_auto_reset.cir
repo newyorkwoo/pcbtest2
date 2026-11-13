@@ -1,0 +1,26 @@
+ESP32 auto-reset: CH340C DTR/RTS -> Q1/Q2 -> EN / IO0 (esptool boot sequence)
+* @title Auto-program sequence: IO0 held low while EN releases
+* @plot v(en) v(io0) v(dtr) v(rts)
+* @expect en_low 0 0.4
+* @expect io0_at_en_rise 0 0.6
+* @expect en_final 3.0 3.35
+V33 v33 0 3.3
+* esptool classic reset: setDTR(False),setRTS(True) -> EN low; 100 ms; setDTR(True),setRTS(False) -> EN released
+* with IO0 low; 50 ms; setDTR(False) -> idle.  CH340C ~DTR/~RTS pins are active-low (asserted = 0 V).
+VDTR dtr 0 PWL(0 3.3 10m 3.3 110m 3.3 110.01m 0 160m 0 160.01m 3.3)
+VRTS rts 0 PWL(0 3.3 10m 3.3 10.01m 0 110m 0 110.01m 3.3)
+* exactly as design.yaml: Q1 B<-R12<-DTR, E=RTS, C=EN ; Q2 B<-R13<-RTS, E=DTR, C=IO0
+R12 dtr q1b 10k
+Q1 en q1b rts QN
+R13 rts q2b 10k
+Q2 io0 q2b dtr QN
+.model QN NPN(Is=6.7f Bf=200 Vaf=74 Rb=10 Cjc=3.6p Cje=4.5p Tf=300p)
+R9 v33 en 10k
+C10 en 0 1u
+R10 v33 io0 10k
+.tran 50u 250m
+.meas tran en_low FIND v(en) AT=100m
+.meas tran t_en_rise WHEN v(en)=2.0 RISE=1 FROM=105m
+.meas tran io0_at_en_rise FIND v(io0) WHEN v(en)=2.0 RISE=1 FROM=105m
+.meas tran en_final FIND v(en) AT=240m
+.end
