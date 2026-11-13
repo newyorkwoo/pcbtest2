@@ -629,6 +629,12 @@ def generate(d: Design, out_path: Path | None = None) -> Path:
     wires = []          # sheet coords (x1, y1, x2, y2)
     pin_pts = set()     # every pin end on the sheet (symbols + power symbols)
     pwr_n = [0]
+    # connection map for the GUI's wiring view (sheet mm, same frame as a full-sheet SVG export)
+    nmap: dict[str, dict] = {}
+    pmap: dict[str, dict] = {}
+
+    def nm(net):
+        return nmap.setdefault(net, {"wires": [], "pins": [], "marks": []})
 
     def prop(k, v, x, y, just=None, hide=False, ang=0):
         return [S("property"), k, str(v), [S("at"), snap(x), snap(y), ang], _effects(just, hide)]
@@ -711,16 +717,28 @@ def generate(d: Design, out_path: Path | None = None) -> Path:
                 node.append([S("instances"), [S("project"), d.name, [S("path"), f"/{root}",
                              [S("reference"), inst.ref], [S("unit"), inst.unit]]]])
                 items.append(node)
+                pe = pmap.setdefault(inst.ref, {"value": str(part.value or ""), "block": part.block,
+                                                "bbox": list(b), "pins": []})
+                pe["bbox"] = [min(pe["bbox"][0], b[0]), min(pe["bbox"][1], b[1]),
+                              max(pe["bbox"][2], b[2]), max(pe["bbox"][3], b[3])]
                 for p in inst.pins:
                     px, py, _ = inst.pin_at(p, sx, sy, rot)
                     pin_pts.add((px, py))
+                    n = bld.pin_net.get((inst.ref, p.number))
+                    pe["pins"].append([p.number, p.name, n, px, py])
+                    if n:
+                        nm(n)["pins"].append([inst.ref, p.number, px, py])
             for i, (x1, y1, x2, y2, _n) in enumerate(cl.wires):
                 if (X(x1), Y(y1)) != (X(x2), Y(y2)):
                     wires.append((X(x1), Y(y1), X(x2), Y(y2)))
+                    if _n:
+                        nm(_n)["wires"].append([X(x1), Y(y1), X(x2), Y(y2)])
             for i, (net, x, y, dirn) in enumerate(cl.labels):
                 label(net, X(x), Y(y), dirn, f"{cl.name}/{i}")
+                nm(net)["marks"].append([X(x), Y(y)])
             for i, (net, x, y, dirn) in enumerate(cl.power):
                 power_symbol(net, X(x), Y(y), dirn, f"{cl.name}/{i}")
+                nm(net)["marks"].append([X(x), Y(y)])
             for i, (x, y) in enumerate(cl.nc):
                 items.append([S("no_connect"), [S("at"), X(x), Y(y)], [S("uuid"), uid(d.name, "nc", cl.name, i)]])
 
@@ -744,6 +762,10 @@ def generate(d: Design, out_path: Path | None = None) -> Path:
                            [S("reference"), ref], [S("unit"), 1]]]]])
             pin_pts.add((fx, fy))
             wires.append((fx, fy, fx, snap(fy + 2.54)))
+            nm(net)["wires"].append([fx, fy, fx, snap(fy + 2.54)])
+            nm(net)["marks"].append([fx, snap(fy + 5.08 if net in bld.supply and not is_ground(net) else fy + 2.54)])
+            if net in bld.supply and not is_ground(net):
+                nm(net)["wires"].append([fx, snap(fy + 2.54), fx, snap(fy + 5.08)])
             if net in bld.supply:
                 power_symbol(net, fx, snap(fy + 2.54), 270 if is_ground(net) else 90, f"flag/{net}")
                 if not is_ground(net):     # VCC symbol points up into the flag: move it below on its own stub
@@ -764,7 +786,30 @@ def generate(d: Design, out_path: Path | None = None) -> Path:
             [S("lib_symbols")] + list(lib_syms.values())] + items + [
             [S("sheet_instances"), [S("path"), "/", [S("page"), "1"]]], [S("embedded_fonts"), S("no")]]
     out_path.write_text(dumps(tree) + "\n", encoding="utf-8")
+    write_map(d, out_path, papers[k][1], nmap, pmap, bld.supply)
     return out_path
+
+
+def write_map(d: Design, sch: Path, paper_wh, nmap, pmap, supply) -> None:
+    """out/schematic_map.json + a full-sheet SVG of the same drawing (the GUI overlays one on the other)."""
+    out = d.project_dir / "out"
+    (out / "preview").mkdir(parents=True, exist_ok=True)
+    svg = out / "preview" / "schematic_sheet.svg"
+    tmp = out / "preview" / "_sheet"
+    tmp.mkdir(exist_ok=True)
+    subprocess.run([str(config.KICAD_CLI), "sch", "export", "svg", "-o", str(tmp), str(sch)],
+                   capture_output=True, text=True, timeout=300)
+    got = sorted(tmp.glob("*.svg"))
+    if got:
+        got[0].replace(svg)
+    for f in tmp.glob("*"):
+        f.unlink()
+    tmp.rmdir()
+    data = {"paper": list(paper_wh), "svg": str(svg.resolve()) if got else None, "supply": sorted(supply),
+            "nets": nmap, "parts": pmap,
+            "design_nets": {n: [list(rp) for rp in pins] for n, pins in d.nets.items()}}
+    import json
+    (out / "schematic_map.json").write_text(json.dumps(data, ensure_ascii=False))
 
 
 def _wire_items(d, wires, pin_pts):
