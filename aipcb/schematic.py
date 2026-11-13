@@ -50,13 +50,32 @@ class _Inst:
         self.box = (xmin, ymin, xmax, ymax)
         self.lab = {"l": 0.0, "r": 0.0, "t": 0.0, "b": 0.0}
         self.x = self.y = 0.0
+        self.sides: set = set()
+        self.text_side = None
 
     def measure(self, pin_net):
+        sides = set()
         for p in self.pins:
             net = pin_net.get((self.ref, p.number))
             ln = (len(net) * LABEL_CH + 2.0) if net else 2.0
             side = {0: "l", 180: "r", 90: "b", 270: "t"}.get(p.angle % 360, "l")
+            sides.add(side)
             self.lab[side] = max(self.lab[side], ln)
+        # vertical pin labels run straight through text placed above/below the body, so a part with top/bottom
+        # pins carries its reference/value on a side that has no pins (resistors, caps, FETs, diodes...)
+        self.sides = sides
+        self.text_side = None
+        if sides & {"t", "b"}:
+            self.text_side = "r" if "r" not in sides else ("l" if "l" not in sides else None)
+        tw = max(len(self.ref), len(str(self.part.value or ""))) * LABEL_CH + 2.0
+        if self.text_side:
+            self.lab[self.text_side] = max(self.lab[self.text_side], tw)
+        else:
+            # centred reference/value wider than the body: reserve the overhang on both sides
+            pad = (tw - (self.box[2] - self.box[0])) / 2
+            if pad > 0:
+                self.lab["l"] = max(self.lab["l"], pad)
+                self.lab["r"] = max(self.lab["r"], pad)
 
     @property
     def w(self):
@@ -64,7 +83,7 @@ class _Inst:
 
     @property
     def h(self):
-        return (self.box[3] - self.box[1]) + self.lab["t"] + self.lab["b"] + 8
+        return (self.box[3] - self.box[1]) + self.lab["t"] + self.lab["b"] + 11
 
 
 def generate(d: Design, out_path: Path | None = None) -> Path:
@@ -115,25 +134,31 @@ def generate(d: Design, out_path: Path | None = None) -> Path:
             row_h = max(row_h, inst.h)
         block_rects.append([name, insts, bw + 4, y + row_h + 4])
 
-    total = sum(w * h for _, _, w, h in block_rects)
-    sheet_w = max(260.0, (total * 1.5) ** 0.5)
-    bx = by = 0.0
-    shelf_h = 0.0
     margin = 20.0
-    placed = []
-    for name, insts, w, h in sorted(block_rects, key=lambda b: -b[3]):
-        if bx > 0 and bx + w > sheet_w:
-            bx = 0.0; by += shelf_h + 8; shelf_h = 0.0
-        placed.append((name, insts, margin + bx, margin + by, w, h))
-        bx += w + 8
-        shelf_h = max(shelf_h, h)
-    used_w = max(p[2] + p[4] for p in placed) + margin
-    used_h = by + shelf_h + margin * 2 + 20
-    paper = "A4"
-    for name, (pw, ph) in (("A4", (297, 210)), ("A3", (420, 297)), ("A2", (594, 420)), ("A1", (841, 594)), ("A0", (1189, 841))):
-        paper = name
-        if used_w <= pw and used_h <= ph:
-            break
+    papers = (("A4", (297, 210)), ("A3", (420, 297)), ("A2", (594, 420)), ("A1", (841, 594)), ("A0", (1189, 841)))
+
+    def pack(sheet_w):
+        bx = by = 0.0
+        shelf_h = 0.0
+        out = []
+        for name, insts, w, h in sorted(block_rects, key=lambda b: -b[3]):
+            if bx > 0 and bx + w > sheet_w:
+                bx = 0.0; by += shelf_h + 8; shelf_h = 0.0
+            out.append((name, insts, margin + bx, margin + by, w, h))
+            bx += w + 8
+            shelf_h = max(shelf_h, h)
+        uw = max(p[2] + p[4] for p in out) + margin
+        uh = by + shelf_h + margin * 2 + 20
+        k = next((i for i, (_, (pw, ph)) in enumerate(papers) if uw <= pw and uh <= ph), len(papers) - 1)
+        return (k, uw * uh), out, uw, uh, k
+
+    # shelf-pack at several widths and keep the smallest paper (then the tightest fit): landscape sheets
+    # are filled instead of stacking every block in one tall column
+    widest = max(w for _, _, w, _ in block_rects)
+    best = min((pack(sw) for sw in [widest] + [float(v) for v in range(200, 1180, 20) if v > widest]),
+               key=lambda r: r[0])
+    _, placed, used_w, used_h, k = best
+    paper = papers[k][0]
 
     # ---------------- emit
     lib_syms = {}
@@ -162,8 +187,20 @@ def generate(d: Design, out_path: Path | None = None) -> Path:
             def prop(k, v, x, y, just=None, hide=False):
                 return [S("property"), k, str(v), [S("at"), snap(x), snap(y), 0], _effects(just, hide)]
 
-            node.append(prop("Reference", inst.ref, sx + xmin, sy - ymax - 1.5, "left"))
-            node.append(prop("Value", part.value, sx + xmin, sy - ymin + 2.5, "left"))
+            cy = sy - (ymax + ymin) / 2
+            if inst.text_side == "r":
+                node.append(prop("Reference", inst.ref, sx + xmax + 1.5, cy - 1.27, "left"))
+                node.append(prop("Value", part.value, sx + xmax + 1.5, cy + 1.27, "left"))
+            elif inst.text_side == "l":
+                node.append(prop("Reference", inst.ref, sx + xmin - 1.5, cy - 1.27, "right"))
+                node.append(prop("Value", part.value, sx + xmin - 1.5, cy + 1.27, "right"))
+            else:
+                # centred over / under the body, beyond any vertical pin labels
+                cx = sx + (xmin + xmax) / 2
+                top = inst.lab["t"] if "t" in inst.sides else 0.0
+                bot = inst.lab["b"] if "b" in inst.sides else 0.0
+                node.append(prop("Reference", inst.ref, cx, sy - ymax - top - 1.8))
+                node.append(prop("Value", part.value, cx, sy - ymin + bot + 2.2))
             node.append(prop("Footprint", part.footprint_id, sx, sy, hide=True))
             node.append(prop("Datasheet", part.data.get("datasheet", sym.props.get("Datasheet", "~")), sx, sy, hide=True))
             node.append(prop("Description", part.data.get("description", sym.props.get("Description", "")), sx, sy, hide=True))

@@ -18,3 +18,12 @@
 `design.yaml` → 元件庫（含 AI 自訂元件）→ 規格驗證 → 原理圖 → ERC → 物理擺放（力導向 + 模擬退火 + 合法化）→ 佈線（雙層 A*、拆線重佈、GND 扇出）→ PCB → DRC（含鋪銅連通性的閉迴路修補）→ SPICE 模擬 → 設計檢查 → 預覽 → **Claude 審核** → 送廠檔
 
 詳細的設計與審核規範見 `CLAUDE.md`。範例專案位於 `projects/fm_radio/`。
+
+## 專案與電路圖
+每次建置（`previews` 階段）都會自動更新各專案的 `README.md` 與 `docs/`：原理圖 PDF / SVG、PCB 3D 圖、檢查與審核摘要。
+
+| 專案 | 說明 | 電路圖 |
+|---|---|---|
+| [fm_radio](projects/fm_radio/) | FM/藍牙口袋收音機（ESP32 + RDA5807M + PAM8302，USB-C 充電） | [PDF](projects/fm_radio/docs/fm_radio_schematic.pdf) · [SVG](projects/fm_radio/docs/schematic.svg) |
+| [outdoor_hmi](projects/outdoor_hmi/) | Outdoor Hub Board 2：按鍵、旋鈕、SOS、震動馬達與 2.5 W 喇叭 | [PDF](projects/outdoor_hmi/docs/outdoor_hmi_schematic.pdf) · [SVG](projects/outdoor_hmi/docs/schematic.svg) |
+

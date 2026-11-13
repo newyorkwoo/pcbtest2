@@ -50,7 +50,78 @@ def previews(d: Design) -> dict:
             if target.exists():
                 res[name] = str(target)
     (out / "index.json").write_text(json.dumps(res, indent=1))
+    res["docs"] = write_docs(d, res)
     return res
+
+
+def write_docs(d: Design, prev: dict) -> list[str]:
+    """Version-controlled circuit documentation in projects/<name>/docs (out/ is not committed):
+    schematic PDF + SVG (with title block), 3D renders, and an auto-generated project README."""
+    docs = d.project_dir / "docs"
+    docs.mkdir(exist_ok=True)
+    sch = d.project_dir / f"{d.name}.kicad_sch"
+    made = []
+    if sch.exists():
+        pdf = docs / f"{d.name}_schematic.pdf"
+        _cli("sch", "export", "pdf", "-o", pdf, sch)
+        if pdf.exists():
+            made.append(pdf.name)
+        tmp = docs / "_svg"
+        tmp.mkdir(exist_ok=True)
+        _cli("sch", "export", "svg", "-o", tmp, sch)       # keeps the drawing sheet / title block
+        svgs = sorted(tmp.glob("*.svg"))
+        if svgs:
+            svgs[0].replace(docs / "schematic.svg")
+            made.append("schematic.svg")
+        shutil.rmtree(tmp, ignore_errors=True)
+    for key, name in (("render_top", "pcb_top.png"), ("render_iso", "pcb_iso.png"), ("render_bottom", "pcb_bottom.png")):
+        if prev.get(key):
+            shutil.copyfile(prev[key], docs / name)
+            made.append(name)
+    (d.project_dir / "README.md").write_text(_project_readme(d, made), encoding="utf-8")
+    return made
+
+
+def _project_readme(d: Design, made: list[str]) -> str:
+    out = d.project_dir / "out"
+
+    def load(name):
+        f = out / name
+        return json.loads(f.read_text()) if f.exists() else {}
+    review, checks, drc = load("review.json"), load("checks.json"), load("drc_summary.json")
+    sims = load("sim/summary.json") or []
+    b = d.board
+    nparts = sum(1 for p in d.parts.values() if p.footprint and not p.footprint_id.startswith("MountingHole"))
+    L = [f"# {d.raw.get('title', d.name)}", "",
+         "> 本檔由 `python -m aipcb previews` 自動產生，請勿手動編輯；設計來源是 `design.yaml`。", "",
+         "| 項目 | 內容 |", "|---|---|",
+         f"| 板子尺寸 | {b['width']} × {b['height']} mm，{b.get('layers', 2)} 層，厚 {b.get('thickness', 1.6)} mm |",
+         f"| 零件 / 網路 | {nparts} 顆 / {len(d.nets)} 個 |"]
+    if drc:
+        L.append(f"| DRC | {drc.get('errors', '?')} 錯誤、{drc.get('unconnected', '?')} 未連接 |")
+    if checks:
+        L.append(f"| 自動檢查 | {'通過' if checks.get('auto_pass') else '未通過'}（error {checks['counts']['error']}、"
+                 f"warning {checks['counts']['warning']}） |")
+    if sims:
+        L.append(f"| SPICE 模擬 | {sum(1 for s in sims if s.get('ok'))}/{len(sims)} 通過 |")
+    if review:
+        L.append(f"| AI 審核 | **{review.get('verdict')}**（{review.get('time', '')}） |")
+    L += ["", "## 電路圖 Schematic", ""]
+    if "schematic.svg" in made:
+        L += ["![schematic](docs/schematic.svg)", ""]
+    if f"{d.name}_schematic.pdf" in made:
+        L += [f"可放大的向量版：[docs/{d.name}_schematic.pdf](docs/{d.name}_schematic.pdf)", ""]
+    pics = [m for m in ("pcb_top.png", "pcb_iso.png", "pcb_bottom.png") if m in made]
+    if pics:
+        L += ["## PCB", "", " ".join(f"<img src=\"docs/{m}\" width=\"32%\">" for m in pics), ""]
+    if review.get("summary"):
+        L += ["## AI 審核摘要", "", review["summary"], ""]
+        for f in review.get("findings", []):
+            if f.get("severity") in ("error", "warning"):
+                L.append(f"- **[{f['severity'].upper()}] {f.get('title', '')}**")
+        L.append("")
+        L.append("完整審核內容：[out/review.md](out/review.md)")
+    return "\n".join(L) + "\n"
 
 
 def bom_rows(d: Design) -> list[dict]:

@@ -233,7 +233,7 @@
  },
  "schematic": {
   "state": "ok",
-  "time": "2026-11-13T10:04:03",
+  "time": "2026-11-13T10:59:18",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/outdoor_hmi.kicad_sch"
@@ -241,7 +241,7 @@
  },
  "erc": {
   "state": "ok",
-  "time": "2026-11-13T10:04:07",
+  "time": "2026-11-13T10:59:22",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -658,7 +658,7 @@
  },
  "previews": {
   "state": "ok",
-  "time": "2026-11-13T10:06:58",
+  "time": "2026-11-13T10:59:31",
   "summary": {
    "ok": true,
    "schematic": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/schematic.svg",
@@ -667,7 +667,14 @@
    "pcb_all": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/pcb_all.svg",
    "render_top": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/render_top.png",
    "render_iso": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/render_iso.png",
-   "render_bottom": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/render_bottom.png"
+   "render_bottom": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/render_bottom.png",
+   "docs": [
+    "outdoor_hmi_schematic.pdf",
+    "schematic.svg",
+    "pcb_top.png",
+    "pcb_iso.png",
+    "pcb_bottom.png"
+   ]
   }
  },
  "review": {

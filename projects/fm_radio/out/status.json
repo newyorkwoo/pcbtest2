@@ -25,7 +25,7 @@
  },
  "schematic": {
   "state": "ok",
-  "time": "2026-11-13T10:31:59",
+  "time": "2026-11-13T10:58:57",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/fm_radio.kicad_sch"
@@ -33,7 +33,7 @@
  },
  "erc": {
   "state": "ok",
-  "time": "2026-11-13T10:32:04",
+  "time": "2026-11-13T10:59:02",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -422,7 +422,7 @@
  },
  "previews": {
   "state": "ok",
-  "time": "2026-11-13T10:33:28",
+  "time": "2026-11-13T10:59:12",
   "summary": {
    "ok": true,
    "schematic": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/schematic.svg",
@@ -431,7 +431,14 @@
    "pcb_all": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/pcb_all.svg",
    "render_top": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/render_top.png",
    "render_iso": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/render_iso.png",
-   "render_bottom": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/render_bottom.png"
+   "render_bottom": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/render_bottom.png",
+   "docs": [
+    "fm_radio_schematic.pdf",
+    "schematic.svg",
+    "pcb_top.png",
+    "pcb_iso.png",
+    "pcb_bottom.png"
+   ]
   }
  },
  "review": {
