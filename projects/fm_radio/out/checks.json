@@ -41,7 +41,7 @@
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U2 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/GND] \u7684\u710a\u76e4 R3 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U2 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [GND] \u7684\u710a\u76e4 R3 F.Cu']",
    "refs": []
   },
   {
@@ -65,7 +65,7 @@
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R14 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/VBAT] \u7684\u710a\u76e4 C2 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R14 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [VBAT] \u7684\u710a\u76e4 C2 F.Cu']",
    "refs": []
   },
   {
@@ -83,31 +83,31 @@
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U7 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/GND] \u7684\u710a\u76e4 R2 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U7 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [GND] \u7684\u710a\u76e4 R2 F.Cu']",
    "refs": []
   },
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R2 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/GND] \u7684\u710a\u76e4 R1 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R2 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [GND] \u7684\u710a\u76e4 R1 F.Cu']",
    "refs": []
   },
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['D2 \u7684\u53c3\u8003\u6b04\u4f4d', '3 \u4e0a [/GND] \u7684\u710a\u76e4 U9 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['D2 \u7684\u53c3\u8003\u6b04\u4f4d', '3 \u4e0a [GND] \u7684\u710a\u76e4 U9 F.Cu']",
    "refs": []
   },
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C20 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/VSYS] \u7684\u710a\u76e4 Q3 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C20 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [VSYS] \u7684\u710a\u76e4 Q3 F.Cu']",
    "refs": []
   },
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C22 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/VBAT] \u7684\u710a\u76e4 U9 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C22 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [VBAT] \u7684\u710a\u76e4 U9 F.Cu']",
    "refs": []
   },
   {
@@ -119,13 +119,13 @@
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C4 \u7684\u53c3\u8003\u6b04\u4f4d', '5 \u4e0a [/+3V3] \u7684\u710a\u76e4 U3 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C4 \u7684\u53c3\u8003\u6b04\u4f4d', '5 \u4e0a [+3V3] \u7684\u710a\u76e4 U3 F.Cu']",
    "refs": []
   },
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U3 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [/GND] \u7684\u710a\u76e4 C4 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U3 \u7684\u53c3\u8003\u6b04\u4f4d', '2 \u4e0a [GND] \u7684\u710a\u76e4 C4 F.Cu']",
    "refs": []
   },
   {
@@ -137,7 +137,7 @@
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C13 \u7684\u53c3\u8003\u6b04\u4f4d', '8 \u4e0a [/GND] \u7684\u710a\u76e4 U6 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C13 \u7684\u53c3\u8003\u6b04\u4f4d', '8 \u4e0a [GND] \u7684\u710a\u76e4 U6 F.Cu']",
    "refs": []
   },
   {
@@ -161,7 +161,7 @@
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C13 \u7684\u53c3\u8003\u6b04\u4f4d', '7 \u4e0a [/+3V3] \u7684\u710a\u76e4 U6 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C13 \u7684\u53c3\u8003\u6b04\u4f4d', '7 \u4e0a [+3V3] \u7684\u710a\u76e4 U6 F.Cu']",
    "refs": []
   },
   {
@@ -173,7 +173,7 @@
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C15 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/GND] \u7684\u710a\u76e4 U6 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C15 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [GND] \u7684\u710a\u76e4 U6 F.Cu']",
    "refs": []
   },
   {
@@ -197,19 +197,19 @@
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U9 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/VBAT] \u7684\u710a\u76e4 C22 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['U9 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [VBAT] \u7684\u710a\u76e4 C22 F.Cu']",
    "refs": []
   },
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R9 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/+3V3] \u7684\u710a\u76e4 C9 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['R9 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [+3V3] \u7684\u710a\u76e4 C9 F.Cu']",
    "refs": []
   },
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C9 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [/+3V3] \u7684\u710a\u76e4 R9 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['C9 \u7684\u53c3\u8003\u6b04\u4f4d', '1 \u4e0a [+3V3] \u7684\u710a\u76e4 R9 F.Cu']",
    "refs": []
   },
   {
@@ -263,7 +263,7 @@
   {
    "severity": "warning",
    "category": "drc",
-   "message": "silk_over_copper: Silkscreen clipped by solder mask ['Q1 \u7684\u53c3\u8003\u6b04\u4f4d', '16 \u4e0a [/+3V3] \u7684\u710a\u76e4 U4 F.Cu']",
+   "message": "silk_over_copper: Silkscreen clipped by solder mask ['Q1 \u7684\u53c3\u8003\u6b04\u4f4d', '16 \u4e0a [+3V3] \u7684\u710a\u76e4 U4 F.Cu']",
    "refs": []
   },
   {

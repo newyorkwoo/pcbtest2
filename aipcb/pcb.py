@@ -7,7 +7,7 @@ import math
 from pathlib import Path
 
 from .placement import ORIGIN, rot_pt
-from .schematic import root_uuid, symbol_uuid, uid
+from .schematic import root_uuid, supply_nets, symbol_uuid, uid
 from .sexpr import Sym, dumps, find, find_all, head
 from .spec import Design
 
@@ -25,8 +25,11 @@ LAYER_DEFS = [
 ]
 
 
-def pcb_net(name: str) -> str:
-    """Schematic local labels on the root sheet produce net names '/NAME'."""
+def pcb_net(name: str, d: Design | None = None) -> str:
+    """Net name as the schematic produces it: local labels on the root sheet give '/NAME', power symbols
+    (supply rails) give the bare global name."""
+    if d is not None and name in supply_nets(d):
+        return name
     return name if name.startswith("/") else "/" + name
 
 
@@ -143,7 +146,7 @@ def _footprint(d: Design, ref: str, pos: dict, net_num: dict, pin_net: dict, nc_
             if net is None and (ref, str(c[1])) in nc_nets:
                 c.append([S("net"), net_num[nc_nets[(ref, str(c[1]))]], nc_nets[(ref, str(c[1]))]])
             if net is not None:
-                c.append([S("net"), net_num[net], pcb_net(net)])
+                c.append([S("net"), net_num[net], pcb_net(net, d)])
                 pin = next((p for p in part.symbol.pins if p.number == str(c[1])), None)
                 if pin:
                     c.append([S("pinfunction"), pin.name])
@@ -187,7 +190,7 @@ def _zone(d: Design, net: str, num: int, layer: str) -> list:
     W, H = float(d.board["width"]), float(d.board["height"])
     m = 0.0
     pts = [(ORIGIN + m, ORIGIN + m), (ORIGIN + W - m, ORIGIN + m), (ORIGIN + W - m, ORIGIN + H - m), (ORIGIN + m, ORIGIN + H - m)]
-    return [S("zone"), [S("net"), num], [S("net_name"), pcb_net(net)], [S("layer"), layer], [S("uuid"), uid(d.name, "zone", net, layer)],
+    return [S("zone"), [S("net"), num], [S("net_name"), pcb_net(net, d)], [S("layer"), layer], [S("uuid"), uid(d.name, "zone", net, layer)],
             [S("hatch"), S("edge"), 0.5], [S("priority"), 0],
             [S("connect_pads"), [S("clearance"), 0.25]], [S("min_thickness"), 0.2], [S("filled_areas_thickness"), S("no")],
             [S("fill"), S("yes"), [S("thermal_gap"), 0.3], [S("thermal_bridge_width"), 0.3], [S("island_removal_mode"), 0]],
@@ -274,7 +277,7 @@ def generate(d: Design, positions: dict, routes: dict | None, out_path: Path | N
             [S("paper"), "A4"],
             [S("title_block"), [S("title"), d.raw.get("title", d.name)], [S("rev"), str(d.raw.get("rev", "A"))]],
             _layers(), _setup(d), [S("net"), 0, ""]]
-    tree += [[S("net"), net_num[n], pcb_net(n)] for n in net_names]
+    tree += [[S("net"), net_num[n], pcb_net(n, d)] for n in net_names]
     nc_nets = nc_net_names(d)
     for k, nm in enumerate(sorted(set(nc_nets.values()))):
         net_num[nm] = len(net_names) + 1 + k

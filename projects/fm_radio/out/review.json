@@ -51,12 +51,17 @@
    "severity": "warning",
    "title": "VSYS 有 3.2 mm 走線縮到 0.2 mm",
    "detail": "進入細腳距焊盤時的縮頸，0.2 mm、1 oz 約可承載 0.6 A，峰值 0.5 A 屬邊界值但可用。"
+  },
+  {
+   "severity": "info",
+   "title": "Schematic redrawn with wires; supply nets renamed",
+   "detail": "Re-review after the schematic generator rewrite: the sheet is now wired (KiCad netlist verified equal to design.yaml pin-for-pin), supply rails use power symbols, so the PCB net names of the rails lost the \"/\" prefix (e.g. /GND -> GND). Diff of the .kicad_pcb against the reviewed board shows no other change (no copper, footprint or position change). ERC 0, DRC 0 errors / 0 unconnected, geometric GND check OK. All earlier findings stand unchanged."
   }
  ],
- "time": "2026-11-13T10:33:53",
+ "time": "2026-11-13T12:46:02",
  "reviewer": "Claude",
  "board": {
   "design.yaml": "7058cfb60603c06bf9d94474bdecd5c1c56ff422fb9f043dd7511778766ade90",
-  "fm_radio.kicad_pcb": "0cb7ef434e252f637dca8cea064ab0a7ac17d7f98da77b690869862131eb50b9"
+  "fm_radio.kicad_pcb": "51fcaac07d5e820f9c49d22473d5409c9efeed0245704f0f31bf479ca8b6f44b"
  }
 }

@@ -127,7 +127,9 @@ def make_schematic(pd: Path) -> dict:
         return {"ok": False, "errors": d.errors}
     p = schematic.generate(d)
     pcb.write_project_file(d)
-    return {"ok": True, "file": str(p)}
+    # the drawing is wired, so prove it: KiCad's own netlist of the sheet must equal design.yaml pin for pin
+    v = schematic.verify(d)
+    return {"ok": v["ok"], "file": str(p), "netlist_match": v["ok"], **({"errors": v["errors"]} if v["errors"] else {})}
 
 
 @stage("erc")

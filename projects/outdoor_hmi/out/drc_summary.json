@@ -203,7 +203,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "C8 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/+3V3] \u7684\u710a\u76e4 R14 F.Cu"
+    "2 \u4e0a [+3V3] \u7684\u710a\u76e4 R14 F.Cu"
    ],
    "pos": [
     {
@@ -374,7 +374,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "R9 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 R10 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 R10 F.Cu"
    ],
    "pos": [
     {
@@ -488,7 +488,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "C13 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/+3V3] \u7684\u710a\u76e4 R22 F.Cu"
+    "2 \u4e0a [+3V3] \u7684\u710a\u76e4 R22 F.Cu"
    ],
    "pos": [
     {
@@ -507,7 +507,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "F.Silkscreen \u4e0a\u7684 \u7dda\u6bb5 SW6",
-    "S2 \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [/GND] SW6"
+    "S2 \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [GND] SW6"
    ],
    "pos": [
     {
@@ -545,7 +545,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "F.Silkscreen \u4e0a\u7684 \u7dda\u6bb5 SW6",
-    "MP \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [/GND] SW6"
+    "MP \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [GND] SW6"
    ],
    "pos": [
     {
@@ -564,7 +564,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "F.Silkscreen \u4e0a\u7684 \u7dda\u6bb5 SW6",
-    "C \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [/GND] SW6"
+    "C \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [GND] SW6"
    ],
    "pos": [
     {
@@ -583,7 +583,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "F.Silkscreen \u4e0a\u7684 \u7dda\u6bb5 SW6",
-    "MP \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [/GND] SW6"
+    "MP \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [GND] SW6"
    ],
    "pos": [
     {
@@ -621,7 +621,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "R23 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "S2 \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [/GND] SW6"
+    "S2 \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [GND] SW6"
    ],
    "pos": [
     {
@@ -640,7 +640,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "R23 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "MP \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [/GND] SW6"
+    "MP \u7684\u975e\u91d1\u5c6c\u5316\u710a\u76e4 [GND] SW6"
    ],
    "pos": [
     {
@@ -678,7 +678,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "R26 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/+3V3] \u7684\u710a\u76e4 R24 F.Cu"
+    "2 \u4e0a [+3V3] \u7684\u710a\u76e4 R24 F.Cu"
    ],
    "pos": [
     {
@@ -697,7 +697,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "C14 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C15 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 C15 F.Cu"
    ],
    "pos": [
     {
@@ -773,7 +773,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "Q1 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C13 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 C13 F.Cu"
    ],
    "pos": [
     {
@@ -811,7 +811,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "C16 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/VSYS] \u7684\u710a\u76e4 C18 F.Cu"
+    "1 \u4e0a [VSYS] \u7684\u710a\u76e4 C18 F.Cu"
    ],
    "pos": [
     {
@@ -830,7 +830,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "D3 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/+3V3] \u7684\u710a\u76e4 C29 F.Cu"
+    "1 \u4e0a [+3V3] \u7684\u710a\u76e4 C29 F.Cu"
    ],
    "pos": [
     {
@@ -849,7 +849,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "D3 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C29 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 C29 F.Cu"
    ],
    "pos": [
     {
@@ -868,7 +868,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "R28 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/+3V3] \u7684\u710a\u76e4 C29 F.Cu"
+    "1 \u4e0a [+3V3] \u7684\u710a\u76e4 C29 F.Cu"
    ],
    "pos": [
     {
@@ -887,7 +887,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "R28 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C29 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 C29 F.Cu"
    ],
    "pos": [
     {
@@ -963,7 +963,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "R29 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C18 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 C18 F.Cu"
    ],
    "pos": [
     {
@@ -982,7 +982,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "C29 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 R28 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 R28 F.Cu"
    ],
    "pos": [
     {
@@ -1020,7 +1020,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "D5 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C29 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 C29 F.Cu"
    ],
    "pos": [
     {
@@ -1058,7 +1058,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "U6 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/AMP_5V] \u7684\u710a\u76e4 C20 F.Cu"
+    "1 \u4e0a [AMP_5V] \u7684\u710a\u76e4 C20 F.Cu"
    ],
    "pos": [
     {
@@ -1077,7 +1077,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "C19 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/AMP_5V] \u7684\u710a\u76e4 C20 F.Cu"
+    "1 \u4e0a [AMP_5V] \u7684\u710a\u76e4 C20 F.Cu"
    ],
    "pos": [
     {
@@ -1115,7 +1115,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "R33 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/VSYS] \u7684\u710a\u76e4 C19 F.Cu"
+    "1 \u4e0a [VSYS] \u7684\u710a\u76e4 C19 F.Cu"
    ],
    "pos": [
     {
@@ -1134,7 +1134,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "U5 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C7 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 C7 F.Cu"
    ],
    "pos": [
     {
@@ -1153,7 +1153,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "U5 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/+3V3] \u7684\u710a\u76e4 C7 F.Cu"
+    "1 \u4e0a [+3V3] \u7684\u710a\u76e4 C7 F.Cu"
    ],
    "pos": [
     {
@@ -1191,7 +1191,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "F.Silkscreen \u4e0a\u7684 \u7dda\u6bb5 D4",
-    "2 \u4e0a [/VSYS] \u7684\u710a\u76e4 D4 F.Cu"
+    "2 \u4e0a [VSYS] \u7684\u710a\u76e4 D4 F.Cu"
    ],
    "pos": [
     {
@@ -1210,7 +1210,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "R1 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C20 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 C20 F.Cu"
    ],
    "pos": [
     {
@@ -1229,7 +1229,7 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "C19 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C20 F.Cu"
+    "2 \u4e0a [GND] \u7684\u710a\u76e4 C20 F.Cu"
    ],
    "pos": [
     {

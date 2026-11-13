@@ -26,12 +26,17 @@
    "severity": "info",
    "title": "沿用前一版審核的已驗證項目",
    "detail": "TPS61022 與 R40 的真負載斷開處理、PAM8302AASCR、Molex PicoBlade（-40 °C）、Broadcom LED 極性、所有 MPN/LCSC 對照、Board 1 介面需求，相較前一版都沒有變動。"
+  },
+  {
+   "severity": "info",
+   "title": "Schematic redrawn with wires; supply nets renamed",
+   "detail": "Re-review after the schematic generator rewrite: the sheet is now wired (KiCad netlist verified equal to design.yaml pin-for-pin), supply rails use power symbols, so the PCB net names of the rails lost the \"/\" prefix (e.g. /GND -> GND). Diff of the .kicad_pcb against the reviewed board shows no other change (no copper, footprint or position change). ERC 0, DRC 0 errors / 0 unconnected, geometric GND check OK. All earlier findings stand unchanged."
   }
  ],
- "time": "2026-11-13T10:08:21",
+ "time": "2026-11-13T12:46:02",
  "reviewer": "Claude",
  "board": {
   "design.yaml": "57c92965f48b7d090aa647b16be02bedb9af23d2338471fdba438573b16e67a0",
-  "outdoor_hmi.kicad_pcb": "fae7473f589ca793fd41499c660188969b1614f8cf59107c487e2091cea6b69d"
+  "outdoor_hmi.kicad_pcb": "7de6d52c6815dc4b10431c9c32d42f1f4f634ebbb9369424261091b621626955"
  }
 }

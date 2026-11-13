@@ -35,7 +35,10 @@ MCP server `aipcb` (see .mcp.json) exposes the same flow as tools.
    Quote tokens containing braces: `"U2.V_{DD}"`. Every pin must be on a net or listed in `nc:`.
 3. Placement hints in `place:` — `lock: true` keeps the part where the last placement put it; `edge: top|bottom|left|right` (+`edge_offset`), `x`/`y` (board-relative mm),
    `rot`, `near: REF.PIN` (+`near_dist`) for decoupling / crystals / ESD. Use `block:` to group functions.
-4. `rules.power_nets` get `power_track` width; `route_first` for critical nets.
+4. `rules.power_nets` get `power_track` width; `route_first` for critical nets. Supply rails (GND*, `+…`, and
+   rail-like power_nets such as VBUS / AMP_5V; override with `rules.supply_nets`) are drawn as power symbols and
+   are named without the `/` prefix on the PCB. The schematic is wired (2-pin parts hang off their IC pin); the
+   `schematic` stage fails unless KiCad's netlist of the sheet equals design.yaml pin for pin.
 5. Write SPICE decks that **mirror design.yaml exactly** (same topology/values) and state expectations with
    `* @expect`. Derive expected values by hand first; when a sim disagrees, decide whether the design or the
    expectation is wrong and say which.

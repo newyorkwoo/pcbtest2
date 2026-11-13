@@ -16,6 +16,7 @@ _autosave-*
 projects/*/out/preview/
 projects/*/out/sim/
 projects/*/out/check.net
+projects/*/out/check_sch.net
 projects/*/out/pipeline.log
 projects/*/out/fab/gerbers/
 projects/*/out/fab/*.step

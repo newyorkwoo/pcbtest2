@@ -25,15 +25,16 @@
  },
  "schematic": {
   "state": "ok",
-  "time": "2026-11-13T10:58:57",
+  "time": "2026-11-13T12:44:22",
   "summary": {
    "ok": true,
-   "file": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/fm_radio.kicad_sch"
+   "file": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/fm_radio.kicad_sch",
+   "netlist_match": true
   }
  },
  "erc": {
   "state": "ok",
-  "time": "2026-11-13T10:59:02",
+  "time": "2026-11-13T12:44:27",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -217,7 +218,7 @@
  },
  "pcb": {
   "state": "ok",
-  "time": "2026-11-13T10:33:11",
+  "time": "2026-11-13T12:44:33",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/fm_radio.kicad_pcb"
@@ -225,7 +226,7 @@
  },
  "drc": {
   "state": "ok",
-  "time": "2026-11-13T10:33:17",
+  "time": "2026-11-13T12:44:42",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -395,7 +396,7 @@
  },
  "checks": {
   "state": "ok",
-  "time": "2026-11-13T10:33:21",
+  "time": "2026-11-13T12:44:48",
   "summary": {
    "ok": true,
    "counts": {
@@ -422,7 +423,7 @@
  },
  "previews": {
   "state": "ok",
-  "time": "2026-11-13T10:59:12",
+  "time": "2026-11-13T12:46:09",
   "summary": {
    "ok": true,
    "schematic": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/schematic.svg",
@@ -443,7 +444,7 @@
  },
  "review": {
   "state": "fail",
-  "time": "2026-11-13T10:33:53",
+  "time": "2026-11-13T12:46:02",
   "summary": {
    "ok": false,
    "verdict": "CONDITIONAL"

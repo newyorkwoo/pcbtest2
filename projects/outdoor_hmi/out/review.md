@@ -7,3 +7,4 @@
 - **[WARNING] SOS 硬體 3 秒判定的誤差（未變）** — 受 74AUP1G17 VT+ 分布影響為 2.14–3.98 s，韌體必須自行確認按住 3 秒。
 - **[INFO] 引擎更新後重建，結果不變** — 用 --keep 重建（位置逐位元相同），套用新的 router（T 形接點焊接、SOT-23-6 GND 預先扇出）與幾何鋪銅檢查：DRC 0/0、幾何檢查通過、4 個模擬通過、checks auto_pass。J4/H3 間隙 0.12 mm 只是低於擺件器 0.4 mm 的間距餘裕，KiCad courtyard 檢查正常。
 - **[INFO] 沿用前一版審核的已驗證項目** — TPS61022 與 R40 的真負載斷開處理、PAM8302AASCR、Molex PicoBlade（-40 °C）、Broadcom LED 極性、所有 MPN/LCSC 對照、Board 1 介面需求，相較前一版都沒有變動。
+- **[INFO] Schematic redrawn with wires; supply nets renamed** — Re-review after the schematic generator rewrite: the sheet is now wired (KiCad netlist verified equal to design.yaml pin-for-pin), supply rails use power symbols, so the PCB net names of the rails lost the "/" prefix (e.g. /GND -> GND). Diff of the .kicad_pcb against the reviewed board shows no other change (no copper, footprint or position change). ERC 0, DRC 0 errors / 0 unconnected, geometric GND check OK. All earlier findings stand unchanged.

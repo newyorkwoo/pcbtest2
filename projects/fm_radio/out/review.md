@@ -12,3 +12,4 @@
 - **[WARNING] 電池低於約 3.33 V 時 3.3 V 軌脫離穩壓（模擬 02）** — 韌體應在 VBAT_SENSE 換算約 3.4 V 時關機；電池必須自帶保護板 (PCM)。
 - **[WARNING] OLED 模組腳位順序因廠商而異** — J3 依 GND-VCC-SCL-SDA 設計，購買時要確認，接反會燒毀模組。
 - **[WARNING] VSYS 有 3.2 mm 走線縮到 0.2 mm** — 進入細腳距焊盤時的縮頸，0.2 mm、1 oz 約可承載 0.6 A，峰值 0.5 A 屬邊界值但可用。
+- **[INFO] Schematic redrawn with wires; supply nets renamed** — Re-review after the schematic generator rewrite: the sheet is now wired (KiCad netlist verified equal to design.yaml pin-for-pin), supply rails use power symbols, so the PCB net names of the rails lost the "/" prefix (e.g. /GND -> GND). Diff of the .kicad_pcb against the reviewed board shows no other change (no copper, footprint or position change). ERC 0, DRC 0 errors / 0 unconnected, geometric GND check OK. All earlier findings stand unchanged.

@@ -233,15 +233,16 @@
  },
  "schematic": {
   "state": "ok",
-  "time": "2026-11-13T10:59:18",
+  "time": "2026-11-13T12:44:54",
   "summary": {
    "ok": true,
-   "file": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/outdoor_hmi.kicad_sch"
+   "file": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/outdoor_hmi.kicad_sch",
+   "netlist_match": true
   }
  },
  "erc": {
   "state": "ok",
-  "time": "2026-11-13T10:59:22",
+  "time": "2026-11-13T12:44:59",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -597,7 +598,7 @@
  },
  "pcb": {
   "state": "ok",
-  "time": "2026-11-13T10:06:42",
+  "time": "2026-11-13T12:45:04",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/outdoor_hmi.kicad_pcb"
@@ -605,7 +606,7 @@
  },
  "drc": {
   "state": "ok",
-  "time": "2026-11-13T10:06:48",
+  "time": "2026-11-13T12:45:12",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -631,7 +632,7 @@
  },
  "checks": {
   "state": "ok",
-  "time": "2026-11-13T10:06:52",
+  "time": "2026-11-13T12:45:17",
   "summary": {
    "ok": true,
    "counts": {
@@ -658,7 +659,7 @@
  },
  "previews": {
   "state": "ok",
-  "time": "2026-11-13T10:59:31",
+  "time": "2026-11-13T12:46:18",
   "summary": {
    "ok": true,
    "schematic": "/Users/steven/Documents/myproject/PCBtest2/projects/outdoor_hmi/out/preview/schematic.svg",
@@ -679,7 +680,7 @@
  },
  "review": {
   "state": "fail",
-  "time": "2026-11-13T10:08:21",
+  "time": "2026-11-13T12:46:02",
   "summary": {
    "ok": false,
    "verdict": "CONDITIONAL"
