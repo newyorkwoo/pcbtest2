@@ -66,6 +66,27 @@ def run_drc(d: Design, refill: bool = True) -> dict:
             "by_type": by_type, "violations": viol, "unconnected_items": unc, "parity": par}
 
 
+def geom_check(d: Design, nets: tuple[str, ...] = ("GND",)) -> dict:
+    """Shape-exact connectivity of the pour nets via KiCad's own Python (aipcb/kicad_geomcheck.py).
+
+    Stricter than zonefix's sample points: items are connected only where their real copper overlaps."""
+    pcb = d.project_dir / f"{d.name}.kicad_pcb"
+    script = Path(__file__).with_name("kicad_geomcheck.py")
+    if not config.KICAD_PYTHON.exists():
+        return {"ok": True, "skipped": f"KiCad Python not found at {config.KICAD_PYTHON} (set AIPCB_KICAD_PYTHON)"}
+    nets = tuple(n for n in nets if n in d.nets)
+    if not nets:
+        return {"ok": True, "nets": []}
+    p = subprocess.run([str(config.KICAD_PYTHON), "-I", str(script), str(pcb), *nets],
+                       capture_output=True, text=True, timeout=300)
+    line = next((l for l in reversed(p.stdout.splitlines()) if l.startswith("{")), None)
+    if p.returncode or not line:
+        return {"ok": False, "error": (p.stderr or p.stdout)[-800:]}
+    res = json.loads(line)
+    res["ok"] = all(n["ok"] for n in res["nets"])
+    return res
+
+
 # ------------------------------------------------------------- heuristics
 def _val(s: str) -> float | None:
     m = re.match(r"^\s*([0-9.]+)\s*([pnuµmkKMG]?)", str(s).replace("R", "").replace("Ω", ""))
@@ -206,6 +227,15 @@ def full_report(d: Design) -> dict:
                 findings.append({"severity": v["severity"], "category": "drc", "message": f"{v['type']}: {v['description']} {v['items']}", "refs": []})
         for v in drc.get("unconnected_items", []):
             findings.append({"severity": "error", "category": "drc", "message": f"unconnected: {v['items']}", "refs": []})
+        g = drc.get("geom") or {}
+        if g.get("error"):
+            findings.append({"severity": "error", "category": "drc", "message": f"geometric pour check failed to run: {g['error']}", "refs": []})
+        for n in g.get("nets", []):
+            for c in n["detached"]:
+                what = f"pads {c['pads']}" if c["pads"] else f"dead copper {c['islands']}"
+                findings.append({"severity": "error", "category": "drc",
+                                 "message": f"geometric check: {n['net']} copper not attached to the main plane at {c['at']}: {what}",
+                                 "refs": [p.split('.')[0] for p in c["pads"]]})
     for s in sims:
         if not s.get("ok"):
             findings.append({"severity": "error", "category": "simulation", "message": f"simulation {s['name']} failed: {s.get('error') or s.get('checks')}", "refs": []})

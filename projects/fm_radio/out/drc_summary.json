@@ -12,17 +12,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "C2 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 U2 F.Cu"
+    "R17 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "2 \u4e0a [/AUDIO_MIX] \u7684\u710a\u76e4 R19 F.Cu"
    ],
    "pos": [
     {
-     "x": 115.875,
-     "y": 124.23
+     "x": 155.58,
+     "y": 110.25
     },
     {
-     "x": 115.95,
-     "y": 124.8625
+     "x": 156.025,
+     "y": 109.6
     }
    ]
   },
@@ -31,17 +31,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "C2 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "3 \u4e0a [/VBAT] \u7684\u710a\u76e4 U2 F.Cu"
+    "R20 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C13 F.Cu"
    ],
    "pos": [
     {
-     "x": 115.875,
-     "y": 124.23
+     "x": 154.9,
+     "y": 114.63
     },
     {
-     "x": 115.0,
-     "y": 124.8625
+     "x": 153.55,
+     "y": 115.275
     }
    ]
   },
@@ -50,17 +50,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "C2 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/CHG_STAT] \u7684\u710a\u76e4 U2 F.Cu"
+    "R20 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "6 \u4e0a [/RCLK_32K] \u7684\u710a\u76e4 U6 F.Cu"
    ],
    "pos": [
     {
-     "x": 115.875,
-     "y": 124.23
+     "x": 154.9,
+     "y": 114.63
     },
     {
-     "x": 116.9,
-     "y": 124.8625
+     "x": 155.7,
+     "y": 115.1
     }
    ]
   },
@@ -69,17 +69,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "U2 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/PROG] \u7684\u710a\u76e4 R3 F.Cu"
+    "C15 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "3 \u4e0a [/GND] \u7684\u710a\u76e4 U6 F.Cu"
    ],
    "pos": [
     {
-     "x": 118.35,
-     "y": 126.0
+     "x": 160.645,
+     "y": 115.0
     },
     {
-     "x": 118.8,
-     "y": 127.1
+     "x": 159.9,
+     "y": 116.1
     }
    ]
   },
@@ -88,17 +88,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "SW1 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "3 \u4e0a [/LDO_EN] \u7684\u710a\u76e4 U3 F.Cu"
+    "C15 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "4 \u4e0a [/FM_IN] \u7684\u710a\u76e4 U6 F.Cu"
    ],
    "pos": [
     {
-     "x": 106.65,
-     "y": 128.15
+     "x": 160.645,
+     "y": 115.0
     },
     {
-     "x": 107.25,
-     "y": 128.8125
+     "x": 159.9,
+     "y": 115.6
     }
    ]
   },
@@ -107,17 +107,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "R23 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C4 F.Cu"
+    "C15 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "5 \u4e0a [/GND] \u7684\u710a\u76e4 U6 F.Cu"
    ],
    "pos": [
     {
-     "x": 109.125,
-     "y": 124.63
+     "x": 160.645,
+     "y": 115.0
     },
     {
-     "x": 108.9,
-     "y": 125.225
+     "x": 159.9,
+     "y": 115.1
     }
    ]
   },
@@ -126,17 +126,93 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "C18 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/+3V3] \u7684\u710a\u76e4 C5 F.Cu"
+    "R17 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "1 \u4e0a [/FM_L] \u7684\u710a\u76e4 R19 F.Cu"
    ],
    "pos": [
     {
-     "x": 109.23,
-     "y": 134.6
+     "x": 155.58,
+     "y": 110.25
     },
     {
-     "x": 109.8,
+     "x": 156.025,
+     "y": 111.25
+    }
+   ]
+  },
+  {
+   "type": "silk_over_copper",
+   "severity": "warning",
+   "description": "Silkscreen clipped by solder mask",
+   "items": [
+    "R19 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "2 \u4e0a [/RCLK_32K] \u7684\u710a\u76e4 R17 F.Cu"
+   ],
+   "pos": [
+    {
+     "x": 154.595,
+     "y": 110.425
+    },
+    {
+     "x": 154.15,
+     "y": 111.075
+    }
+   ]
+  },
+  {
+   "type": "silk_over_copper",
+   "severity": "warning",
+   "description": "Silkscreen clipped by solder mask",
+   "items": [
+    "R19 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "1 \u4e0a [/+3V3] \u7684\u710a\u76e4 R17 F.Cu"
+   ],
+   "pos": [
+    {
+     "x": 154.595,
+     "y": 110.425
+    },
+    {
+     "x": 154.15,
+     "y": 109.425
+    }
+   ]
+  },
+  {
+   "type": "silk_over_copper",
+   "severity": "warning",
+   "description": "Silkscreen clipped by solder mask",
+   "items": [
+    "Q2 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "2 \u4e0a [/Q2_B] \u7684\u710a\u76e4 R13 F.Cu"
+   ],
+   "pos": [
+    {
+     "x": 127.25,
+     "y": 133.65
+    },
+    {
+     "x": 127.975,
      "y": 133.4
+    }
+   ]
+  },
+  {
+   "type": "silk_over_copper",
+   "severity": "warning",
+   "description": "Silkscreen clipped by solder mask",
+   "items": [
+    "C9 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "1 \u4e0a [/+3V3] \u7684\u710a\u76e4 C8 F.Cu"
+   ],
+   "pos": [
+    {
+     "x": 128.3,
+     "y": 109.33
+    },
+    {
+     "x": 128.625,
+     "y": 110.3
     }
    ]
   },
@@ -183,17 +259,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "C9 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/+3V3] \u7684\u710a\u76e4 C8 F.Cu"
+    "C12 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "25 \u4e0a [/ESP_IO0] \u7684\u710a\u76e4 U1 F.Cu"
    ],
    "pos": [
     {
-     "x": 128.3,
-     "y": 109.33
+     "x": 150.12,
+     "y": 124.2
     },
     {
-     "x": 128.625,
-     "y": 110.3
+     "x": 148.8,
+     "y": 124.05
     }
    ]
   },
@@ -202,36 +278,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "Q2 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/Q2_B] \u7684\u710a\u76e4 R13 F.Cu"
+    "C12 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "26 \u4e0a [/RTC_INT] \u7684\u710a\u76e4 U1 F.Cu"
    ],
    "pos": [
     {
-     "x": 127.25,
-     "y": 133.65
+     "x": 150.12,
+     "y": 124.2
     },
     {
-     "x": 127.975,
-     "y": 133.4
-    }
-   ]
-  },
-  {
-   "type": "silk_over_copper",
-   "severity": "warning",
-   "description": "Silkscreen clipped by solder mask",
-   "items": [
-    "R13 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/VBAT_SENSE] \u7684\u710a\u76e4 R8 F.Cu"
-   ],
-   "pos": [
-    {
-     "x": 128.8,
-     "y": 134.83
-    },
-    {
-     "x": 127.8,
-     "y": 135.575
+     "x": 148.8,
+     "y": 122.78
     }
    ]
   },
@@ -374,25 +431,6 @@
    "description": "Silkscreen clipped by solder mask",
    "items": [
     "R2 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "B5 \u4e0a [/CC2] \u7684\u710a\u76e4 J1 F.Cu"
-   ],
-   "pos": [
-    {
-     "x": 141.3,
-     "y": 150.83
-    },
-    {
-     "x": 141.8,
-     "y": 151.805
-    }
-   ]
-  },
-  {
-   "type": "silk_over_copper",
-   "severity": "warning",
-   "description": "Silkscreen clipped by solder mask",
-   "items": [
-    "R2 \u7684\u53c3\u8003\u6b04\u4f4d",
     "B6 \u4e0a [/USB_DP] \u7684\u710a\u76e4 J1 F.Cu"
    ],
    "pos": [
@@ -411,17 +449,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "C12 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "25 \u4e0a [/ESP_IO0] \u7684\u710a\u76e4 U1 F.Cu"
+    "R2 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "B5 \u4e0a [/CC2] \u7684\u710a\u76e4 J1 F.Cu"
    ],
    "pos": [
     {
-     "x": 150.12,
-     "y": 124.2
+     "x": 141.3,
+     "y": 150.83
     },
     {
-     "x": 148.8,
-     "y": 124.05
+     "x": 141.8,
+     "y": 151.805
     }
    ]
   },
@@ -430,17 +468,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "C12 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "26 \u4e0a [/RTC_INT] \u7684\u710a\u76e4 U1 F.Cu"
+    "SW1 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "3 \u4e0a [/LDO_EN] \u7684\u710a\u76e4 U3 F.Cu"
    ],
    "pos": [
     {
-     "x": 150.12,
-     "y": 124.2
+     "x": 106.65,
+     "y": 128.15
     },
     {
-     "x": 148.8,
-     "y": 122.78
+     "x": 107.25,
+     "y": 128.8125
     }
    ]
   },
@@ -449,17 +487,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "R20 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C13 F.Cu"
+    "C18 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "1 \u4e0a [/+3V3] \u7684\u710a\u76e4 C5 F.Cu"
    ],
    "pos": [
     {
-     "x": 154.9,
-     "y": 114.63
+     "x": 109.23,
+     "y": 134.6
     },
     {
-     "x": 153.55,
-     "y": 115.275
+     "x": 109.8,
+     "y": 133.4
     }
    ]
   },
@@ -468,17 +506,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "R20 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "6 \u4e0a [/RCLK_32K] \u7684\u710a\u76e4 U6 F.Cu"
+    "R23 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "2 \u4e0a [/GND] \u7684\u710a\u76e4 C4 F.Cu"
    ],
    "pos": [
     {
-     "x": 154.9,
-     "y": 114.63
+     "x": 109.125,
+     "y": 124.63
     },
     {
-     "x": 155.7,
-     "y": 115.1
+     "x": 108.9,
+     "y": 125.225
     }
    ]
   },
@@ -487,17 +525,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "R17 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/FM_L] \u7684\u710a\u76e4 R19 F.Cu"
+    "R13 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "1 \u4e0a [/VBAT_SENSE] \u7684\u710a\u76e4 R8 F.Cu"
    ],
    "pos": [
     {
-     "x": 155.58,
-     "y": 110.25
+     "x": 128.8,
+     "y": 134.83
     },
     {
-     "x": 156.025,
-     "y": 111.25
+     "x": 127.8,
+     "y": 135.575
     }
    ]
   },
@@ -506,17 +544,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "R19 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/RCLK_32K] \u7684\u710a\u76e4 R17 F.Cu"
+    "C2 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "2 \u4e0a [/GND] \u7684\u710a\u76e4 U2 F.Cu"
    ],
    "pos": [
     {
-     "x": 154.595,
-     "y": 110.425
+     "x": 115.875,
+     "y": 124.23
     },
     {
-     "x": 154.15,
-     "y": 111.075
+     "x": 115.95,
+     "y": 124.8625
     }
    ]
   },
@@ -525,17 +563,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "C15 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "3 \u4e0a [/GND] \u7684\u710a\u76e4 U6 F.Cu"
+    "C2 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "3 \u4e0a [/VBAT] \u7684\u710a\u76e4 U2 F.Cu"
    ],
    "pos": [
     {
-     "x": 160.645,
-     "y": 115.0
+     "x": 115.875,
+     "y": 124.23
     },
     {
-     "x": 159.9,
-     "y": 116.1
+     "x": 115.0,
+     "y": 124.8625
     }
    ]
   },
@@ -544,17 +582,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "C15 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "4 \u4e0a [/FM_IN] \u7684\u710a\u76e4 U6 F.Cu"
+    "C2 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "1 \u4e0a [/CHG_STAT] \u7684\u710a\u76e4 U2 F.Cu"
    ],
    "pos": [
     {
-     "x": 160.645,
-     "y": 115.0
+     "x": 115.875,
+     "y": 124.23
     },
     {
-     "x": 159.9,
-     "y": 115.6
+     "x": 116.9,
+     "y": 124.8625
     }
    ]
   },
@@ -563,55 +601,17 @@
    "severity": "warning",
    "description": "Silkscreen clipped by solder mask",
    "items": [
-    "C15 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "5 \u4e0a [/GND] \u7684\u710a\u76e4 U6 F.Cu"
+    "U2 \u7684\u53c3\u8003\u6b04\u4f4d",
+    "1 \u4e0a [/PROG] \u7684\u710a\u76e4 R3 F.Cu"
    ],
    "pos": [
     {
-     "x": 160.645,
-     "y": 115.0
+     "x": 118.35,
+     "y": 126.0
     },
     {
-     "x": 159.9,
-     "y": 115.1
-    }
-   ]
-  },
-  {
-   "type": "silk_over_copper",
-   "severity": "warning",
-   "description": "Silkscreen clipped by solder mask",
-   "items": [
-    "R17 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "2 \u4e0a [/AUDIO_MIX] \u7684\u710a\u76e4 R19 F.Cu"
-   ],
-   "pos": [
-    {
-     "x": 155.58,
-     "y": 110.25
-    },
-    {
-     "x": 156.025,
-     "y": 109.6
-    }
-   ]
-  },
-  {
-   "type": "silk_over_copper",
-   "severity": "warning",
-   "description": "Silkscreen clipped by solder mask",
-   "items": [
-    "R19 \u7684\u53c3\u8003\u6b04\u4f4d",
-    "1 \u4e0a [/+3V3] \u7684\u710a\u76e4 R17 F.Cu"
-   ],
-   "pos": [
-    {
-     "x": 154.595,
-     "y": 110.425
-    },
-    {
-     "x": 154.15,
-     "y": 109.425
+     "x": 118.8,
+     "y": 127.1
     }
    ]
   },
@@ -637,13 +637,17 @@
  ],
  "unconnected_items": [],
  "parity": [],
- "zone_repairs": [
-  {
-   "trace_mm": 2.27,
-   "vias": 0,
-   "component_pads": [
-    "U4.1"
-   ]
-  }
- ]
+ "zone_repairs": [],
+ "geom": {
+  "nets": [
+   {
+    "net": "GND",
+    "ok": true,
+    "islands": 26,
+    "components": 1,
+    "detached": []
+   }
+  ],
+  "ok": true
+ }
 }

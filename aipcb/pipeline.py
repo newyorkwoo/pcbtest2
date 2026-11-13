@@ -170,20 +170,32 @@ def make_pcb(pd: Path) -> dict:
 def drc(pd: Path) -> dict:
     d = load(pd, check=False)
     r = checks.run_drc(d)
+    g = checks.geom_check(d)
     fixes = []
     for _ in range(3):   # closed loop: stitch unanchored GND pour islands, rebuild, re-check
-        if not any("Zone" in " ".join(v["items"]) for v in r.get("unconnected_items", [])):
+        kicad_open = any("Zone" in " ".join(v["items"]) for v in r.get("unconnected_items", []))
+        detached = [c for n in g.get("nets", []) if n["net"] == "GND" for c in n["detached"]]
+        if not kicad_open and not detached:
             break
         pos = json.loads((_out(pd) / "placement.json").read_text())["positions"]
         routes = json.loads((_out(pd) / "routes.json").read_text())
-        added = zonefix.fix_islands(d, pos, routes)
+        # the shape-exact check knows which copper is really detached; zonefix's own graph is the fallback
+        added = zonefix.fix_islands(d, pos, routes, external=detached or None)
         if not added:
             break
         fixes += added
-        log(pd, f"  zone repair: +{len(added)} stitching vias")
+        log(pd, f"  zone repair: +{len(added)} stitches")
         pcb.generate(d, pos, routes)
         r = checks.run_drc(d)
+        g = checks.geom_check(d)
     r["zone_repairs"] = fixes
+    r["geom"] = g
+    if not g.get("ok", True):
+        n_bad = sum(len(n["detached"]) for n in g.get("nets", [])) or 1
+        r["ok"] = False
+        r["errors"] = r.get("errors", 0) + n_bad
+        r.setdefault("by_type", {})["geom_detached_copper"] = n_bad
+        log(pd, f"  geometric pour check: {n_bad} detached GND component(s) remain")
     (_out(pd) / "drc_summary.json").write_text(json.dumps(r, indent=1))
     return r
 

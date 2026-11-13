@@ -291,7 +291,7 @@
  },
  "drc": {
   "state": "ok",
-  "time": "2026-11-13T09:08:55",
+  "time": "2026-11-13T09:16:34",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -300,12 +300,24 @@
    "by_type": {
     "silk_over_copper": 67
    },
-   "zone_repairs": []
+   "zone_repairs": [],
+   "geom": {
+    "nets": [
+     {
+      "net": "GND",
+      "ok": true,
+      "islands": 36,
+      "components": 1,
+      "detached": []
+     }
+    ],
+    "ok": true
+   }
   }
  },
  "checks": {
   "state": "ok",
-  "time": "2026-11-13T09:09:00",
+  "time": "2026-11-13T09:16:40",
   "summary": {
    "ok": true,
    "counts": {

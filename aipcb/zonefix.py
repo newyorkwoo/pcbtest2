@@ -37,10 +37,15 @@ def _inside(poly, x, y) -> bool:
     return bool(_poly_mask(np.array([[x]]), np.array([[y]]), poly)[0, 0])
 
 
-def fix_islands(d: Design, positions: dict, routes: dict, net: str = "GND") -> list[dict]:
+def fix_islands(d: Design, positions: dict, routes: dict, net: str = "GND",
+                external: list[dict] | None = None) -> list[dict]:
     """Connectivity-aware pour repair.  Builds a graph of {pour islands, vias, GND pads, GND tracks},
     finds components not attached to the main plane and stitches each one with a via placed where
-    the opposite layer belongs to the main component."""
+    the opposite layer belongs to the main component.
+
+    `external`: the `detached` list of kicad_geomcheck (shape-exact). When given it decides which copper is
+    detached instead of this module's sample-point graph, which can accept a pad sitting in a clearance hole
+    whose thermal spokes were never generated."""
     pcb = parse_file(d.project_dir / f"{d.name}.kicad_pcb")
     islands = []                                    # (layer, pts, area)
     for z in find_all(pcb, "zone"):
@@ -117,21 +122,41 @@ def fix_islands(d: Design, positions: dict, routes: dict, net: str = "GND") -> l
     comps: dict[int, list[int]] = {}
     for k in range(len(nodes)):
         comps.setdefault(f(k), []).append(k)
+    groups = []    # (island indices, pad dicts, via dicts) per detached component
+    if external is not None:
+        pad_by_name = {f"{p['ref']}.{p['pad']}": p for p in r.net_pads(nid)}
+        claimed: set[int] = set()
+        for c in external:
+            isl = []
+            for e in c.get("islands", []):
+                for i, (L, pts, area) in enumerate(islands):
+                    if i in claimed or L != e["layer"] or abs(area - e["area_mm2"]) > max(0.05, 0.02 * area):
+                        continue
+                    xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
+                    if abs((min(xs) + max(xs)) / 2 - e["at"][0]) < 0.1 and abs((min(ys) + max(ys)) / 2 - e["at"][1]) < 0.1:
+                        isl.append(i); claimed.add(i); break
+            pads = [pad_by_name[n] for n in c.get("pads", []) if n in pad_by_name]
+            groups.append((isl, pads, []))
+        main_isl = [i for i in range(len(islands)) if i not in claimed]
+    else:
+        for root, members in comps.items():
+            if root == main:
+                continue
+            groups.append(([k for k in members if nodes[k][0] == "isl"],
+                           [nodes[k][1] for k in members if nodes[k][0] == "pad"],
+                           [nodes[k][1] for k in members if nodes[k][0] == "via"]))
+        main_isl = [i for i in range(len(islands)) if f(i) == main]
     _, via_ok, _ = r.masks(nid, r.hw0)
     ii, jj = np.meshgrid(np.arange(r.nx), np.arange(r.ny))
     GX = ORIGIN + ii * r.g; GY = ORIGIN + jj * r.g
     erode = int(np.ceil((r.via_d / 2 + 0.05) / r.g))
     main_mask = {"F.Cu": np.zeros(GX.shape, bool), "B.Cu": np.zeros(GX.shape, bool)}
-    for i, (L, pts, _) in enumerate(islands):
-        if f(i) == main:
-            main_mask[L] |= _poly_mask(GX, GY, pts)
+    for i in main_isl:
+        L, pts, _ = islands[i]
+        main_mask[L] |= _poly_mask(GX, GY, pts)
     main_mask = {L: ~r._dilate(~m, erode) for L, m in main_mask.items()}
     added = []
-    for root, members in comps.items():
-        if root == main:
-            continue
-        isl = [k for k in members if nodes[k][0] == "isl"]
-        pads = [nodes[k][1] for k in members if nodes[k][0] == "pad"]
+    for isl, pads, vias_g in groups:
         if not isl and not pads:
             continue
         best = None
@@ -152,16 +177,14 @@ def fix_islands(d: Design, positions: dict, routes: dict, net: str = "GND") -> l
             for k in isl:
                 L, pts, _ = islands[k]
                 src_m[L] |= ~r._dilate(~_poly_mask(GX, GY, pts), int(np.ceil(r.hw0 / r.g)))
-            for k in members:
-                kind, obj = nodes[k]
-                if kind == "pad":       # bare pad with no pour around it: start from the pad core
-                    for c in r._pad_cells(obj):
-                        L = LAYERS[c // r.N]; cc = c % r.N
-                        if r.pad_core.reshape(2, -1)[c // r.N][cc] == nid:
-                            src_m[L][cc // r.nx, cc % r.nx] = True
-                if kind == "via":
-                    i, j = int(round((obj["x"] - ORIGIN) / r.g)), int(round((obj["y"] - ORIGIN) / r.g))
-                    src_m["F.Cu"][j, i] = src_m["B.Cu"][j, i] = True
+            for obj in pads:            # bare pad with no pour around it: start from the pad core
+                for c in r._pad_cells(obj):
+                    L = LAYERS[c // r.N]; cc = c % r.N
+                    if r.pad_core.reshape(2, -1)[c // r.N][cc] == nid:
+                        src_m[L][cc // r.nx, cc % r.nx] = True
+            for obj in vias_g:
+                i, j = int(round((obj["x"] - ORIGIN) / r.g)), int(round((obj["y"] - ORIGIN) / r.g))
+                src_m["F.Cu"][j, i] = src_m["B.Cu"][j, i] = True
             sources, targets = set(), set()
             ys_, xs_ = np.nonzero(src_m["F.Cu"] | src_m["B.Cu"])
             if not len(xs_):

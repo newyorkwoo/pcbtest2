@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-11-13T09:05:56",
+    "date": "2026-11-13T09:16:21",
     "ignored_checks": [
         {
             "description": "Thermal relief connection to zone incomplete",
@@ -58,20 +58,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "C2 的參考欄位",
+                    "description": "R17 的參考欄位",
                     "pos": {
-                        "x": 115.875,
-                        "y": 124.23
+                        "x": 155.58,
+                        "y": 110.25
                     },
-                    "uuid": "80c6c9bd-d556-5135-a6ba-6932703c4418"
+                    "uuid": "d70b37e6-813f-54c5-b728-450f3a10e760"
                 },
                 {
-                    "description": "2 上 [/GND] 的焊盤 U2 F.Cu",
+                    "description": "2 上 [/AUDIO_MIX] 的焊盤 R19 F.Cu",
                     "pos": {
-                        "x": 115.95,
-                        "y": 124.8625
+                        "x": 156.025,
+                        "y": 109.6
                     },
-                    "uuid": "25574776-7e2c-5cff-844b-47eeaf1c99e9"
+                    "uuid": "4b80598c-d0a9-5c05-9f56-d8d519aaf085"
                 }
             ],
             "severity": "warning",
@@ -81,20 +81,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "C2 的參考欄位",
+                    "description": "R20 的參考欄位",
                     "pos": {
-                        "x": 115.875,
-                        "y": 124.23
+                        "x": 154.9,
+                        "y": 114.63
                     },
-                    "uuid": "80c6c9bd-d556-5135-a6ba-6932703c4418"
+                    "uuid": "0e07c478-ff01-57c6-ab4f-026918b5bb9a"
                 },
                 {
-                    "description": "3 上 [/VBAT] 的焊盤 U2 F.Cu",
+                    "description": "2 上 [/GND] 的焊盤 C13 F.Cu",
                     "pos": {
-                        "x": 115.0,
-                        "y": 124.8625
+                        "x": 153.55,
+                        "y": 115.275
                     },
-                    "uuid": "00239307-393b-5014-ad54-68ee30509395"
+                    "uuid": "d94e1f51-5f8f-5f35-bbd7-801a1430ad14"
                 }
             ],
             "severity": "warning",
@@ -104,20 +104,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "C2 的參考欄位",
+                    "description": "R20 的參考欄位",
                     "pos": {
-                        "x": 115.875,
-                        "y": 124.23
+                        "x": 154.9,
+                        "y": 114.63
                     },
-                    "uuid": "80c6c9bd-d556-5135-a6ba-6932703c4418"
+                    "uuid": "0e07c478-ff01-57c6-ab4f-026918b5bb9a"
                 },
                 {
-                    "description": "1 上 [/CHG_STAT] 的焊盤 U2 F.Cu",
+                    "description": "6 上 [/RCLK_32K] 的焊盤 U6 F.Cu",
                     "pos": {
-                        "x": 116.9,
-                        "y": 124.8625
+                        "x": 155.7,
+                        "y": 115.1
                     },
-                    "uuid": "b0f82de1-a91f-5482-9d30-cb71e3b55a3f"
+                    "uuid": "446e4455-c1bb-523d-b370-efeed4f0e3f8"
                 }
             ],
             "severity": "warning",
@@ -127,20 +127,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "U2 的參考欄位",
+                    "description": "C15 的參考欄位",
                     "pos": {
-                        "x": 118.35,
-                        "y": 126.0
+                        "x": 160.645,
+                        "y": 115.0
                     },
-                    "uuid": "9ee6bc99-9d30-50c2-bee5-67bc00a11f94"
+                    "uuid": "e99fd974-dd20-5387-8795-d7bf9b88bcb8"
                 },
                 {
-                    "description": "1 上 [/PROG] 的焊盤 R3 F.Cu",
+                    "description": "3 上 [/GND] 的焊盤 U6 F.Cu",
                     "pos": {
-                        "x": 118.8,
-                        "y": 127.1
+                        "x": 159.9,
+                        "y": 116.1
                     },
-                    "uuid": "5b932654-c406-5944-971d-70a0b730c9fd"
+                    "uuid": "1844561e-d1ba-5530-bde7-0fb93fc51f18"
                 }
             ],
             "severity": "warning",
@@ -150,20 +150,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "SW1 的參考欄位",
+                    "description": "C15 的參考欄位",
                     "pos": {
-                        "x": 106.65,
-                        "y": 128.15
+                        "x": 160.645,
+                        "y": 115.0
                     },
-                    "uuid": "e2ffad52-2f15-47ff-8782-46a40ce175b2"
+                    "uuid": "e99fd974-dd20-5387-8795-d7bf9b88bcb8"
                 },
                 {
-                    "description": "3 上 [/LDO_EN] 的焊盤 U3 F.Cu",
+                    "description": "4 上 [/FM_IN] 的焊盤 U6 F.Cu",
                     "pos": {
-                        "x": 107.25,
-                        "y": 128.8125
+                        "x": 159.9,
+                        "y": 115.6
                     },
-                    "uuid": "7bf46d0a-d2e0-5fca-9bde-a3a19c440dd4"
+                    "uuid": "ff4b03a1-7e75-52f3-b305-a2ecc253a360"
                 }
             ],
             "severity": "warning",
@@ -173,20 +173,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "R23 的參考欄位",
+                    "description": "C15 的參考欄位",
                     "pos": {
-                        "x": 109.125,
-                        "y": 124.63
+                        "x": 160.645,
+                        "y": 115.0
                     },
-                    "uuid": "84f47d34-3461-5d01-8e53-01f34c19b861"
+                    "uuid": "e99fd974-dd20-5387-8795-d7bf9b88bcb8"
                 },
                 {
-                    "description": "2 上 [/GND] 的焊盤 C4 F.Cu",
+                    "description": "5 上 [/GND] 的焊盤 U6 F.Cu",
                     "pos": {
-                        "x": 108.9,
-                        "y": 125.225
+                        "x": 159.9,
+                        "y": 115.1
                     },
-                    "uuid": "ddbd83a2-ae65-5b2a-923d-5c050b61ac66"
+                    "uuid": "fd1d8675-5376-5553-b674-47422303834d"
                 }
             ],
             "severity": "warning",
@@ -196,20 +196,112 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "C18 的參考欄位",
+                    "description": "R17 的參考欄位",
                     "pos": {
-                        "x": 109.23,
-                        "y": 134.6
+                        "x": 155.58,
+                        "y": 110.25
                     },
-                    "uuid": "38847d5d-49f9-51f4-8b0d-6c826f55d02a"
+                    "uuid": "d70b37e6-813f-54c5-b728-450f3a10e760"
                 },
                 {
-                    "description": "1 上 [/+3V3] 的焊盤 C5 F.Cu",
+                    "description": "1 上 [/FM_L] 的焊盤 R19 F.Cu",
                     "pos": {
-                        "x": 109.8,
+                        "x": 156.025,
+                        "y": 111.25
+                    },
+                    "uuid": "0ef0d10f-6fa2-5702-8565-11e9eef6778d"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "R19 的參考欄位",
+                    "pos": {
+                        "x": 154.595,
+                        "y": 110.425
+                    },
+                    "uuid": "970e695b-725b-5deb-a9ff-a733b1b72ef5"
+                },
+                {
+                    "description": "2 上 [/RCLK_32K] 的焊盤 R17 F.Cu",
+                    "pos": {
+                        "x": 154.15,
+                        "y": 111.075
+                    },
+                    "uuid": "6be6ccac-1228-5f81-8433-d74d1fed5756"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "R19 的參考欄位",
+                    "pos": {
+                        "x": 154.595,
+                        "y": 110.425
+                    },
+                    "uuid": "970e695b-725b-5deb-a9ff-a733b1b72ef5"
+                },
+                {
+                    "description": "1 上 [/+3V3] 的焊盤 R17 F.Cu",
+                    "pos": {
+                        "x": 154.15,
+                        "y": 109.425
+                    },
+                    "uuid": "df3a22d2-7e12-5de3-8dfa-31f6944fcac5"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Q2 的參考欄位",
+                    "pos": {
+                        "x": 127.25,
+                        "y": 133.65
+                    },
+                    "uuid": "e6554d15-b18b-5eec-8e06-75411e6502cf"
+                },
+                {
+                    "description": "2 上 [/Q2_B] 的焊盤 R13 F.Cu",
+                    "pos": {
+                        "x": 127.975,
                         "y": 133.4
                     },
-                    "uuid": "11ed02e2-6ae8-5d57-b651-137594976a7c"
+                    "uuid": "49a91d18-cc5e-5de7-aff1-c51a826ae393"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "C9 的參考欄位",
+                    "pos": {
+                        "x": 128.3,
+                        "y": 109.33
+                    },
+                    "uuid": "65f659cd-6239-5c64-9a8a-3952bf712b13"
+                },
+                {
+                    "description": "1 上 [/+3V3] 的焊盤 C8 F.Cu",
+                    "pos": {
+                        "x": 128.625,
+                        "y": 110.3
+                    },
+                    "uuid": "142144dd-4c2b-54e2-ab25-db98a4db2a33"
                 }
             ],
             "severity": "warning",
@@ -265,20 +357,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "C9 的參考欄位",
+                    "description": "C12 的參考欄位",
                     "pos": {
-                        "x": 128.3,
-                        "y": 109.33
+                        "x": 150.12,
+                        "y": 124.2
                     },
-                    "uuid": "65f659cd-6239-5c64-9a8a-3952bf712b13"
+                    "uuid": "a4fdfc6b-d37d-5ca7-b7a3-b12126556bc0"
                 },
                 {
-                    "description": "1 上 [/+3V3] 的焊盤 C8 F.Cu",
+                    "description": "25 上 [/ESP_IO0] 的焊盤 U1 F.Cu",
                     "pos": {
-                        "x": 128.625,
-                        "y": 110.3
+                        "x": 148.8,
+                        "y": 124.05
                     },
-                    "uuid": "142144dd-4c2b-54e2-ab25-db98a4db2a33"
+                    "uuid": "8034e108-3b9a-5201-bac7-ec2683de3760"
                 }
             ],
             "severity": "warning",
@@ -288,43 +380,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "Q2 的參考欄位",
+                    "description": "C12 的參考欄位",
                     "pos": {
-                        "x": 127.25,
-                        "y": 133.65
+                        "x": 150.12,
+                        "y": 124.2
                     },
-                    "uuid": "e6554d15-b18b-5eec-8e06-75411e6502cf"
+                    "uuid": "a4fdfc6b-d37d-5ca7-b7a3-b12126556bc0"
                 },
                 {
-                    "description": "2 上 [/Q2_B] 的焊盤 R13 F.Cu",
+                    "description": "26 上 [/RTC_INT] 的焊盤 U1 F.Cu",
                     "pos": {
-                        "x": 127.975,
-                        "y": 133.4
+                        "x": 148.8,
+                        "y": 122.78
                     },
-                    "uuid": "49a91d18-cc5e-5de7-aff1-c51a826ae393"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_over_copper"
-        },
-        {
-            "description": "Silkscreen clipped by solder mask",
-            "items": [
-                {
-                    "description": "R13 的參考欄位",
-                    "pos": {
-                        "x": 128.8,
-                        "y": 134.83
-                    },
-                    "uuid": "00fc68a2-59ad-5178-8c95-119f217d6fd3"
-                },
-                {
-                    "description": "1 上 [/VBAT_SENSE] 的焊盤 R8 F.Cu",
-                    "pos": {
-                        "x": 127.8,
-                        "y": 135.575
-                    },
-                    "uuid": "5a710903-3071-50c7-b0ea-ce59ec05f23f"
+                    "uuid": "9f251707-38df-517c-9e9e-58c9b7cfdf2e"
                 }
             ],
             "severity": "warning",
@@ -503,12 +572,12 @@
                     "uuid": "4e220c24-ab52-54b4-a35d-91e70f99686f"
                 },
                 {
-                    "description": "B5 上 [/CC2] 的焊盤 J1 F.Cu",
+                    "description": "B6 上 [/USB_DP] 的焊盤 J1 F.Cu",
                     "pos": {
-                        "x": 141.8,
+                        "x": 140.8,
                         "y": 151.805
                     },
-                    "uuid": "ebf31e7c-cb19-5e2f-a911-12cb882215ab"
+                    "uuid": "d7e142e9-d720-558c-b7be-3b88406d3665"
                 }
             ],
             "severity": "warning",
@@ -526,12 +595,12 @@
                     "uuid": "4e220c24-ab52-54b4-a35d-91e70f99686f"
                 },
                 {
-                    "description": "B6 上 [/USB_DP] 的焊盤 J1 F.Cu",
+                    "description": "B5 上 [/CC2] 的焊盤 J1 F.Cu",
                     "pos": {
-                        "x": 140.8,
+                        "x": 141.8,
                         "y": 151.805
                     },
-                    "uuid": "d7e142e9-d720-558c-b7be-3b88406d3665"
+                    "uuid": "ebf31e7c-cb19-5e2f-a911-12cb882215ab"
                 }
             ],
             "severity": "warning",
@@ -541,20 +610,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "C12 的參考欄位",
+                    "description": "SW1 的參考欄位",
                     "pos": {
-                        "x": 150.12,
-                        "y": 124.2
+                        "x": 106.65,
+                        "y": 128.15
                     },
-                    "uuid": "a4fdfc6b-d37d-5ca7-b7a3-b12126556bc0"
+                    "uuid": "e2ffad52-2f15-47ff-8782-46a40ce175b2"
                 },
                 {
-                    "description": "25 上 [/ESP_IO0] 的焊盤 U1 F.Cu",
+                    "description": "3 上 [/LDO_EN] 的焊盤 U3 F.Cu",
                     "pos": {
-                        "x": 148.8,
-                        "y": 124.05
+                        "x": 107.25,
+                        "y": 128.8125
                     },
-                    "uuid": "8034e108-3b9a-5201-bac7-ec2683de3760"
+                    "uuid": "7bf46d0a-d2e0-5fca-9bde-a3a19c440dd4"
                 }
             ],
             "severity": "warning",
@@ -564,20 +633,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "C12 的參考欄位",
+                    "description": "C18 的參考欄位",
                     "pos": {
-                        "x": 150.12,
-                        "y": 124.2
+                        "x": 109.23,
+                        "y": 134.6
                     },
-                    "uuid": "a4fdfc6b-d37d-5ca7-b7a3-b12126556bc0"
+                    "uuid": "38847d5d-49f9-51f4-8b0d-6c826f55d02a"
                 },
                 {
-                    "description": "26 上 [/RTC_INT] 的焊盤 U1 F.Cu",
+                    "description": "1 上 [/+3V3] 的焊盤 C5 F.Cu",
                     "pos": {
-                        "x": 148.8,
-                        "y": 122.78
+                        "x": 109.8,
+                        "y": 133.4
                     },
-                    "uuid": "9f251707-38df-517c-9e9e-58c9b7cfdf2e"
+                    "uuid": "11ed02e2-6ae8-5d57-b651-137594976a7c"
                 }
             ],
             "severity": "warning",
@@ -587,20 +656,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "R20 的參考欄位",
+                    "description": "R23 的參考欄位",
                     "pos": {
-                        "x": 154.9,
-                        "y": 114.63
+                        "x": 109.125,
+                        "y": 124.63
                     },
-                    "uuid": "0e07c478-ff01-57c6-ab4f-026918b5bb9a"
+                    "uuid": "84f47d34-3461-5d01-8e53-01f34c19b861"
                 },
                 {
-                    "description": "2 上 [/GND] 的焊盤 C13 F.Cu",
+                    "description": "2 上 [/GND] 的焊盤 C4 F.Cu",
                     "pos": {
-                        "x": 153.55,
-                        "y": 115.275
+                        "x": 108.9,
+                        "y": 125.225
                     },
-                    "uuid": "d94e1f51-5f8f-5f35-bbd7-801a1430ad14"
+                    "uuid": "ddbd83a2-ae65-5b2a-923d-5c050b61ac66"
                 }
             ],
             "severity": "warning",
@@ -610,20 +679,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "R20 的參考欄位",
+                    "description": "R13 的參考欄位",
                     "pos": {
-                        "x": 154.9,
-                        "y": 114.63
+                        "x": 128.8,
+                        "y": 134.83
                     },
-                    "uuid": "0e07c478-ff01-57c6-ab4f-026918b5bb9a"
+                    "uuid": "00fc68a2-59ad-5178-8c95-119f217d6fd3"
                 },
                 {
-                    "description": "6 上 [/RCLK_32K] 的焊盤 U6 F.Cu",
+                    "description": "1 上 [/VBAT_SENSE] 的焊盤 R8 F.Cu",
                     "pos": {
-                        "x": 155.7,
-                        "y": 115.1
+                        "x": 127.8,
+                        "y": 135.575
                     },
-                    "uuid": "446e4455-c1bb-523d-b370-efeed4f0e3f8"
+                    "uuid": "5a710903-3071-50c7-b0ea-ce59ec05f23f"
                 }
             ],
             "severity": "warning",
@@ -633,20 +702,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "R17 的參考欄位",
+                    "description": "C2 的參考欄位",
                     "pos": {
-                        "x": 155.58,
-                        "y": 110.25
+                        "x": 115.875,
+                        "y": 124.23
                     },
-                    "uuid": "d70b37e6-813f-54c5-b728-450f3a10e760"
+                    "uuid": "80c6c9bd-d556-5135-a6ba-6932703c4418"
                 },
                 {
-                    "description": "1 上 [/FM_L] 的焊盤 R19 F.Cu",
+                    "description": "2 上 [/GND] 的焊盤 U2 F.Cu",
                     "pos": {
-                        "x": 156.025,
-                        "y": 111.25
+                        "x": 115.95,
+                        "y": 124.8625
                     },
-                    "uuid": "0ef0d10f-6fa2-5702-8565-11e9eef6778d"
+                    "uuid": "25574776-7e2c-5cff-844b-47eeaf1c99e9"
                 }
             ],
             "severity": "warning",
@@ -656,20 +725,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "R19 的參考欄位",
+                    "description": "C2 的參考欄位",
                     "pos": {
-                        "x": 154.595,
-                        "y": 110.425
+                        "x": 115.875,
+                        "y": 124.23
                     },
-                    "uuid": "970e695b-725b-5deb-a9ff-a733b1b72ef5"
+                    "uuid": "80c6c9bd-d556-5135-a6ba-6932703c4418"
                 },
                 {
-                    "description": "2 上 [/RCLK_32K] 的焊盤 R17 F.Cu",
+                    "description": "3 上 [/VBAT] 的焊盤 U2 F.Cu",
                     "pos": {
-                        "x": 154.15,
-                        "y": 111.075
+                        "x": 115.0,
+                        "y": 124.8625
                     },
-                    "uuid": "6be6ccac-1228-5f81-8433-d74d1fed5756"
+                    "uuid": "00239307-393b-5014-ad54-68ee30509395"
                 }
             ],
             "severity": "warning",
@@ -679,20 +748,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "C15 的參考欄位",
+                    "description": "C2 的參考欄位",
                     "pos": {
-                        "x": 160.645,
-                        "y": 115.0
+                        "x": 115.875,
+                        "y": 124.23
                     },
-                    "uuid": "e99fd974-dd20-5387-8795-d7bf9b88bcb8"
+                    "uuid": "80c6c9bd-d556-5135-a6ba-6932703c4418"
                 },
                 {
-                    "description": "3 上 [/GND] 的焊盤 U6 F.Cu",
+                    "description": "1 上 [/CHG_STAT] 的焊盤 U2 F.Cu",
                     "pos": {
-                        "x": 159.9,
-                        "y": 116.1
+                        "x": 116.9,
+                        "y": 124.8625
                     },
-                    "uuid": "1844561e-d1ba-5530-bde7-0fb93fc51f18"
+                    "uuid": "b0f82de1-a91f-5482-9d30-cb71e3b55a3f"
                 }
             ],
             "severity": "warning",
@@ -702,89 +771,20 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "C15 的參考欄位",
+                    "description": "U2 的參考欄位",
                     "pos": {
-                        "x": 160.645,
-                        "y": 115.0
+                        "x": 118.35,
+                        "y": 126.0
                     },
-                    "uuid": "e99fd974-dd20-5387-8795-d7bf9b88bcb8"
+                    "uuid": "9ee6bc99-9d30-50c2-bee5-67bc00a11f94"
                 },
                 {
-                    "description": "4 上 [/FM_IN] 的焊盤 U6 F.Cu",
+                    "description": "1 上 [/PROG] 的焊盤 R3 F.Cu",
                     "pos": {
-                        "x": 159.9,
-                        "y": 115.6
+                        "x": 118.8,
+                        "y": 127.1
                     },
-                    "uuid": "ff4b03a1-7e75-52f3-b305-a2ecc253a360"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_over_copper"
-        },
-        {
-            "description": "Silkscreen clipped by solder mask",
-            "items": [
-                {
-                    "description": "C15 的參考欄位",
-                    "pos": {
-                        "x": 160.645,
-                        "y": 115.0
-                    },
-                    "uuid": "e99fd974-dd20-5387-8795-d7bf9b88bcb8"
-                },
-                {
-                    "description": "5 上 [/GND] 的焊盤 U6 F.Cu",
-                    "pos": {
-                        "x": 159.9,
-                        "y": 115.1
-                    },
-                    "uuid": "fd1d8675-5376-5553-b674-47422303834d"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_over_copper"
-        },
-        {
-            "description": "Silkscreen clipped by solder mask",
-            "items": [
-                {
-                    "description": "R17 的參考欄位",
-                    "pos": {
-                        "x": 155.58,
-                        "y": 110.25
-                    },
-                    "uuid": "d70b37e6-813f-54c5-b728-450f3a10e760"
-                },
-                {
-                    "description": "2 上 [/AUDIO_MIX] 的焊盤 R19 F.Cu",
-                    "pos": {
-                        "x": 156.025,
-                        "y": 109.6
-                    },
-                    "uuid": "4b80598c-d0a9-5c05-9f56-d8d519aaf085"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_over_copper"
-        },
-        {
-            "description": "Silkscreen clipped by solder mask",
-            "items": [
-                {
-                    "description": "R19 的參考欄位",
-                    "pos": {
-                        "x": 154.595,
-                        "y": 110.425
-                    },
-                    "uuid": "970e695b-725b-5deb-a9ff-a733b1b72ef5"
-                },
-                {
-                    "description": "1 上 [/+3V3] 的焊盤 R17 F.Cu",
-                    "pos": {
-                        "x": 154.15,
-                        "y": 109.425
-                    },
-                    "uuid": "df3a22d2-7e12-5de3-8dfa-31f6944fcac5"
+                    "uuid": "5b932654-c406-5944-971d-70a0b730c9fd"
                 }
             ],
             "severity": "warning",
