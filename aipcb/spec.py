@@ -8,7 +8,7 @@ Schema (abridged):
           net_widths: {NET: mm}, route_passes: 4, stitch_pitch: 4.0}
   parts:
     U1: {symbol: Lib:Sym, footprint: Lib:Fp, value, mpn, lcsc, manufacturer, block,
-         description, dnp: false, place: {x, y, rot, edge, fixed, near, side}}
+         description, dnp: false, place: {x, y, rot, edge, fixed, near, side, lock}}
   nets:
     NETNAME: [U1.3, R1.1, U2.GND]        # REF.PIN  (pin number or unique pin name;
                                           #  a name shared by several pins selects all of them)

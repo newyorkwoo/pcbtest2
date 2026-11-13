@@ -1,7 +1,7 @@
 """Physics-based component placement engine.
 
 Pipeline:
-  1. constrained parts (fixed / edge) are pinned
+  1. constrained parts (fixed / edge) are pinned; locked parts keep their previous out/placement.json pose
   2. force-directed relaxation: net springs (star model), courtyard repulsion,
      board-boundary walls, "near" springs (decoupling caps to IC pins), block cohesion
   3. simulated annealing (translate / rotate / swap) on a cost of
@@ -40,6 +40,7 @@ class Comp:
     rot: int = 0
     fixed: bool = False
     rot_fixed: bool = False
+    locked: bool = False          # pose taken verbatim from the previous placement (no edge clamp, no snap)
     edge: str | None = None
     edge_offset: float = 0.0
     near: tuple[str, str] | None = None
@@ -79,7 +80,7 @@ class Comp:
 
 
 class Placer:
-    def __init__(self, d: Design, seed: int = 1):
+    def __init__(self, d: Design, seed: int = 1, locked: dict | None = None):
         self.d = d
         self.rng = random.Random(seed)
         b = d.board
@@ -121,6 +122,11 @@ class Placer:
                 r, p = str(pl["near"]).split(".", 1)
                 c.near = (r, p)
                 c.near_dist = float(pl.get("near_dist", 2.0))
+            explicit_xy = "x" in pl and "y" in pl
+            if locked and ref in locked and not explicit_xy:
+                prev = locked[ref]
+                c.x, c.y, c.rot = float(prev["x"]), float(prev["y"]), int(prev.get("rot", 0)) % 360
+                c.fixed = c.rot_fixed = c.locked = True
             self.comps[ref] = c
         self.net_members: list[list[tuple[str, int]]] = [[] for _ in self.net_names]
         for ref, c in self.comps.items():
@@ -414,6 +420,8 @@ class Placer:
         (lets the maze router escape 0.5 mm pitch pads)."""
         steps = [k * g / 4 for k in range(4)]
         for c in self.comps.values():
+            if c.locked:
+                continue
             fp = self.d.parts[c.ref].footprint
             pads = [p for p in fp.pads if p.kind == "smd"]
             if not pads:
@@ -447,7 +455,7 @@ class Placer:
 
     def run(self, iters: int = 400, moves: int = 30000) -> dict:
         for c in self.comps.values():
-            if c.fixed:
+            if c.fixed and not c.locked:
                 self.apply_edge(c)
         self.init_positions()
         self.force_directed(iters)
@@ -456,23 +464,51 @@ class Placer:
         problems = self.legalize()
         self.snap_pads(float(self.d.rules["grid"]))
         res = self.total_cost()
+        locked = [c for c in self.comps.values() if c.locked]
+        for i, a in enumerate(locked):      # legalize never moves fixed parts: report what a lock leaves behind
+            if self.outside(a) > 1e-6:
+                problems.append(f"{a.ref}: locked position is outside the board")
+            for b in self.comps.values():
+                if b is not a and (not b.locked or b.ref > a.ref) and self.overlap(a, b) > 1e-6:
+                    problems.append(f"{a.ref}: locked position overlaps {b.ref}")
         res["problems"] = problems
+        res["locked"] = sorted(c.ref for c in locked)
         res["positions"] = {r: {"x": round(c.x, 3), "y": round(c.y, 3), "rot": c.rot} for r, c in self.comps.items()}
         return res
 
 
+def lock_set(d: Design, prev: dict, keep=None, unlock=()) -> dict:
+    """Which previous poses to keep.
+
+    keep: None -> only parts with `place: {lock: true}`; True / "all" -> every previously placed part;
+    an iterable of refs -> those. `unlock` refs are always re-placed. Explicit place.x/y in design.yaml
+    still win over a lock (that is how a single part is nudged while the rest stays put)."""
+    if keep is True or keep == "all":
+        refs = set(prev)
+    else:
+        refs = set(keep or ())
+    refs |= {r for r, p in d.parts.items() if (p.place or {}).get("lock")}
+    refs -= set(unlock or ())
+    return {r: prev[r] for r in refs if r in prev}
+
+
 def place(d: Design, seed: int = 1, iters: int = 400, moves: int = 30000, tries: int = 3,
-          out: Path | None = None) -> dict:
+          out: Path | None = None, keep=None, unlock=()) -> dict:
+    out = Path(out or d.project_dir / "out" / "placement.json")
+    prev = json.loads(out.read_text())["positions"] if out.exists() else {}
+    locked = lock_set(d, prev, keep, unlock)
+    missing = sorted(set(keep) - set(prev)) if keep not in (None, True, "all") else []
     best = None
     for t in range(tries):
-        p = Placer(d, seed=seed + t)
+        p = Placer(d, seed=seed + t, locked=locked)
         r = p.run(iters, moves)
         score = r["total"] + 1000 * len(r["problems"])
         if best is None or score < best[0]:
             best = (score, r)
     res = best[1]
+    if missing:
+        res["problems"] = res["problems"] + [f"{r}: --keep requested but no previous position" for r in missing]
     res["board"] = {"width": d.board["width"], "height": d.board["height"], "origin": ORIGIN}
-    out = Path(out or d.project_dir / "out" / "placement.json")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(res, indent=1))
     return res

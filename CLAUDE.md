@@ -17,6 +17,8 @@ Everything runs offline on this machine.
 ```
 .venv/bin/python -m aipcb build <project>       # full flow (library→…→previews), 1–4 min
 .venv/bin/python -m aipcb <stage> <project>     # library validate schematic erc place route pcb drc sim checks previews
+.venv/bin/python -m aipcb build <p> --keep      # keep every placed part where it is, place only new ones, re-route
+                                               #   (--keep U1,J2 keeps only those; --unlock R5 re-places R5)
 .venv/bin/python -m aipcb review-package <p>    # data for the AI review
 .venv/bin/python -m aipcb fab <p> [--force]     # gated on checks + review PASS
 .venv/bin/python -m aipcb gui [project]         # desktop dashboard
@@ -29,7 +31,7 @@ MCP server `aipcb` (see .mcp.json) exposes the same flow as tools.
    footprint where possible — and its pinout must be cross-checked against the datasheet in the review.
 2. Nets are `REF.PIN` (pin number, or a pin name — a name shared by several pins selects all, e.g. `U1.GND`).
    Quote tokens containing braces: `"U2.V_{DD}"`. Every pin must be on a net or listed in `nc:`.
-3. Placement hints in `place:` — `edge: top|bottom|left|right` (+`edge_offset`), `x`/`y` (board-relative mm),
+3. Placement hints in `place:` — `lock: true` keeps the part where the last placement put it; — `edge: top|bottom|left|right` (+`edge_offset`), `x`/`y` (board-relative mm),
    `rot`, `near: REF.PIN` (+`near_dist`) for decoupling / crystals / ESD. Use `block:` to group functions.
 4. `rules.power_nets` get `power_track` width; `route_first` for critical nets.
 5. Write SPICE decks that **mirror design.yaml exactly** (same topology/values) and state expectations with

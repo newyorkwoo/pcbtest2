@@ -139,9 +139,10 @@ def erc(pd: Path) -> dict:
 
 
 @stage("placement")
-def place(pd: Path, seed: int = 1, tries: int = 3, moves: int = 30000) -> dict:
+def place(pd: Path, seed: int = 1, tries: int = 3, moves: int = 30000, keep=None, unlock=()) -> dict:
+    """keep: None (only `place.lock` parts), True (every previously placed part) or a list of refs."""
     d = load(pd)
-    r = placement.place(d, seed=seed, tries=tries, moves=moves)
+    r = placement.place(d, seed=seed, tries=tries, moves=moves, keep=keep, unlock=unlock)
     return {"ok": not r["problems"] and r["overlap"] < 1e-6, **{k: (round(v, 2) if isinstance(v, float) else v)
                                                                  for k, v in r.items() if k != "positions"}}
 
@@ -241,8 +242,11 @@ def export_fab(pd: Path, force: bool = False) -> dict:
     return fab.export(d, force=force)
 
 
-def build(pd, place_tries: int = 3, moves: int = 30000) -> dict:
-    """Full automatic flow up to (not including) the AI review."""
+def build(pd, place_tries: int = 3, moves: int = 30000, keep=None, unlock=()) -> dict:
+    """Full automatic flow up to (not including) the AI review.
+
+    keep=True re-uses the previous placement for every part already on the board (new parts and
+    `unlock` refs are placed around them), so a design.yaml edit re-routes without reshuffling the board."""
     pd = project_dir(str(pd))
     out = {}
     out["library"] = build_library(pd)
@@ -252,7 +256,7 @@ def build(pd, place_tries: int = 3, moves: int = 30000) -> dict:
         return out
     out["schematic"] = make_schematic(pd)
     out["erc"] = {k: v for k, v in erc(pd).items() if k != "violations"}
-    out["placement"] = place(pd, tries=place_tries, moves=moves)
+    out["placement"] = place(pd, tries=place_tries, moves=moves, keep=keep, unlock=unlock)
     out["routing"] = route(pd)
     out["pcb"] = make_pcb(pd)
     out["drc"] = {k: v for k, v in drc(pd).items() if k not in ("violations", "unconnected_items", "parity")}

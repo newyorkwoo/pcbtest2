@@ -136,10 +136,17 @@ def validate_design(project: str) -> str:
 
 
 @mcp.tool()
-def build_board(project: str, placement_tries: int = 3) -> str:
+def build_board(project: str, placement_tries: int = 3, keep_placement: str = "", unlock: str = "") -> str:
     """Run the whole automatic flow: library, validate, schematic, ERC, physics placement, autorouting,
-    PCB generation, DRC (+pour repair), SPICE sims, design checks, previews. Takes 1-4 minutes."""
-    return _j(_quiet(P.build, P.project_dir(project), place_tries=placement_tries))
+    PCB generation, DRC (+pour repair), SPICE sims, design checks, previews. Takes 1-4 minutes.
+
+    keep_placement: "" = place from scratch (parts with place.lock still keep their pose);
+    "all" = keep every previously placed part and only place new ones (re-route without reshuffling);
+    "U1,J2" = keep just these. unlock: comma-separated refs to re-place even when kept."""
+    keep = None if not keep_placement else (True if keep_placement == "all" else
+                                            [r.strip() for r in keep_placement.split(",") if r.strip()])
+    return _j(_quiet(P.build, P.project_dir(project), place_tries=placement_tries, keep=keep,
+                     unlock=[r.strip() for r in unlock.split(",") if r.strip()]))
 
 
 @mcp.tool()
