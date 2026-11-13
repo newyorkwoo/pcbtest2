@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import shutil
 import subprocess
@@ -71,18 +72,33 @@ def bom_rows(d: Design) -> list[dict]:
     return sorted(rows, key=lambda r: r["Designator"])
 
 
+def board_fingerprint(project_dir: Path) -> dict:
+    """sha256 of design.yaml and the generated .kicad_pcb: binds a review to the exact board it saw."""
+    fp = {}
+    for f in [project_dir / "design.yaml", *sorted(project_dir.glob("*.kicad_pcb"))]:
+        if f.exists():
+            fp[f.name] = hashlib.sha256(f.read_bytes()).hexdigest()
+    return fp
+
+
 def export(d: Design, force: bool = False) -> dict:
     out = d.project_dir / "out"
     review = out / "review.json"
     checks = out / "checks.json"
     gate = {"review": None, "auto_pass": None}
     if review.exists():
-        gate["review"] = json.loads(review.read_text()).get("verdict")
+        rv = json.loads(review.read_text())
+        gate["review"] = rv.get("verdict")
+        # A review only counts for the board it actually looked at; any rebuild since then invalidates it.
+        gate["review_current"] = rv.get("board") == board_fingerprint(d.project_dir)
+        if not gate["review_current"]:
+            gate["review"] = f"STALE ({gate['review']})"
     if checks.exists():
         gate["auto_pass"] = json.loads(checks.read_text()).get("auto_pass")
     if not force and not (gate["review"] == "PASS" and gate["auto_pass"]):
         return {"ok": False, "blocked": True, "gate": gate,
                 "message": "Fab export requires auto checks with 0 errors AND an AI review verdict of PASS "
+                           "on the current board (a rebuild after the review makes it STALE) "
                            "(use force=True to override for a prototype)."}
     fab = out / "fab"
     if fab.exists():

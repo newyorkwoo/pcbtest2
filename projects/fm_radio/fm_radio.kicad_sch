@@ -3149,7 +3149,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Amplifier_Audio:PAM8302AAD"
+		(symbol "Amplifier_Audio:PAM8302AAS"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -3165,7 +3165,7 @@
 					)
 				)
 			)
-			(property "Value" "PAM8302AAD"
+			(property "Value" "PAM8302AAS"
 				(at 7.62 8.89 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -3197,7 +3197,7 @@
 					)
 				)
 			)
-			(property "Description" "2.5W Filterless Class-D Mono Audio Amplifier, SOIC-8"
+			(property "Description" "2.5W Filterless Class-D Mono Audio Amplifier, MSOP-8"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -3230,7 +3230,7 @@
 					)
 				)
 			)
-			(symbol "PAM8302AAD_0_1"
+			(symbol "PAM8302AAS_0_1"
 				(rectangle
 					(start -7.62 7.62)
 					(end 7.62 -7.62)
@@ -3243,7 +3243,7 @@
 					)
 				)
 			)
-			(symbol "PAM8302AAD_1_1"
+			(symbol "PAM8302AAS_1_1"
 				(pin input line
 					(at -10.16 -5.08 0)
 					(length 2.54)
@@ -9817,7 +9817,7 @@
 		(uuid "0593a96a-b4c2-5062-9dfb-11f3824921f2")
 	)
 	(symbol
-		(lib_id "Amplifier_Audio:PAM8302AAD")
+		(lib_id "Amplifier_Audio:PAM8302AAS")
 		(at 143.51 156.21 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -9861,7 +9861,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "2.5W Filterless Class-D Mono Audio Amplifier, SOIC-8"
+		(property "Description" "MSOP-8 variant (PAM8302AADCR is SO-8); pinout identical"
 			(at 143.51 156.21 0)
 			(effects
 				(font
@@ -9870,7 +9870,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "PAM8302AADCR"
+		(property "MPN" "PAM8302AASCR"
 			(at 143.51 156.21 0)
 			(effects
 				(font

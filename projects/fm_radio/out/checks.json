@@ -1,8 +1,8 @@
 {
  "counts": {
   "error": 0,
-  "warning": 36,
-  "info": 0
+  "warning": 35,
+  "info": 1
  },
  "auto_pass": true,
  "findings": [
@@ -17,13 +17,13 @@
   {
    "severity": "warning",
    "category": "power-integrity",
-   "message": "power net VSYS has necked-down track (0.2 mm)",
+   "message": "power net VSYS has 5.8 mm of 46 mm necked down to 0.2 mm",
    "refs": []
   },
   {
-   "severity": "warning",
+   "severity": "info",
    "category": "power-integrity",
-   "message": "power net +3V3 has necked-down track (0.2 mm)",
+   "message": "power net +3V3: 1.4 mm of 114 mm necked to 0.2 mm (pad entry into fine-pitch pins)",
    "refs": []
   },
   {

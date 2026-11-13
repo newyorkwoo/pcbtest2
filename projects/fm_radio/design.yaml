@@ -156,8 +156,9 @@ parts:
   R22: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: audio}
   R23: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 10k, mpn: "0603WAF1002T5E", lcsc: C25804, block: audio}
   C18: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 1u, mpn: "CL10A105KB8NNNC", lcsc: C15849, block: audio}
-  U8: {symbol: "Amplifier_Audio:PAM8302AAD", footprint: "Package_SO:MSOP-8_3x3mm_P0.65mm", value: PAM8302A,
-       mpn: PAM8302AADCR, manufacturer: Diodes Inc, lcsc: C113367, block: audio}
+  U8: {symbol: "Amplifier_Audio:PAM8302AAS", footprint: "Package_SO:MSOP-8_3x3mm_P0.65mm", value: PAM8302A,
+       mpn: PAM8302AASCR, manufacturer: Diodes Inc, lcsc: C113367, block: audio,
+       description: "MSOP-8 variant (PAM8302AADCR is SO-8); pinout identical"}
   C19: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0805_2012Metric", value: 10u, mpn: "CL21A106KAYNNNE", lcsc: C15850, block: audio, place: {near: U8.VDD, near_dist: 3}}
   C20: {symbol: "Device:C", footprint: "Capacitor_SMD:C_0603_1608Metric", value: 100n, mpn: "CC0603KRX7R9BB104", lcsc: C14663, block: audio, place: {near: U8.VDD}}
   R11: {symbol: "Device:R", footprint: "Resistor_SMD:R_0603_1608Metric", value: 100k, mpn: "0603WAF1003T5E", lcsc: C25803, block: audio, description: "amp off by default"}

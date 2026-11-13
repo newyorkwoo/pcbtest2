@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-11-13T04:50:20",
+    "date": "2026-11-13T09:08:55",
     "ignored_checks": [
         {
             "description": "Thermal relief connection to zone incomplete",
@@ -707,7 +707,7 @@
                         "x": 150.75,
                         "y": 101.7
                     },
-                    "uuid": "cee5b27e-ba0e-4eab-befc-c5573c6e48e9"
+                    "uuid": "d93b169d-1402-4077-81b3-041b761aef10"
                 },
                 {
                     "description": "S1 的非金屬化焊盤 [/ENC_SW_RAW] SW6",
@@ -730,7 +730,7 @@
                         "x": 163.25,
                         "y": 101.7
                     },
-                    "uuid": "1c43915c-1f03-4dbb-878d-f30da3189341"
+                    "uuid": "2a959926-8adb-4d2a-9db2-ed5cdf4ec659"
                 },
                 {
                     "description": "S2 的非金屬化焊盤 [/GND] SW6",
@@ -753,7 +753,7 @@
                         "x": 163.25,
                         "y": 101.7
                     },
-                    "uuid": "1c43915c-1f03-4dbb-878d-f30da3189341"
+                    "uuid": "2a959926-8adb-4d2a-9db2-ed5cdf4ec659"
                 },
                 {
                     "description": "B 的非金屬化焊盤 [/ENC_B_RAW] SW6",
@@ -776,7 +776,7 @@
                         "x": 163.25,
                         "y": 101.7
                     },
-                    "uuid": "1c43915c-1f03-4dbb-878d-f30da3189341"
+                    "uuid": "2a959926-8adb-4d2a-9db2-ed5cdf4ec659"
                 },
                 {
                     "description": "MP 的非金屬化焊盤 [/GND] SW6",
@@ -799,7 +799,7 @@
                         "x": 150.75,
                         "y": 114.9
                     },
-                    "uuid": "0029f19e-642e-4f1c-9e15-ecac02b9015f"
+                    "uuid": "9733d2c6-f209-4c73-bbb1-dff2aaa9922b"
                 },
                 {
                     "description": "C 的非金屬化焊盤 [/GND] SW6",
@@ -822,7 +822,7 @@
                         "x": 150.75,
                         "y": 114.9
                     },
-                    "uuid": "0029f19e-642e-4f1c-9e15-ecac02b9015f"
+                    "uuid": "9733d2c6-f209-4c73-bbb1-dff2aaa9922b"
                 },
                 {
                     "description": "MP 的非金屬化焊盤 [/GND] SW6",
@@ -845,7 +845,7 @@
                         "x": 150.75,
                         "y": 114.9
                     },
-                    "uuid": "0029f19e-642e-4f1c-9e15-ecac02b9015f"
+                    "uuid": "9733d2c6-f209-4c73-bbb1-dff2aaa9922b"
                 },
                 {
                     "description": "A 的非金屬化焊盤 [/ENC_A_RAW] SW6",
@@ -1489,7 +1489,7 @@
                         "x": 137.825,
                         "y": 102.1
                     },
-                    "uuid": "8b75145a-38d3-40df-a5df-50fde09810bb"
+                    "uuid": "35c6fea2-0479-4fbb-9f8d-9b18279a570d"
                 },
                 {
                     "description": "1 上 [/LED_K] 的焊盤 D4 F.Cu",
@@ -1512,7 +1512,7 @@
                         "x": 134.325,
                         "y": 104.9
                     },
-                    "uuid": "db9bcc1a-e726-4a78-bdd6-27de82886095"
+                    "uuid": "9956ae02-987d-475c-85db-331f2636e689"
                 },
                 {
                     "description": "2 上 [/VSYS] 的焊盤 D4 F.Cu",

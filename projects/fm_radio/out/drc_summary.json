@@ -637,5 +637,13 @@
  ],
  "unconnected_items": [],
  "parity": [],
- "zone_repairs": []
+ "zone_repairs": [
+  {
+   "trace_mm": 2.27,
+   "vias": 0,
+   "component_pads": [
+    "U4.1"
+   ]
+  }
+ ]
 }

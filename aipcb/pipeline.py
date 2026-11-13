@@ -213,7 +213,8 @@ def submit_review(pd: Path, verdict: str, summary: str, findings: list | None = 
     verdict = verdict.upper()
     assert verdict in ("PASS", "FAIL", "CONDITIONAL"), "verdict must be PASS / FAIL / CONDITIONAL"
     data = {"verdict": verdict, "summary": summary, "findings": findings or [],
-            "time": _dt.datetime.now().isoformat(timespec="seconds"), "reviewer": "Claude"}
+            "time": _dt.datetime.now().isoformat(timespec="seconds"), "reviewer": "Claude",
+            "board": fab.board_fingerprint(pd)}
     (_out(pd) / "review.json").write_text(json.dumps(data, indent=1, ensure_ascii=False))
     md = [f"# AI Design Review — {verdict}", "", summary, ""]
     for f in findings or []:

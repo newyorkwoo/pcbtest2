@@ -879,7 +879,7 @@ class Router:
         out = {"segments": [], "vias": []}
         for n, r in self.routes.items():
             name = self.net_names[n - 1]
-            for L, x1, y1, x2, y2, w in r.segs:
+            for L, x1, y1, x2, y2, w in _weld_t_junctions(r.segs, r.vias):
                 if abs(x1 - x2) < 1e-9 and abs(y1 - y2) < 1e-9:
                     continue
                 out["segments"].append({"net": name, "layer": LAYERS[L], "x1": round(x1, 4), "y1": round(y1, 4),
@@ -888,6 +888,55 @@ class Router:
                 out["vias"].append({"net": name, "x": round(x, 4), "y": round(y, 4),
                                     "d": self.via_d, "drill": self.via_drill})
         return out
+
+
+def _weld_t_junctions(segs, vias=(), eps: float = 1e-6) -> list:
+    """Turn T-junctions into shared vertices.
+
+    The A* tree may end a branch on the middle of an existing segment (or, after a neck-down, a grid step beside
+    its centreline but still inside its copper). KiCad's connectivity only counts end-to-end contacts, so such a
+    branch is reported as track_dangling. Split the trunk at the projected point and, for an off-centre end, add
+    a short joiner that stays inside the copper both tracks already cover."""
+    segs = [tuple(s) for s in segs]
+    key = lambda L, x, y: (L, round(x, 4), round(y, 4))
+    count, width = {}, {}
+    for L, x1, y1, x2, y2, w in segs:
+        for x, y in ((x1, y1), (x2, y2)):
+            k = key(L, x, y)
+            count[k] = count.get(k, 0) + 1
+            width[k] = w
+    via_pts = {(round(x, 4), round(y, 4)) for x, y in vias}
+    ends = {}   # only lone ends: not shared with another segment end and not on a via
+    for (L, x, y), c in count.items():
+        if c == 1 and (x, y) not in via_pts:
+            ends.setdefault(L, []).append(((x, y), width[(L, x, y)]))
+    splits = {}   # seg index -> list of (t, x, y)
+    joiners = []
+    for i, (L, x1, y1, x2, y2, w) in enumerate(segs):
+        dx, dy = x2 - x1, y2 - y1
+        ll = dx * dx + dy * dy
+        if ll < eps:
+            continue
+        for (px, py), pw in ends.get(L, []):
+            t = ((px - x1) * dx + (py - y1) * dy) / ll
+            if t <= eps or t >= 1 - eps:
+                continue
+            qx, qy = x1 + t * dx, y1 + t * dy
+            dist = math.hypot(px - qx, py - qy)
+            if dist > w / 2 + eps:
+                continue
+            if (abs(px - x1) < eps and abs(py - y1) < eps) or (abs(px - x2) < eps and abs(py - y2) < eps):
+                continue
+            splits.setdefault(i, []).append((t, qx, qy))
+            if dist > eps:
+                joiners.append((L, px, py, qx, qy, min(w, pw)))
+    out = []
+    for i, (L, x1, y1, x2, y2, w) in enumerate(segs):
+        pts = [(x1, y1)] + [(x, y) for _, x, y in sorted(splits.get(i, []))] + [(x2, y2)]
+        for (a, b), (c, e) in zip(pts, pts[1:]):
+            if abs(a - c) > eps or abs(b - e) > eps:
+                out.append((L, a, b, c, e, w))
+    return out + joiners
 
 
 def route(d: Design, positions: dict, out: Path | None = None, log=print, gnd_mode: str = "pour",

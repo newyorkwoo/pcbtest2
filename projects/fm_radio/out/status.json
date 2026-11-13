@@ -1,7 +1,7 @@
 {
  "library": {
   "state": "ok",
-  "time": "2026-11-12T20:09:49",
+  "time": "2026-11-13T08:57:57",
   "summary": {
    "ok": true,
    "generated": [
@@ -11,7 +11,7 @@
  },
  "validate": {
   "state": "ok",
-  "time": "2026-11-12T20:09:52",
+  "time": "2026-11-13T08:58:00",
   "summary": {
    "project": "fm_radio",
    "parts": 75,
@@ -25,7 +25,7 @@
  },
  "schematic": {
   "state": "ok",
-  "time": "2026-11-12T20:09:56",
+  "time": "2026-11-13T08:58:03",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/fm_radio.kicad_sch"
@@ -33,7 +33,7 @@
  },
  "erc": {
   "state": "ok",
-  "time": "2026-11-12T20:10:01",
+  "time": "2026-11-13T08:58:08",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -42,7 +42,7 @@
  },
  "placement": {
   "state": "ok",
-  "time": "2026-11-12T20:10:36",
+  "time": "2026-11-13T08:58:43",
   "summary": {
    "ok": true,
    "wirelength": 902.15,
@@ -60,22 +60,22 @@
  },
  "routing": {
   "state": "ok",
-  "time": "2026-11-12T20:11:41",
+  "time": "2026-11-13T09:03:38",
   "summary": {
    "ok": true,
    "failed": [],
-   "wirelength_mm": 982.4,
-   "seconds": 40.4,
+   "wirelength_mm": 976.3,
+   "seconds": 20.4,
    "nets_total": 48,
    "gnd_fanout_vias": 59,
-   "stitch_vias": 146,
+   "stitch_vias": 140,
    "gnd_unconnected": [],
-   "pass": 2
+   "pass": 1
   }
  },
  "pcb": {
   "state": "ok",
-  "time": "2026-11-12T20:11:44",
+  "time": "2026-11-13T09:03:44",
   "summary": {
    "ok": true,
    "file": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/fm_radio.kicad_pcb"
@@ -83,7 +83,7 @@
  },
  "drc": {
   "state": "ok",
-  "time": "2026-11-12T20:11:50",
+  "time": "2026-11-13T09:05:56",
   "summary": {
    "ok": true,
    "errors": 0,
@@ -92,12 +92,20 @@
    "by_type": {
     "silk_over_copper": 33
    },
-   "zone_repairs": []
+   "zone_repairs": [
+    {
+     "trace_mm": 2.27,
+     "vias": 0,
+     "component_pads": [
+      "U4.1"
+     ]
+    }
+   ]
   }
  },
  "simulation": {
   "state": "ok",
-  "time": "2026-11-12T20:11:50",
+  "time": "2026-11-13T09:01:23",
   "summary": {
    "ok": true,
    "count": 4,
@@ -235,13 +243,13 @@
  },
  "checks": {
   "state": "ok",
-  "time": "2026-11-12T20:11:54",
+  "time": "2026-11-13T09:06:01",
   "summary": {
    "ok": true,
    "counts": {
     "error": 0,
-    "warning": 36,
-    "info": 0
+    "warning": 35,
+    "info": 1
    },
    "auto_pass": true,
    "erc": {
@@ -262,7 +270,7 @@
  },
  "previews": {
   "state": "ok",
-  "time": "2026-11-12T20:12:01",
+  "time": "2026-11-13T09:06:09",
   "summary": {
    "ok": true,
    "schematic": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/preview/schematic.svg",
@@ -283,18 +291,17 @@
   }
  },
  "fab": {
-  "state": "ok",
-  "time": "2026-11-11T23:03:14",
+  "state": "fail",
+  "time": "2026-11-13T09:02:00",
   "summary": {
-   "ok": true,
-   "dir": "/Users/steven/Documents/myproject/PCBtest2/projects/fm_radio/out/fab",
-   "gerber_log": "",
+   "ok": false,
+   "blocked": true,
    "gate": {
-    "review": "CONDITIONAL",
-    "auto_pass": true
+    "review": "STALE (CONDITIONAL)",
+    "auto_pass": true,
+    "review_current": false
    },
-   "forced": true,
-   "note": "JLCPCB CPL rotations may need per-footprint offsets; check in their preview before ordering."
+   "message": "Fab export requires auto checks with 0 errors AND an AI review verdict of PASS on the current board (a rebuild after the review makes it STALE) (use force=True to override for a prototype)."
   }
  }
 }
