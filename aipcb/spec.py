@@ -14,6 +14,13 @@ Schema (abridged):
                                           #  a name shared by several pins selects all of them)
   nc: [U1.IO35, ...]                      # pins intentionally unconnected
   notes: free text describing design intent (used for AI review)
+  spec:                                   # optional, shown beside the schematic in the GUI
+    summary: "what the device is / does"
+    blocks: {block: "plain-language explanation" | {title, text}}
+    sections: {"Section": {key: value | [values]}}    # the device spec sheet
+  requirements:                           # optional product requirements document (GUI 設計需求書)
+    purpose, users: [...], scenarios: [...], constraints: [...], out_of_scope: [...], acceptance: [...]
+    functional / non_functional: [{id, text, priority: 必要|建議|選配, design, verify: "sim 01 | test"}]
 """
 from __future__ import annotations
 

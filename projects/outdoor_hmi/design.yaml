@@ -68,6 +68,186 @@ notes: |
     High-pass ~80 Hz (protects the small speaker and kills plop).
   - Filterless outputs: ferrite bead + 470 pF C0G per leg against EMI into the GNSS/DAB antennas.
 
+# Product requirements document (設計需求書) shown beside the schematic in the GUI. Consolidated from the official
+# All-in-One Outdoor Hub product spec + the Board 2 (HMI & Alarm) engineering requirements (2026-11-14).
+# Each requirement traces to the design (design:) and its verification (verify:; "sim NN" shows that SPICE run's
+# live PASS/FAIL). scope: which board / discipline owns it — only "Board 2" items are implemented by this design.
+requirements:
+  source: "全球版全能型戶外探險中樞（All-in-One Outdoor Hub）官方產品規格書 + HMI & Alarm 板工程架構需求，2026-11-14 綜整"
+  purpose: >-
+    為頂級戶外活動設計的全能型戶外探險中樞：200 g 輕量、寬面扁平的掌上型專業 GPS，全實體物理操控，整合 L1+L5 雙頻
+    GNSS 離線地圖、歐洲 DAB+/FM 數位廣播、2 W FRS 對講與 APRS 位置求救、全球時區自動識別與雙模智慧鬧鐘，
+    在 −40～+85 °C 與雨雪環境下可靠運作，目標售價約 600 美元（約新台幣 18,000～19,500 元）。
+    本設計為其中的 Board 2「人機介面與警報板」：負責所有實體按鍵、旋鈕、SOS 鍵、震動、喇叭與 SOS 閃光，
+    經 FPC 與 Board 1（主控 AP + GNSS + RF）連接，所有控制走單一 I2C 匯流排。
+  product:
+    定位與預算: "全球版旗艦戶外 GPS / 廣播 / 對講整合機，約 US$600"
+    外觀與重量: "寬面扁平掌上型，總重 200 g（電池 60 g）"
+    外殼與防護: "碳纖維增強 PC 外殼 + TPU 防摔包角，IP68、MIL-STD-810H"
+    實體操控: ["不銹鋼數位編碼旋鈕（頂部右側，高阻尼，下壓 = Enter，旋轉縮放地圖）",
+             "5 顆正面防滑大按鍵（返回、選單、Fn、GPS 標記點 Waymark 等）",
+             "頂部 SOS 鍵：亮橘色微凹、實體防誤觸掀蓋，長按 3 秒觸發"]
+    螢幕: "3.0 吋半透半反彩色 LCD，0.5 mm 大猩猩玻璃"
+    廣播: "DAB / DAB+ Band III 174–240 MHz + FM 76–108 MHz，DLS / RDS 文字"
+    對講: "2 W FRS（約 467 MHz）類比 / 數位雙模 + APRS 位置封包"
+    天線: "可拆式 SMA-Female 雙頻天線（FRS / DAB+）+ 內建隱藏印刷輔助天線"
+    喇叭: "2 W 釹鐵硼高磁力喇叭，具排水設計"
+    定位: "五星雙頻 GNSS L1+L5（GPS / GLONASS / Galileo / BeiDou / QZSS）"
+    地圖與儲存: "64 GB eMMC + microSD 最大 512 GB；OSM 向量圖 + 10/20 m 等高線，即時地形陰影（C/C++）"
+    電池與充電: "3,500 mAh 耐寒電芯（−20 °C 保有 ≥85 % 放電），USB-PD 20 W 快充（30 分鐘 70 %），5 W 逆向 OTG"
+    感測器: "ABC：氣壓計（暴風預警）、電子羅盤、高度計"
+    無線與語言: "藍牙 5.3、Wi-Fi；繁中 / 英 / 德 / 法 / 義 / 西 / 荷"
+    時區: "GNSS 定位後比對內建全球時區邊界資料庫，離線自動切換時區與夏令時間"
+    電源模式: ["探險模式（全開）約 15–18 小時", "省電導航模式（關藍牙 / 喇叭 / 廣播，GPS 30 秒一次）約 3–5 天",
+             "生存救援模式（關螢幕 / 地圖 / 廣播，FRS 最低功率守聽，每 20 分鐘定位並發 APRS）≥ 7 天"]
+    工作溫度: "−40～+85 °C（HMI & Alarm 板）"
+  users:
+    - "登山、越野、救難等戶外使用者：可能戴手套、在雨雪、低溫或強光下操作"
+    - "山屋 / 木屋與帳篷過夜的登山客：需要不吵醒他人的震動鬧鐘"
+    - "周遭持有同款設備或數位無線電的山友與搜救隊（接收 SOS / APRS）"
+    - "Board 1 的應用處理器（AP）韌體：透過 FPC 與 I2C 控制本板"
+  scenarios:
+    - "導航中戴手套操作：轉旋鈕縮放離線地圖、下壓確認；按 Waymark 鍵標記航點；低溫或雨中不會誤觸"
+    - "山屋起床攻頂：震動鬧鐘模式，喇叭完全靜音，兩顆 LRA 對稱強烈震動喚醒"
+    - "帳篷露營：以指定 DAB+ / FM 電台當鬧鈴，音量由小漸大；收不到訊號時 1 秒內改為蜂鳴音 + 強烈震動（Fail-safe）"
+    - "緊急求救：掀蓋長按 SOS 3 秒 → 第一級本地警報（2 W 喇叭最大音量約 100 dB 蜂鳴 + 頂部 LED 摩斯碼閃爍）、第二級 FRS 語音求救、第三級每 5 分鐘 APRS 座標發射"
+    - "生存救援模式：本板全部斷電待命，只保留按鍵與 SOS 喚醒能力"
+  product_requirements:
+    - {id: SR-01, text: "全實體物理操控：編碼旋鈕 + 5 顆正面按鍵 + 防誤觸 SOS 鍵", scope: Board 2, priority: 必要, design: "見 FR-01 ~ FR-06", verify: "實機"}
+    - {id: SR-02, text: "雙模智慧鬧鐘：震動模式 / 廣播音喚醒模式（含 1 秒 Fail-safe）", scope: "Board 2 + 韌體", priority: 必要, design: "見 FR-07、FR-11、FR-12", verify: "實機"}
+    - {id: SR-03, text: "SOS 第一級本地警報：喇叭最大功率約 100 dB 蜂鳴 + LED 摩斯碼", scope: Board 2, priority: 必要, design: "見 FR-06、FR-08、FR-10", verify: "聲壓計量測"}
+    - {id: SR-04, text: "SOS 第二 / 三級：FRS 語音求救、每 5 分鐘 APRS 座標", scope: Board 1, priority: 必要, design: "Board 2 提供 SOS_PRESS / SOS_LONG 喚醒訊號", verify: "Board 1 測試"}
+    - {id: SR-05, text: "DAB / DAB+ / FM 廣播與 DLS / RDS 文字", scope: Board 1, priority: 必要, design: "Board 2 只負責音訊放大（AUDIO_P/N 差動輸入）", verify: "Board 1 測試"}
+    - {id: SR-06, text: "2 W FRS 對講與 APRS", scope: Board 1, priority: 必要, design: "Board 2 音訊輸入需抑制 467 MHz 干擾（FR-09）", verify: "Board 1 測試"}
+    - {id: SR-07, text: "L1+L5 雙頻 GNSS、離線地圖、全球時區自動識別", scope: "Board 1 + 韌體", priority: 必要, design: "—", verify: "Board 1 測試"}
+    - {id: SR-08, text: "3.0 吋半透半反螢幕、ABC 感測器、藍牙 5.3 / Wi-Fi、64 GB eMMC + microSD", scope: Board 1, priority: 必要, design: "—", verify: "Board 1 測試"}
+    - {id: SR-09, text: "3,500 mAh 電池、USB-PD 20 W 快充、5 W OTG", scope: "Board 1（PMIC）", priority: 必要, design: "Board 2 由 VSYS 3.0–4.35 V 供電", verify: "Board 1 測試"}
+    - {id: SR-10, text: "三段式電源模式（探險 / 省電導航 / 生存救援）", scope: "全系統", priority: 必要, design: "Board 2 所有負載可個別關閉（FR-13）", verify: "整機續航測試"}
+    - {id: SR-11, text: "200 g、IP68、MIL-STD-810H、碳纖維 PC 外殼、TPU 包角", scope: 機構, priority: 必要, design: "Board 2 板厚 1.0 mm、80 × 48 mm", verify: "機構測試"}
+  functional:
+    - {id: FR-01, text: "5 顆正面實體按鍵（返回 / 選單 / Fn / 標記點 Waymark / 第 5 鍵），按下以中斷通知主機", scope: Board 2, priority: 必要, design: "C&K KSC IP67 密封按鍵 → TCA9554（0x21）I2C 鍵盤晶片 + KEY_INT_N", verify: "實機"}
+    - {id: FR-02, text: "按鍵硬體 RC 濾波去抖動 + TVS 靜電防護陣列", scope: Board 2, priority: 必要, design: "10k 上拉 / 100k 串聯 / 10 nF C0G（τ ≈ 1 ms），SP0504BAHT", verify: "sim 04"}
+    - {id: FR-03, text: "編碼旋鈕 A/B 相與 Push 直接拉到主板 AP 的硬體四倍頻正交解碼 Timer，快轉不漏步", scope: Board 2, priority: 必要, design: "Alps EC12D（−40～+85 °C）15 脈衝 / 30 段 + 按壓，10k / 10k / 10 nF 濾波（τ ≈ 0.1 ms）", verify: "sim 04"}
+    - {id: FR-04, text: "SOS 鍵獨立拉線，按下立即通知主機", scope: Board 2, priority: 必要, design: "SOS_PRESS（1k + 10 nF），FPC 獨立接點", verify: "sim 01"}
+    - {id: FR-05, text: "SOS 硬體長按延時（約 3 秒）中斷觸發，與韌體無關；短按 / 誤觸不累積", scope: Board 2, priority: 必要, design: "910k / 4.7 µF X8R + 74AUP1G17 施密特 → SOS_LONG；D5 放電", verify: "sim 01"}
+    - {id: FR-06, text: "頂部高亮 LED 以摩斯碼閃爍求救", scope: Board 2, priority: 必要, design: "紅色 0.5 W 2835 LED + DMG2302U，AP PWM，約 95～150 mA", verify: "sim 03"}
+    - {id: FR-07, text: "1~2 顆專用 Haptic Driver：LRA 自動共振校準、即時波形播放、閉環追蹤溫度造成的共振偏移，由主板 I2C 控制", scope: Board 2, priority: 必要, design: "2 × DRV2605L（同位址 0x5A，經 TCA9546A CH0 / CH1），共用 HAPTIC_TRIG 同步觸發", verify: "實機（−40 / +25 / +85 °C）"}
+    - {id: FR-08, text: "2.5～3 W 高效 Class-D 功放，具硬體 Mute、過熱關斷與短路保護", scope: Board 2, priority: 必要, design: "TPS61022 升壓 5 V + PAM8302A（2.5 W / 4 Ω，內建過熱 / 短路保護），AMP_SD_N 硬體靜音", verify: "實機量測輸出功率"}
+    - {id: FR-09, text: "差動音訊輸入，抑制 FRS 467 MHz 射頻干擾", scope: Board 2, priority: 必要, design: "100 nF 隔直 / 10k / 100 pF C0G：高通 80 Hz、低通約 300 kHz", verify: "sim 02"}
+    - {id: FR-10, text: "SOS 第一級警報：喇叭最大功率發出約 100 dB 蜂鳴", scope: "Board 2 + 喇叭", priority: 必要, design: "2.5 W 輸出；100 dB 需喇叭靈敏度 ≥ 約 96 dB @1 W/1 m", verify: "聲壓計量測（1 m）"}
+    - {id: FR-11, text: "鬧鐘 Fail-safe：電台收不到時 1 秒內切換蜂鳴音 + 強烈震動", scope: "Board 2 + 韌體", priority: 必要, design: "喇叭與兩顆 LRA 為獨立路徑，可同時驅動", verify: "實機"}
+    - {id: FR-12, text: "廣播鬧鈴音量由小漸大", scope: 韌體, priority: 必要, design: "AP 音訊數位音量控制；Board 2 固定增益", verify: "實機"}
+    - {id: FR-13, text: "省電 / 生存模式下本板負載可全部關閉，只保留按鍵與 SOS 喚醒", scope: Board 2, priority: 必要, design: "BOOST_EN 真正斷電、AMP_SD_N、HAPTIC_EN 皆有安全預設下拉", verify: "實機量測待機電流"}
+  non_functional:
+    - {id: NFR-01, text: "工作溫度 −40～+85 °C：全部 IC 採汽車級 AEC-Q100 或 −40～+85 °C 工業級", scope: Board 2, priority: 必要, design: "全部 IC 為 −40～+85 °C 以上等級；電阻 AEC-Q200", verify: "BOM 審核 + 溫箱測試"}
+    - {id: NFR-02, text: "被動元件鎖定：高頻 / 時序電容 C0G/NP0，其餘 X8R；關鍵節點嚴禁 X5R", scope: Board 2, priority: 必要, design: "時序 / RC / RF 用 C0G，去耦 X8R，大容量 X7R（X8R 無 10–22 µF），全板無 X5R", verify: "BOM 審核"}
+    - {id: NFR-03, text: "PCB 三防共形覆層，杜絕冷熱交替凝露造成的微短路與腐蝕", scope: "Board 2 + 製程", priority: 必要, design: "IPC-CC-830 壓克力 / 聚氨酯，FPC 接點、按鍵、編碼器、JST 接點避開", verify: "冷凝 / 淋水測試"}
+    - {id: NFR-04, text: "極致整合、減少離散邏輯：單一通訊匯流排（I2C）", scope: Board 2, priority: 必要, design: "按鍵、I2C 開關、兩顆 haptic 全掛同一 I2C；僅 SOS 長按保留單閘施密特（見差異表）", verify: "審核"}
+    - {id: NFR-05, text: "所有外露按鍵 / 旋鈕 / SOS 線路具 ESD 防護", scope: Board 2, priority: 必要, design: "SP0504BAHT TVS 陣列 ×3", verify: "IEC 61000-4-2 測試"}
+    - {id: NFR-06, text: "主板未上電或 FPC 鬆脫時本板保持安靜（靜音、升壓關、馬達關、LED 關）", scope: Board 2, priority: 必要, design: "每個來自 Board 1 的輸入都有安全預設上 / 下拉", verify: "審核"}
+    - {id: NFR-07, text: "喇叭輸出不干擾 GNSS / DAB 天線", scope: Board 2, priority: 必要, design: "無濾波輸出每腳磁珠 + 470 pF C0G", verify: "EMI 預掃"}
+    - {id: NFR-08, text: "SOS 全開時 VSYS 電流在 FPC 額定內", scope: Board 2, priority: 必要, design: "VSYS 4 接點（2 A 預算），峰值約 1.45 A", verify: "審核"}
+    - {id: NFR-09, text: "輕量化：板子薄、小", scope: Board 2, priority: 建議, design: "80 × 48 mm，板厚 1.0 mm，2 層", verify: "DRC"}
+  deviations:
+    - {item: "功放型號 / 封裝", source: "TPA2013D1 等級（內建升壓單晶片），QFN / WLCSP 超小封裝", design: "TPS61022（VQFN 2×2）升壓 + PAM8302A（MSOP-8）", reason: "目前全部 IC 腳位都來自 KiCad 原廠符號（無 AI 產生腳位）；代價是面積較大、PAM8302A 非 QFN。Rev B 可改 TPA2013D1 縮小面積"}
+    - {item: "Haptic driver 數量", source: "一處寫「單顆」DRV2605L，另一處寫「1~2 顆」；鬧鐘需「兩組高對稱性 LRA」", design: "2 × DRV2605L（各驅動一顆 LRA）", reason: "一顆 DRV2605L 只能驅動一顆 LRA；兩顆同位址 0x5A，以 TCA9546A 分通道"}
+    - {item: "Haptic driver 型號", source: "TI DRV2605LEVM 等級", design: "DRV2605L IC", reason: "DRV2605LEVM 是評估板，量產用其上的 DRV2605L 晶片"}
+    - {item: "消滅離散邏輯 / 協同 MCU", source: "按鍵、解碼與狀態判斷收斂到一顆寬溫協同 MCU，或直接進主板 AP", design: "旋鈕直通 AP；按鍵經 TCA9554 I2C 鍵盤晶片；SOS 長按保留 RC + 74AUP1G17", reason: "採原文允許的「主板 AP 硬體中斷 / I2C 鍵盤晶片」選項，不另加 MCU（免韌體）；SOS 硬體長按延時是原文另一條明確要求"}
+    - {item: "喇叭功率匹配", source: "整機規格 2 W 喇叭；功放 2.5～3 W", design: "功放最大 2.5 W / 4 Ω，J4 標示 4 Ω 2.5 W 喇叭", reason: "待決：選用 ≥2.5 W 喇叭，或韌體限制最大音量，避免燒喇叭"}
+    - {item: "100 dB 警報聲壓", source: "2 W 喇叭最大功率 100 dB", design: "電路可輸出 2.5 W", reason: "待決：100 dB @1 m 需喇叭靈敏度 ≥ 約 96 dB @1 W/1 m，選型時確認"}
+    - {item: "第 5 顆按鍵功能", source: "列出返回、選單、Fn、Waymark 四種功能", design: "第 5 顆暫定 PAGE（翻頁）", reason: "待決：確認第 5 顆按鍵用途"}
+    - {item: "SOS 鍵機構", source: "頂部、亮橘色微凹、實體防誤觸掀蓋", design: "SW7 C&K KSC 置於板頂邊，橘色鍵帽、掀蓋由機構提供", reason: "掀蓋與鍵帽屬機構設計，需與外殼一起驗證"}
+  constraints:
+    - "Board 2 為 2 層板；所有 RF（GNSS、DAB+、FRS）在 Board 1 的 ≥4 層板上"
+    - "80 × 48 mm，板厚 1.0 mm；只透過一條 26 pin 0.5 mm FPC 與 Board 1 連接"
+    - "標準匯流排（I2C，3.3 V，400 kHz）架構"
+    - "整機重量 200 g、預算約 US$600"
+  out_of_scope:
+    - "Board 1：AP、GNSS、DAB+/FM、FRS/APRS、PMIC 與充電、螢幕、感測器、儲存、藍牙 / Wi-Fi"
+    - "外殼、旋鈕、按鍵帽、SOS 掀蓋與防水結構"
+    - "韌體（鬧鐘、音量漸強、時區、地圖、多國語系）"
+  acceptance:
+    - "ERC 0 錯誤、DRC 0 錯誤 / 0 未連接"
+    - "全部 SPICE 模擬 PASS"
+    - "AI 設計審核 PASS（目前 CONDITIONAL：EC12D 焊腳需試裝確認）"
+    - "打樣板在 −40 / +25 / +85 °C 通過 FR-01 ~ FR-13"
+    - "SOS 警報聲壓 ≥ 100 dB @1 m（裝上選定喇叭）"
+    - "差異表中的「待決」項目全部有結論"
+
+# Device description + spec sheet shown next to the schematic in the GUI (原理圖 → 電路說明 / 規格書).
+spec:
+  summary: >-
+    戶外多功能主機（Outdoor Hub）的第 2 片板：人機介面與警報板。提供 5 顆防水按鍵、旋轉編碼器（含按壓）、
+    帶硬體 3 秒長按判定的 SOS 鍵、SOS 閃光 LED、兩顆 LRA 線性馬達的觸覺回饋，以及 2.5 W 喇叭擴大機。
+    透過 26 pin FPC 接到第 1 片板（AP、GNSS、DAB+/FM、FRS/APRS、電源管理、顯示器），工作溫度 −40～+85 °C。
+  blocks:
+    fpc:
+      title: "FPC 連接到主板（Board 1）"
+      text: >-
+        J1 Hirose FH12 26 pin 0.5 mm FPC。VSYS 用 4 個接點（2 A 預算）、GND 7 個接點；+3V3 是主板常開的邏輯電源。
+        所有從主板來的輸入在本板都有安全預設的上/下拉電阻，主板沒上電時本板保持安靜（靜音、升壓關、馬達關、LED 關）。
+    i2c:
+      title: "I2C 與通道切換"
+      text: "R1/R2 4.7 kΩ 匯流排上拉（主板已有上拉時可不焊）。U3 TCA9546A（0x70）I2C 開關：兩顆 DRV2605L 位址同為 0x5A，各放在不同通道（CH0 = A、CH1 = B）。"
+    keys:
+      title: "前面板按鍵"
+      text: >-
+        5 顆 C&K KSC 密封（IP67）按鍵：BACK、MENU、FN、MARK（標記航點）、PAGE，按下接地。每顆經 10 kΩ 上拉 → 100 kΩ 串聯 → 10 nF
+        （τ ≈ 1 ms 去彈跳兼濾射頻）進 U4 TCA9554（0x21）擴充 IO；TCA9554 的 ~INT 拉低 KEY_INT_N 喚醒主機。D1 SP0504 TVS 防靜電。
+    encoder:
+      title: "旋轉編碼器"
+      text: "SW6 EC12D（15 脈衝 / 30 段 + 按壓）。A/B/按壓直接送主機（計時器正交解碼 ×4），採 Bourns 建議的 10 kΩ 上拉 / 10 kΩ 串聯 / 10 nF 濾波；D2 TVS 防靜電。"
+    sos:
+      title: "SOS 鍵與 3 秒長按判定"
+      text: >-
+        SW7 按下接 +3V3。SOS_PRESS（1 kΩ + 10 nF）立即通知主機；同時經 910 kΩ 對 4.7 µF 充電，約 3 秒後越過 U5 74AUP1G17 施密特門檻，
+        輸出 SOS_LONG 獨立喚醒主機（模擬 01）。放開時 D5 1N4148 立刻放電，短按不會累積。D3 TVS 防靜電。
+    led:
+      title: "SOS 閃光燈"
+      text: "D4 紅色 2835 0.5 W LED，由 Q1 DMG2302U 開關、主機 PWM 控制（摩斯碼）；R37/R38 兩顆 33 Ω 並聯限流，約 95～150 mA（模擬 03）。"
+    haptic_a:
+      title: "觸覺回饋 A"
+      text: "U1 DRV2605L 閉迴路 LRA 驅動（自動追蹤共振頻率、自動校正，補償溫度漂移），VDD = VSYS；馬達接 J2 JST-SH 2 pin。"
+    haptic_b:
+      title: "觸覺回饋 B"
+      text: "U2 DRV2605L 同 A；兩顆的 IN/TRIG 共用 HAPTIC_TRIG，同一個邊緣同時觸發，左右對稱震動。馬達接 J3。"
+    boost:
+      title: "5 V 升壓"
+      text: >-
+        3.0～4.35 V 電池無法對 4 Ω 輸出 2.5 W，所以 U6 TPS61022 把 VSYS 升到 AMP_5V = 5.0 V（732 kΩ / 100 kΩ 回授）。
+        BOOST_EN 低電位時真正斷開輸出，擴大機完全斷電。
+    amp:
+      title: "2.5 W 擴大機"
+      text: >-
+        U7 PAM8302A 以 5 V 推 4 Ω / 2.5 W 喇叭。差動輸入經 100 nF 隔直 → 10 kΩ → 100 pF：高通約 80 Hz 保護小喇叭、
+        低通濾掉 FRS 467 MHz 干擾（模擬 02）。無濾波輸出每腳加磁珠 + 470 pF，避免干擾 GNSS / DAB 天線。AMP_SD_N 為硬體靜音。
+    mechanical:
+      title: "固定孔"
+      text: "四個 M2 螺絲固定孔。"
+  sections:
+    "產品概要 Overview":
+      用途: "戶外多功能主機的人機介面與警報板（Board 2 of 2）"
+      工作溫度: "−40～+85 °C（全部 IC 為工業級；電阻 AEC-Q200；無 X5R 電容）"
+      防護: "三防漆（IPC-CC-830），FPC 接點、按鍵、編碼器、JST 接點避開"
+      連接: "26 pin 0.5 mm FPC 到 Board 1"
+    "電源 Power":
+      VSYS: "3.0～4.35 V（1S 鋰電池，由 Board 1 供應），FPC 4 接點，2 A 預算"
+      +3V3: "Board 1 常開邏輯電源（擴充 IO、I2C 開關、SOS 計時、上拉）"
+      AMP_5V: "TPS61022 升壓 5.0 V（4.87～5.12 V），BOOST_EN 控制、關閉時真正斷電"
+      最大負載: "SOS 全開：擴大機約 1.1 A + LED 0.14 A + 兩顆 LRA 約 0.2 A（取自 VSYS）"
+    "操作介面 Controls":
+      按鍵: "5 顆 IP67 按鍵（BACK / MENU / FN / MARK / PAGE），RC 去彈跳 τ ≈ 1 ms，經 TCA9554 + 中斷"
+      編碼器: "EC12D 15 脈衝 / 30 段 + 按壓，RC 濾波 τ ≈ 0.1 ms（模擬 04）"
+      SOS 鍵: "即時 SOS_PRESS + 硬體長按 SOS_LONG（約 3 秒，模擬 01）"
+      ESD: "所有按鍵 / 編碼器線上 SP0504BAHT TVS"
+    "輸出 Outputs":
+      喇叭: "PAM8302A，4 Ω / 2.5 W @ 5 V，高通約 80 Hz、射頻抑制（模擬 02）"
+      觸覺: "2 × DRV2605L LRA 閉迴路驅動，同步觸發"
+      SOS 燈: "紅色 0.5 W LED，PWM 摩斯碼，約 95～150 mA（模擬 03）"
+    "I2C (3.3 V, 400 kHz)":
+      位址: ["0x21 TCA9554 按鍵擴充 IO", "0x70 TCA9546A I2C 開關", "0x5A DRV2605L ×2（各在 TCA9546A CH0 / CH1）"]
+      上拉: "4.7 kΩ（Board 1 已有上拉時不焊 R1/R2）"
+
 board:
   width: 80
   height: 48

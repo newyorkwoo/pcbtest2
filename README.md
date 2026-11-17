@@ -13,6 +13,7 @@
 | 桌面儀表板 | `.venv/bin/python -m aipcb gui fm_radio` |
 | 命令列全流程 | `.venv/bin/python -m aipcb build fm_radio` |
 | 送廠檔 | `.venv/bin/python -m aipcb fab fm_radio`（AI 審核 PASS 才放行；`--force` 僅限打樣） |
+| Claude Desktop 擴充功能 | `.venv/bin/python packaging/mcpb/build.py` → 將 `packaging/mcpb/dist/aipcb.mcpb` 拖進 Claude Desktop「設定 → 擴充功能」安裝；安裝時選擇專案資料夾（預設為本 repo 的 `projects/`） |
 
 ## 流程
 `design.yaml` → 元件庫（含 AI 自訂元件）→ 規格驗證 → 原理圖 → ERC → 物理擺放（力導向 + 模擬退火 + 合法化）→ 佈線（雙層 A*、拆線重佈、GND 扇出）→ PCB → DRC（含鋪銅連通性的閉迴路修補）→ SPICE 模擬 → 設計檢查 → 預覽 → **Claude 審核** → 送廠檔

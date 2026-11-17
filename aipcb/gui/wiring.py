@@ -18,6 +18,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QGraphicsScene, QGraphicsView,
                                QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSplitter, QTableWidget,
                                QTableWidgetItem, QTabWidget, QVBoxLayout, QWidget)
 
+from .zoom import ZoomableView, ZoomBar
+
 NET_COLOR = QColor("#ff6a00")
 PART_COLOR = QColor("#1e6fd9")
 
@@ -40,7 +42,7 @@ def _seg_dist(px, py, x1, y1, x2, y2):
     return math.hypot(px - (x1 + t * dx), py - (y1 + t * dy))
 
 
-class SheetView(QGraphicsView):
+class SheetView(ZoomableView):
     """Schematic sheet + highlight overlay. Wheel zoom, drag pan, click to pick, double-click to fit."""
 
     def __init__(self, on_pick):
@@ -80,6 +82,7 @@ class SheetView(QGraphicsView):
         self.resetTransform()
         self.fitInView(rect or self.scene().sceneRect(), Qt.KeepAspectRatio)
         self._zoomed = rect is not None
+        self._emit_zoom()
 
     def P(self, x, y):
         return QPointF(x * self.k, y * self.k)
@@ -133,14 +136,12 @@ class SheetView(QGraphicsView):
         self.fit(r)
 
     # ---------------------------------------------------------------- interaction
-    def wheelEvent(self, e):
-        f = 1.2 if e.angleDelta().y() > 0 else 1 / 1.2
-        self.scale(f, f); self._zoomed = True
-
     def resizeEvent(self, e):
         super().resizeEvent(e)
         if self.svg and not self._zoomed:
             self.fit()
+        else:
+            self._emit_zoom()
 
     def mouseDoubleClickEvent(self, e):
         self.fit()
@@ -190,6 +191,7 @@ class WiringTab(QWidget):
         tv.addLayout(bar)
         self.view = SheetView(self.pick)
         tv.addWidget(self.view, 1)
+        tv.addWidget(ZoomBar(self.view, self.show_all))
         right.addWidget(top)
         self.table = QTableWidget(0, 5)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -226,7 +228,7 @@ class WiringTab(QWidget):
         self.fill_lists()
         n_pins = sum(len(p["pins"]) for p in self.map["parts"].values())
         self.stat.setText(f"{len(self.map['parts'])} 個元件 · {len(self.map['design_nets'])} 個網路 · {n_pins} 個接腳"
-                          "\n滾輪縮放、拖曳平移、雙擊回到全圖")
+                          "\n滾輪或下方橫桿縮放、拖曳平移、雙擊回到全圖")
         sel, self.sel = self.sel, None
         if sel and ((sel[0] == "net" and sel[1] in self.map["design_nets"]) or
                     (sel[0] == "part" and sel[1] in self.map["parts"])):

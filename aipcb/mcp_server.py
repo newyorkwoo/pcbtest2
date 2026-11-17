@@ -16,14 +16,10 @@ try:                                    # MCP python SDK 2.x
 except ImportError:                     # SDK 1.x
     from mcp.server.fastmcp import FastMCP
 
-from . import config, library
+from . import config, guide, library
 from . import pipeline as P
 
-mcp = FastMCP("aipcb", instructions=(
-    "Local EDA engine (KiCad 10 + physics placer + maze router + ngspice). Workflow: create_project -> "
-    "search_symbols/get_symbol_pins/search_footprints -> write design.yaml (write_design) -> validate_design -> "
-    "build_board (schematic, ERC, placement, routing, PCB, DRC, sims, checks, previews) -> fix issues -> "
-    "get_review_package -> submit_review -> export_fab. Net syntax REF.PIN (pin number or name)."))
+mcp = FastMCP("aipcb", instructions=guide.SHORT)
 
 
 def _quiet(fn, *a, **kw):
@@ -40,6 +36,13 @@ def _j(obj, limit: int = 60000) -> str:
 
 # ------------------------------------------------------------------ projects
 @mcp.tool()
+def get_design_guide() -> str:
+    """The designer / reviewer rules for aipcb (design.yaml conventions, placement hints, SPICE expectations,
+    review policy) and where the projects live. Read this once before designing or reviewing."""
+    return guide.GUIDE + f"\n\nProjects folder: {config.PROJECTS}\nExports folder: {config.EXPORTS}\n"
+
+
+@mcp.tool()
 def list_projects() -> str:
     """List design projects and the state of each pipeline stage."""
     out = {}
@@ -52,15 +55,11 @@ def list_projects() -> str:
 @mcp.tool()
 def create_project(name: str, title: str = "", width_mm: float = 60, height_mm: float = 40) -> str:
     """Create projects/<name>/ with a skeleton design.yaml."""
-    pd = config.PROJECTS / name
-    if (pd / "design.yaml").exists():
-        return f"project {name} already exists"
-    (pd / "sim").mkdir(parents=True, exist_ok=True)
-    skel = {"project": name, "title": title or name, "rev": "A", "notes": "",
-            "board": {"width": width_mm, "height": height_mm, "corner_radius": 2, "layers": 2, "fab": "jlcpcb"},
-            "rules": {"track": 0.2, "power_track": 0.4, "clearance": 0.2, "via": [0.6, 0.3], "power_nets": []},
-            "parts": {}, "nets": {}, "nc": []}
-    (pd / "design.yaml").write_text(yaml.safe_dump(skel, sort_keys=False, allow_unicode=True))
+    from . import archive
+    try:
+        pd = archive.new_project(name, title, width_mm, height_mm)
+    except (FileExistsError, ValueError) as e:
+        return str(e)
     return f"created {pd}/design.yaml"
 
 
@@ -201,6 +200,22 @@ def submit_review(project: str, verdict: str, summary: str, findings_json: str =
     """Record the AI design review. verdict: PASS | CONDITIONAL | FAIL.
     findings_json: [{"severity": "error|warning|info", "title": "...", "detail": "..."}]"""
     return _j(_quiet(P.submit_review, P.project_dir(project), verdict, summary, json.loads(findings_json)))
+
+
+@mcp.tool()
+def export_project(project: str, dest: str = "", make_zip: bool = True) -> str:
+    """Archive the whole project into one folder (+ .zip): project/ (re-importable), documents/ (requirements, spec,
+    description HTML, schematic PDF, BOM, wiring list, review, checks, sims, fab) and manifest.json (sha256)."""
+    from . import archive
+    return _j(_quiet(archive.export_project, P.project_dir(project), dest or None, make_zip))
+
+
+@mcp.tool()
+def import_project(source: str, name: str = "", overwrite: bool = False) -> str:
+    """Import an export folder / .zip / manifest.json (or a bare project folder) into projects/. Checksums are
+    verified; an existing project is only replaced with overwrite=True and is backed up to exports/ first."""
+    from . import archive
+    return _j(_quiet(archive.import_project, source, name or None, overwrite))
 
 
 @mcp.tool()

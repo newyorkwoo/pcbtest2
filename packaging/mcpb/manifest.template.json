@@ -1,0 +1,54 @@
+{
+  "manifest_version": "0.4",
+  "name": "aipcb",
+  "display_name": "aipcb — AI PCB Designer (KiCad)",
+  "version": "0.1.0",
+  "description": "Design, simulate, review and fab-export PCBs on your Mac: Claude writes design.yaml, KiCad 10 does the rest — offline.",
+  "long_description": "aipcb turns Claude into a circuit designer and design reviewer. Describe a circuit in plain language; Claude picks KiCad parts, writes design.yaml and runs the local flow: schematic, ERC, physics-based placement, 2-layer autorouting with GND pour, DRC with pour repair, ngspice simulations, design checks and previews. An AI review (PASS / CONDITIONAL / FAIL) gates the Gerber / BOM / CPL export.\n\n**Requires KiCad 10** installed at /Applications/KiCad (its kicad-cli, libraries, libngspice and Python are used). Everything runs locally; no network access is needed after the Python dependencies are installed.",
+  "author": {
+    "name": "newyorkwoo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/newyorkwoo/pcbtest2"
+  },
+  "icon": "icon.png",
+  "server": {
+    "type": "uv",
+    "entry_point": "server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "--directory", "${__dirname}", "server.py"],
+      "env": {
+        "AIPCB_PROJECTS": "${user_config.projects_dir}",
+        "AIPCB_EXPORTS": "${user_config.exports_dir}"
+      }
+    }
+  },
+  "tools": "__TOOLS__",
+  "user_config": {
+    "projects_dir": {
+      "type": "directory",
+      "title": "Projects folder",
+      "description": "Folder holding one sub-folder per board (each with design.yaml). Shared with the aipcb CLI / GUI when you point it at the repo's projects/ folder.",
+      "required": true,
+      "default": "__PROJECTS_DIR__"
+    },
+    "exports_dir": {
+      "type": "directory",
+      "title": "Exports folder",
+      "description": "Where export_project writes archives and import_project keeps backups.",
+      "required": true,
+      "default": "__EXPORTS_DIR__"
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin"],
+    "runtimes": {
+      "python": ">=3.11"
+    }
+  },
+  "keywords": ["pcb", "kicad", "eda", "electronics", "schematic", "spice", "gerber"],
+  "license": "MIT"
+}

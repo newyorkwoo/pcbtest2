@@ -1,0 +1,13 @@
+[project]
+name = "aipcb-mcp"
+version = "0.1.0"
+description = "aipcb local EDA engine (KiCad 10) as an MCP server for Claude Desktop"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.20",
+    "numpy>=2.0",
+    "pyyaml>=6.0",
+]
+
+[tool.uv]
+package = false

@@ -6,7 +6,10 @@ import platform
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PROJECTS = ROOT / "projects"
+# Overridable so the engine can run from an installed bundle (Claude Desktop extension) while the
+# projects live elsewhere. Exports default to a sibling of the projects folder.
+PROJECTS = Path(os.environ["AIPCB_PROJECTS"]).expanduser() if os.environ.get("AIPCB_PROJECTS") else ROOT / "projects"
+EXPORTS = Path(os.environ["AIPCB_EXPORTS"]).expanduser() if os.environ.get("AIPCB_EXPORTS") else PROJECTS.parent / "exports"
 
 
 def _default_kicad() -> tuple[Path, Path, Path, Path]:

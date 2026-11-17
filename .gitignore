@@ -26,3 +26,10 @@ projects/*/out/fab/*.step
 .claude/
 projects/*/out/schematic_map.json
 projects/*/out/wiring.json
+
+# Project archives (aipcb export)
+exports/
+
+# Claude Desktop extension build output
+packaging/mcpb/build/
+packaging/mcpb/dist/

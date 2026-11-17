@@ -3,6 +3,10 @@
 commands: build | library | validate | schematic | erc | place | route | pcb | drc | sim | checks |
           previews | fab [--force] | status | gui | mcp
 
+archive (one folder + .zip with the whole project and readable documents):
+  export <project> [--to DIR] [--no-zip]          default DIR: ./exports
+  import <folder|.zip|manifest.json> [--name NEW] [--overwrite]
+
 placement locks (build / place):
   --keep               keep every part at its previous position; only new parts are placed
   --keep U1,J2         keep just these parts
@@ -21,21 +25,37 @@ from . import pipeline as P
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="aipcb")
     ap.add_argument("command")
-    ap.add_argument("project", nargs="?", default="fm_radio")
+    ap.add_argument("project", nargs="?", default=None)
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--tries", type=int, default=3)
     ap.add_argument("--moves", type=int, default=30000)
     ap.add_argument("--keep", nargs="?", const="all", default=None)
     ap.add_argument("--unlock", default="")
+    ap.add_argument("--to", default=None, help="export: destination folder")
+    ap.add_argument("--no-zip", action="store_true", help="export: folder only, no .zip")
+    ap.add_argument("--name", default=None, help="import: save under a new project name")
+    ap.add_argument("--overwrite", action="store_true", help="import: replace an existing project (it is backed up)")
     a = ap.parse_args(argv)
+    if a.command in ("export", "import"):
+        if not a.project:
+            ap.error(f"{a.command} 需要專案名稱或路徑")
+        from . import archive
+        try:
+            res = (archive.export_project(P.project_dir(a.project), a.to, make_zip=not a.no_zip) if a.command == "export"
+                   else archive.import_project(a.project, name=a.name, overwrite=a.overwrite))
+        except (OSError, ValueError) as e:
+            print(f"{a.command} 失敗：{e}", file=sys.stderr)
+            return 1
+        print(json.dumps(res, indent=1, ensure_ascii=False))
+        return 0
     keep = None if a.keep is None else (True if a.keep == "all" else [r for r in a.keep.split(",") if r])
     unlock = [r for r in a.unlock.split(",") if r]
-    pd = P.project_dir(a.project)
     cmd = a.command
-    if cmd == "gui":
+    if cmd == "gui":                       # no project given: the GUI reopens the last closed project
         from .gui.app import main as gui_main
-        return gui_main(str(pd))
+        return gui_main(str(P.project_dir(a.project)) if a.project else None)
+    pd = P.project_dir(a.project or "fm_radio")
     if cmd == "mcp":
         from .mcp_server import main as mcp_main
         return mcp_main()

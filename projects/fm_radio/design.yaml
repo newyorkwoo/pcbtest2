@@ -19,6 +19,129 @@ notes: |
   - Programming: CH340C USB-UART at 3.3 V with classic DTR/RTS auto-reset transistors; RESET and BOOT buttons.
   - User controls: UP / DOWN / MODE buttons (ESP32 internal pull-ups). Battery voltage on IO34 via 100k/100k divider.
 
+# Product requirements document (設計需求書) shown beside the schematic in the GUI. Each requirement traces to the
+# design (design:) and its verification (verify:; "sim NN" shows that SPICE run's live PASS/FAIL).
+requirements:
+  purpose: >-
+    做一台放在口袋、隨身帶的小收音機：沒有網路也能聽 FM 廣播，有手機時可當藍牙喇叭播音樂，並隨時顯示正確時間。
+    以單節鋰電池供電、USB-C 充電，整板交由 JLCPCB 製造與貼片。
+  users:
+    - "一般使用者：戶外、通勤、居家隨身聽廣播或手機音樂"
+    - "開發者：透過 USB 直接燒錄 ESP32 韌體、更新功能"
+  scenarios:
+    - "外出無網路：開機收聽 FM，用 UP / DOWN 換台，螢幕顯示頻率與時間"
+    - "在家：手機以藍牙連線播放音樂；有 WiFi 時自動以 NTP 校時"
+    - "邊充邊聽：插 USB-C 充電時照常使用，拔線瞬間不斷電、不重開機"
+    - "長時間關機後再開：時間仍正確（RTC 備援電池）"
+  functional:
+    - {id: FR-01, text: "接收 FM 廣播並以立體聲解調", priority: 必要, design: "RDA5807M + 約 75 cm 導線天線，I2C 控制", verify: "實機收台測試"}
+    - {id: FR-02, text: "作為藍牙喇叭播放手機音樂", priority: 必要, design: "ESP32 Bluetooth Classic A2DP sink，DAC1 輸出", verify: "實機配對播放"}
+    - {id: FR-03, text: "FM 與藍牙音訊經同一顆喇叭播放，音質無明顯失真", priority: 必要, design: "10 kΩ 電阻混音 + 22 kHz RC 低通 + PAM8302A", verify: "sim 03"}
+    - {id: FR-04, text: "可靜音並關閉擴大機省電", priority: 建議, design: "AMP_SD（IO26）控制 PAM8302 SD 腳", verify: "實機量測待機電流"}
+    - {id: FR-05, text: "顯示頻率、藍牙狀態與當地時間", priority: 必要, design: "0.96 吋 SSD1306 OLED（I2C 0x3C）", verify: "實機顯示"}
+    - {id: FR-06, text: "關機後仍保持時間；有 WiFi 時自動校時", priority: 必要, design: "PCF8563 RTC + CR1220 備援，NTP", verify: "斷電 24 h 後比對時間"}
+    - {id: FR-07, text: "USB-C 充電，充電中有指示燈", priority: 必要, design: "5.1 kΩ CC 下拉，MCP73831 500 mA，紅色 LED", verify: "實機充電量測"}
+    - {id: FR-08, text: "插拔 USB 時不斷電、不重開機", priority: 必要, design: "D2 蕭特基 + LTC4412/AO3401A 理想二極體電源路徑", verify: "sim 01"}
+    - {id: FR-09, text: "實體電源開關", priority: 必要, design: "SW1 滑動開關控制 AP2112K EN", verify: "實機"}
+    - {id: FR-10, text: "UP / DOWN / MODE 按鍵操作", priority: 必要, design: "ESP32 GPIO 內部上拉", verify: "實機"}
+    - {id: FR-11, text: "USB 一鍵燒錄，不需手動按 BOOT", priority: 必要, design: "CH340C + DTR/RTS 自動重置電晶體", verify: "sim 04"}
+    - {id: FR-12, text: "韌體可讀取電池電量", priority: 建議, design: "100k/100k 分壓 → IO34 ADC", verify: "實機比對電錶"}
+  non_functional:
+    - {id: NFR-01, text: "電池放電到約 3.4 V 前 3.3 V 系統保持穩壓", priority: 必要, design: "AP2112K 低壓差 LDO", verify: "sim 02（約 3.33 V 以下開始脫離穩壓，已列為審核警告）"}
+    - {id: NFR-02, text: "USB 資料線具 ESD 防護", priority: 必要, design: "USBLC6-2SC6", verify: "審核"}
+    - {id: NFR-03, text: "板子尺寸不超過 80 × 60 mm，2 層板", priority: 必要, design: "board 80 × 60 mm，2 層 1.6 mm", verify: "DRC"}
+    - {id: NFR-04, text: "可由 JLCPCB 製造與貼片，零件盡量有 LCSC 料號", priority: 建議, design: "全部零件附 MPN / LCSC（U6 除外）", verify: "BOM 審核"}
+    - {id: NFR-05, text: "所有 IC 腳位經資料手冊核對", priority: 必要, design: "KiCad 原廠符號；RDA5807M 自訂符號已依資料手冊修正", verify: "AI 審核"}
+  constraints:
+    - "全部設計流程離線完成（KiCad 10 + aipcb）"
+    - "2 層板，JLCPCB 標準製程（線寬 / 間距 0.2 mm、導通孔 0.6 / 0.3 mm）"
+    - "電源只能來自 USB-C 5 V 或單節鋰電池"
+  out_of_scope:
+    - "外殼與機構設計"
+    - "韌體（只定義硬體介面與腳位）"
+    - "AM / DAB 廣播、立體聲雙喇叭"
+  acceptance:
+    - "ERC 0 錯誤、DRC 0 錯誤 / 0 未連接"
+    - "全部 SPICE 模擬 PASS"
+    - "AI 設計審核 PASS（目前 CONDITIONAL：U6 RDA5807M 需另行採購）"
+    - "打樣板實機通過 FR-01 ~ FR-12"
+
+# Device description + spec sheet shown next to the schematic in the GUI (原理圖 → 電路說明 / 規格書).
+spec:
+  summary: >-
+    口袋型 FM 收音機兼藍牙喇叭。ESP32 當藍牙 A2DP 接收端（手機播音樂到喇叭）、用 WiFi 校時並負責介面；
+    RDA5807M 收 FM 廣播；0.96 吋 OLED 顯示頻率、藍牙狀態與當地時間；PAM8302 D 類擴大機推 8 Ω / 1 W 喇叭。
+    單節鋰電池供電，USB-C 充電且可邊充邊用，拔掉 USB 時電源無縫切到電池。
+  blocks:
+    usb_power:
+      title: "USB-C 電源輸入"
+      text: "J1 USB-C 母座。R1/R2 5.1 kΩ 把 CC1/CC2 下拉，讓充電器知道這是 5 V 用電端；U7 USBLC6 保護 USB D+/D− 不被靜電打壞。"
+    charger:
+      title: "鋰電池充電與電源路徑"
+      text: >-
+        U2 MCP73831 以 500 mA 充單節鋰電池（R3 2 kΩ 設定充電電流，D1 紅燈 = 充電中）。插著 USB 時，VBUS 經蕭特基 D2 供應 VSYS；
+        拔掉 USB 的瞬間，U9 LTC4412 理想二極體控制器打開 P-MOS Q3，改由電池供電，VSYS 不會掉電（模擬 01）。
+        R7/R8 把電池電壓對半分壓給 ESP32 IO34 量電量。
+    regulator:
+      title: "3.3 V 穩壓與電源開關"
+      text: "U3 AP2112K 把 VSYS 降成 3.3 V（最大 600 mA）。滑動開關 SW1 控制穩壓器的 EN 腳 = 整機電源開關；D4 綠燈 = 電源開。"
+    mcu:
+      title: "ESP32 主控"
+      text: "U1 ESP32-WROOM-32E：藍牙音訊接收、WiFi NTP 校時、I2C 主機、按鍵與顯示。R9/C10 為 EN 的上電延遲，SW2 重置、SW3 開機下載模式。"
+    usb_uart:
+      title: "USB 轉串列（燒錄）"
+      text: "U4 CH340C 把 USB 轉成 UART 接 ESP32；Q1/Q2 是經典的 DTR/RTS 自動重置電路，燒錄時不用手動按 BOOT。"
+    i2c:
+      title: "I2C 匯流排與 OLED"
+      text: "R15/R16 4.7 kΩ 為 I2C 上拉；J3 接 0.96 吋 SSD1306 OLED 模組（位址 0x3C）。"
+    rtc:
+      title: "即時時鐘"
+      text: >-
+        U5 PCF8563（位址 0x51）以 32.768 kHz 晶振 Y1 計時；CR1220 鈕扣電池 BT1 經 BAT54C 二極體 OR 備援，關機也不丟時間。
+        其 CLKOUT 同時當作 FM 晶片的參考時脈。
+    fm:
+      title: "FM 收音"
+      text: "U6 RDA5807M 單晶片 FM 立體聲調諧器，I2C 控制（0x10/0x11），參考時脈來自 RTC 的 32.768 kHz；AE1 為約 75 cm 的導線天線。"
+    audio:
+      title: "混音與擴大機"
+      text: >-
+        FM 左右聲道與 ESP32 DAC1（藍牙音訊）用 10 kΩ 電阻相加，經 RC 低通（約 22 kHz）與交流耦合送進 U8 PAM8302 D 類擴大機，
+        推動 J4 的 8 Ω / 1 W 喇叭。AMP_SD（IO26）可靜音並關閉擴大機省電。
+    ui:
+      title: "按鍵"
+      text: "UP / DOWN / MODE 三顆按鍵接 ESP32，使用晶片內部上拉。"
+    mechanical:
+      title: "固定孔"
+      text: "四個 M2.5 螺絲固定孔。"
+  sections:
+    "產品概要 Overview":
+      用途: "FM 收音機 + 藍牙喇叭，具時鐘顯示"
+      主控: "ESP32-WROOM-32E（Bluetooth Classic A2DP、WiFi）"
+      顯示: "0.96 吋 SSD1306 OLED（I2C 0x3C）"
+      操作: "電源滑動開關、UP / DOWN / MODE 按鍵、RESET、BOOT"
+    "電源 Power":
+      輸入: "USB-C 5 V（5.1 kΩ CC 下拉，USB 2.0）"
+      電池: "1S 鋰電池 3.7 V，JST-PH 2 pin（pin 1 = +BAT）"
+      充電: "MCP73831，定電流 500 mA，紅色 LED 指示"
+      電源路徑: "USB 優先（蕭特基）；拔除時 LTC4412 + AO3401A 理想二極體無縫切換到電池"
+      系統電壓 VSYS: "接 USB 約 4.6 V；電池供電約等於電池電壓（模擬 01）"
+      邏輯電壓: "3.3 V，AP2112K-3.3，最大 600 mA"
+      低電量限制: "電池低於約 3.33 V 時 3.3 V 軌開始脫離穩壓（模擬 02）"
+    "無線與音訊 Radio & Audio":
+      FM 收音: "RDA5807M，FM 廣播頻段，立體聲，約 75 cm 導線天線"
+      藍牙: "ESP32 A2DP 接收，音訊由 DAC1（IO25）輸出"
+      混音: "FM L/R + 藍牙 DAC 電阻混音，RC 低通約 22 kHz（模擬 03）"
+      擴大機: "PAM8302A D 類單聲道"
+      喇叭: "8 Ω / 1 W"
+    "時間 Clock":
+      RTC: "PCF8563（I2C 0x51），32.768 kHz 晶振"
+      備援電池: "CR1220（Keystone 3000 電池座），BAT54C 二極體 OR"
+      校時: "有 WiFi 時以 NTP 自動校時"
+    "介面 Interfaces":
+      USB: "充電 + 燒錄（CH340C USB-UART，DTR/RTS 自動重置，模擬 04）"
+      I2C 位址: ["0x10 / 0x11 RDA5807M", "0x3C SSD1306 OLED", "0x51 PCF8563"]
+      電量量測: "電池電壓 1/2 分壓 → ESP32 IO34"
+
 board:
   width: 80
   height: 60

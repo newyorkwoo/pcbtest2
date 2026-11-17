@@ -10,17 +10,20 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QProcess, Qt, QTimer
-from PySide6.QtGui import QAction, QBrush, QColor, QFont, QPainter, QPixmap
+from PySide6.QtCore import QProcess, QSettings, Qt, QTimer, QUrl
+from PySide6.QtGui import QAction, QBrush, QColor, QDesktopServices, QFont, QKeySequence, QPainter, QPixmap
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
-from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGraphicsScene, QGraphicsView, QHBoxLayout,
-                               QHeaderView, QLabel, QListWidget, QMainWindow, QMessageBox, QPlainTextEdit,
+from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QDialogButtonBox, QDoubleSpinBox, QFileDialog,
+                               QFormLayout, QFrame, QLineEdit, QListWidgetItem, QStackedWidget, QGraphicsScene, QGraphicsView, QHBoxLayout,
+                               QHeaderView, QInputDialog, QLabel, QListWidget, QMainWindow, QMessageBox, QPlainTextEdit,
                                QPushButton, QSplitter, QTableWidget, QTableWidgetItem, QTabWidget, QTextBrowser,
                                QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from .. import config
 from ..pipeline import STAGES
+from .design_info import DesignInfoPanel
 from .wiring import WiringTab
+from .zoom import ZoomableView, ZoomBar
 from .wiring_diagram import WiringDiagramTab
 
 STAGE_LABEL = {
@@ -34,8 +37,8 @@ STATE_ICON = {"ok": "✓", "fail": "✗", "running": "…", None: "·"}
 SEV_COLOR = {"error": "#d64545", "warning": "#c98a0b", "info": "#5a7bd6"}
 
 
-class SvgView(QGraphicsView):
-    """Zoom (wheel) / pan (drag) SVG viewer."""
+class SvgView(ZoomableView):
+    """Zoom (wheel / ZoomBar) / pan (drag) SVG viewer."""
 
     def __init__(self):
         super().__init__()
@@ -46,6 +49,7 @@ class SvgView(QGraphicsView):
         self.setBackgroundBrush(QBrush(QColor("#ffffff")))
         self._path = None
         self._mtime = 0
+        self._zoomed = False
 
     def load(self, path: Path | None):
         if not path or not Path(path).exists():
@@ -69,7 +73,8 @@ class SvgView(QGraphicsView):
     def _fit(self):
         self._zoomed = False                # follow the window size until the user zooms
         self.resetTransform()
-        self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
+        self.fitInView(self.scene().sceneRect(), Qt.KeepAspectRatio)
+        self._emit_zoom()
 
     def showEvent(self, e):
         super().showEvent(e)
@@ -80,11 +85,8 @@ class SvgView(QGraphicsView):
         super().resizeEvent(e)
         if self._path and not getattr(self, "_zoomed", False):
             self._fit()
-
-    def wheelEvent(self, e):
-        f = 1.2 if e.angleDelta().y() > 0 else 1 / 1.2
-        self.scale(f, f)
-        self._zoomed = True
+        else:
+            self._emit_zoom()
 
     def mouseDoubleClickEvent(self, e):
         self._fit()
@@ -118,12 +120,11 @@ class Dashboard(QMainWindow):
         self.resize(1500, 950)
         self.proc: QProcess | None = None
         self._mtimes: dict[str, float] = {}
+        self.project: str | None = None          # the one open project (name under projects/)
+        self._proj_actions: list[QAction] = []    # menu items that need an open project
 
         # ---------------- left panel
         left = QWidget(); lv = QVBoxLayout(left)
-        self.project_box = QComboBox()
-        self.project_box.currentTextChanged.connect(self.refresh_all)
-        lv.addWidget(QLabel("專案 Project")); lv.addWidget(self.project_box)
         self.verdict = QLabel(); self.verdict.setAlignment(Qt.AlignCenter)
         self.verdict.setFont(QFont("", 15, QFont.Bold)); self.verdict.setMinimumHeight(48)
         lv.addWidget(self.verdict)
@@ -146,7 +147,13 @@ class Dashboard(QMainWindow):
 
         # ---------------- tabs
         self.tabs = QTabWidget()
-        self.sch_view = SvgView(); self.tabs.addTab(self.sch_view, "原理圖 Schematic")
+        sch = QSplitter()
+        schl = QWidget(); sl = QVBoxLayout(schl); sl.setContentsMargins(0, 0, 0, 0)
+        self.sch_view = SvgView(); sl.addWidget(self.sch_view, 1)
+        sl.addWidget(ZoomBar(self.sch_view, self.sch_view._fit))
+        self.sch_info = DesignInfoPanel()
+        sch.addWidget(schl); sch.addWidget(self.sch_info); sch.setSizes([760, 420])
+        self.tabs.addTab(sch, "原理圖 Schematic")
         self.wdiag = WiringDiagramTab(); self.tabs.addTab(self.wdiag, "實體接線圖 Wiring Diagram")
         self.wiring = WiringTab(); self.tabs.addTab(self.wiring, "網路追蹤 Nets")
         pcbw = QWidget(); pv = QVBoxLayout(pcbw)
@@ -184,21 +191,306 @@ class Dashboard(QMainWindow):
         self.tabs.addTab(self.log, "Log")
 
         split = QSplitter(); split.addWidget(left); split.addWidget(self.tabs); split.setSizes([420, 1080])
-        self.setCentralWidget(split)
-        act = QAction("Refresh", self); act.setShortcut("Ctrl+R"); act.triggered.connect(self.refresh_all)
-        self.addAction(act)
+        self.stack = QStackedWidget()
+        self.stack.addWidget(self._build_welcome()); self.stack.addWidget(split)
+        self.setCentralWidget(self.stack)
+        self.settings = QSettings("aipcb", "dashboard")
+        self._build_menus()
 
-        projects = sorted(p.parent.name for p in config.PROJECTS.glob("*/design.yaml"))
-        self.project_box.addItems(projects)
-        if project and Path(project).name in projects:
-            self.project_box.setCurrentText(Path(project).name)
+        # start-up: the project given on the command line, else the one open (or last closed) when the app quit
+        start = Path(project).name if project else self.settings.value("last_project", "")
+        if not (start and (config.PROJECTS / start / "design.yaml").exists() and self.set_project(start, ask=False)):
+            self._show_welcome()
         self.timer = QTimer(self); self.timer.timeout.connect(self.poll); self.timer.start(1500)
+
+    # ------------------------------------------------------------- project open / close
+    def _build_welcome(self) -> QWidget:
+        w = QWidget(); v = QVBoxLayout(w); v.setContentsMargins(80, 60, 80, 60)
+        t = QLabel("aipcb"); t.setFont(QFont("", 30, QFont.Bold)); v.addWidget(t)
+        sub = QLabel("目前沒有開啟的專案。從「檔案 File」選單或下方開始。"); sub.setStyleSheet("color:#888"); v.addWidget(sub)
+        row = QHBoxLayout()
+        for text, fn in (("＋ 新增專案", self.new_project), ("開啟專案…", self.open_project), ("匯入專案…", self.import_project)):
+            b = QPushButton(text); b.setMinimumHeight(36); b.clicked.connect(fn); row.addWidget(b)
+        row.addStretch(1); v.addLayout(row)
+        v.addSpacing(16)
+        h = QLabel("最近開啟 / 所有專案（點兩下開啟）"); h.setFont(QFont("", 13, QFont.Bold)); v.addWidget(h)
+        self.welcome_list = QListWidget(); self.welcome_list.setFont(QFont("", 13))
+        self.welcome_list.itemActivated.connect(lambda it: self.open_by_name(it.data(Qt.UserRole)))
+        v.addWidget(self.welcome_list, 1)
+        return w
+
+    def _show_welcome(self):
+        self.welcome_list.clear()
+        recent = [n for n in (self.settings.value("recent", []) or [])]
+        allp = sorted(p.parent.name for p in config.PROJECTS.glob("*/design.yaml"))
+        for n in [n for n in recent if n in allp] + [n for n in allp if n not in recent]:
+            raw = {}
+            try:
+                import yaml
+                raw = yaml.safe_load((config.PROJECTS / n / "design.yaml").read_text(encoding="utf-8")) or {}
+            except Exception:  # noqa: BLE001
+                pass
+            it = QListWidgetItem(f"{n}    —  {raw.get('title', '')}  (rev {raw.get('rev', 'A')})"
+                                 + ("    · 最近開啟" if n in recent else ""))
+            it.setData(Qt.UserRole, n)
+            self.welcome_list.addItem(it)
+        if self.welcome_list.count():
+            self.welcome_list.setCurrentRow(0)
+        self.stack.setCurrentIndex(0)
+        self.setWindowTitle("aipcb — Claude 驅動的 EDA 儀表板")
+        for a in self._proj_actions:
+            a.setEnabled(False)
+
+    def set_project(self, name: str, ask: bool = True) -> bool:
+        """open `name`; the currently open project is closed first (asking to save when `ask`)"""
+        if not (config.PROJECTS / name / "design.yaml").exists():
+            QMessageBox.warning(self, "aipcb", f"找不到專案 {name}"); return False
+        if self.project and self.project != name and not self.close_project(ask=ask):
+            return False
+        self.project = name
+        self._mark_saved()
+        self.settings.setValue("last_project", name)
+        self._remember_recent(name)
+        try:
+            import yaml
+            title = (yaml.safe_load((self.pd / "design.yaml").read_text(encoding="utf-8")) or {}).get("title", "")
+        except Exception:  # noqa: BLE001
+            title = ""
+        self.setWindowTitle(f"{name} — {title} · aipcb" if title else f"{name} · aipcb")
+        self.stack.setCurrentIndex(1)
+        for a in self._proj_actions:
+            a.setEnabled(True)
+        self._mtimes.clear()
         self.refresh_all()
+        return True
+
+    def _mark_saved(self):
+        """remember the project's state; closing it unchanged later needs no save prompt"""
+        from .. import archive
+        self._baseline = archive.fingerprint(self.pd) if self.project else None
+
+    def is_modified(self) -> bool:
+        from .. import archive
+        return bool(self.project) and archive.fingerprint(self.pd) != getattr(self, "_baseline", None)
+
+    def open_by_name(self, name: str):
+        if name and name != self.project:
+            self.set_project(name)
+
+    def close_project(self, ask: bool = True) -> bool:
+        """-> False if the user cancelled. Asks Save / Don't Save / Cancel; Save = snapshot to exports/."""
+        if not self.project:
+            return True
+        if self.proc and self.proc.state() != QProcess.NotRunning:
+            QMessageBox.warning(self, "aipcb", "流程正在執行中，請等它完成後再關閉專案。"); return False
+        if ask and self.is_modified():           # unchanged since it was opened / last saved: close straight away
+            box = QMessageBox(QMessageBox.Question, "關閉專案",
+                              f"專案「{self.project}」自開啟或上次儲存後有變更。關閉前要儲存嗎？\n\n"
+                              "儲存會把整個專案與所有產出存成一份快照（資料夾 + .zip）到 exports/。", parent=self)
+            b_save = box.addButton("儲存", QMessageBox.AcceptRole)
+            b_no = box.addButton("不儲存", QMessageBox.DestructiveRole)
+            box.addButton("取消", QMessageBox.RejectRole)
+            box.setDefaultButton(b_save)
+            box.exec()
+            if box.clickedButton() is b_save:
+                if not self.save_snapshot():
+                    return False
+            elif box.clickedButton() is not b_no:
+                return False
+        self.settings.setValue("last_project", self.project)
+        self.project = None
+        self._show_welcome()
+        return True
+
+    def closeEvent(self, e):
+        last = self.project
+        if not self.close_project():
+            e.ignore(); return
+        if last:
+            self.settings.setValue("last_project", last)     # reopened on next start
+        self.settings.sync()
+        e.accept()
+
+    # ------------------------------------------------------------- menu bar
+    def _act(self, menu, text, fn, shortcut=None, tip=None, role=None, needs=False):
+        a = QAction(text, self)
+        if needs:
+            self._proj_actions.append(a)
+        if shortcut is not None:
+            a.setShortcut(shortcut if isinstance(shortcut, QKeySequence) else QKeySequence(shortcut))
+        if tip:
+            a.setStatusTip(tip)
+        if role is not None:
+            a.setMenuRole(role)
+        a.triggered.connect(lambda *_: fn())
+        menu.addAction(a)
+        return a
+
+    def _build_menus(self):
+        mb = self.menuBar()
+        K = QKeySequence
+        # ---- File
+        f = mb.addMenu("檔案 File")
+        self._act(f, "新增專案… New Project", self.new_project, K.New, "建立新的空白專案（design.yaml 骨架）")
+        self._act(f, "開啟專案… Open Project", self.open_project, K.Open, "選擇專案的 design.yaml 開啟")
+        self.recent_menu = f.addMenu("最近開啟 Open Recent")
+        self.recent_menu.aboutToShow.connect(self._fill_recent)
+        f.addSeparator()
+        self._act(f, "關閉專案 Close Project", self.close_project, K.Close, "關閉目前專案（會詢問是否儲存）", needs=True)
+        f.addSeparator()
+        self._act(f, "儲存存檔 Save Snapshot", self.save_snapshot, K.Save,
+                  "design.yaml 是唯一來源、隨時都已存檔；這會把目前專案的完整快照存到 exports/", needs=True)
+        self._act(f, "另存新專案… Save As", self.save_as, K.SaveAs, "以新名稱複製整個專案（含所有產出）", needs=True)
+        f.addSeparator()
+        self._act(f, "匯入專案… Import", self.import_project, "Ctrl+Shift+I", "匯入先前匯出的資料夾 / .zip")
+        self._act(f, "匯出專案… Export", self.export_project, "Ctrl+Shift+E",
+                  "把整個專案與所有產出整理成一個資料夾 + .zip", needs=True)
+        self._act(f, "輸出送廠檔 Export Fab Output", self.export_fab, None, "Gerber / 鑽孔 / BOM / 座標檔（需 AI 審核 PASS）",
+                  needs=True)
+        f.addSeparator()
+        k = f.addMenu("以 KiCad 開啟 Open in KiCad")
+        self._act(k, "原理圖 Schematic", lambda: self.open_kicad("sch"), needs=True)
+        self._act(k, "電路板 PCB", lambda: self.open_kicad("pcb"), needs=True)
+        self._act(f, "編輯 design.yaml", self.edit_design, None, "用系統預設編輯器開啟 design.yaml", needs=True)
+        self._act(f, "在 Finder 中顯示專案 Reveal in Finder", self.reveal_project, needs=True)
+        self._act(f, "開啟匯出資料夾 Open Exports Folder", self.open_exports)
+        f.addSeparator()
+        self._act(f, "關閉視窗 Close Window", self.close, "Ctrl+Shift+W")
+        self._act(f, "結束 Quit aipcb", self.close, K.Quit, role=QAction.QuitRole)   # close() -> asks to save
+        # ---- View
+        v = mb.addMenu("檢視 View")
+        self._act(v, "重新整理 Refresh", self.refresh_all, "Ctrl+R", needs=True)
+        v.addSeparator()
+        for i in range(min(9, self.tabs.count())):
+            self._act(v, self.tabs.tabText(i), lambda i=i: self.tabs.setCurrentIndex(i), f"Ctrl+{i + 1}", needs=True)
+        v.addSeparator()
+        self._act(v, "全螢幕 Full Screen", lambda: self.showNormal() if self.isFullScreen() else self.showFullScreen(),
+                  K.FullScreen)
+        # ---- Build
+        b = mb.addMenu("流程 Build")
+        self._act(b, "全流程 Build", lambda: self.run(["build"]), "Ctrl+B", needs=True)
+        self._act(b, "執行所選階段 Run Selected Stage", self.run_selected, "Ctrl+Shift+B", needs=True)
+        self._act(b, "保留擺放重建 Build --keep", lambda: self.run(["build", "--keep"]), None,
+                  "保留已擺放元件位置，只擺新元件並重新佈線", needs=True)
+        # ---- Window / Help
+        w = mb.addMenu("視窗 Window")
+        self._act(w, "最小化 Minimize", self.showMinimized, "Ctrl+M")
+        self._act(w, "縮放 Zoom", lambda: self.showNormal() if self.isMaximized() else self.showMaximized())
+        h = mb.addMenu("說明 Help")
+        self._act(h, "使用說明 (CLAUDE.md)", lambda: self._open_path(config.ROOT / "CLAUDE.md"))
+        self._act(h, "專案 README", lambda: self._open_path(self.pd / "README.md"), needs=True)
+        self._act(h, "關於 aipcb About", self.about, role=QAction.AboutRole)
+        self.statusBar()
+
+    def _open_path(self, p: Path):
+        if not Path(p).exists():
+            QMessageBox.information(self, "aipcb", f"找不到 {p}"); return
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(p)))
+
+    def _remember_recent(self, name):
+        if not name:
+            return
+        rec = [n for n in (self.settings.value("recent", []) or []) if n != name]
+        self.settings.setValue("recent", [name] + rec[:9])
+
+    def _fill_recent(self):
+        self.recent_menu.clear()
+        names = [n for n in (self.settings.value("recent", []) or []) if (config.PROJECTS / n / "design.yaml").exists()]
+        for n in names:
+            self._act(self.recent_menu, n, lambda n=n: self.open_by_name(n))
+        if not names:
+            a = self.recent_menu.addAction("（無）"); a.setEnabled(False)
+        self.recent_menu.addSeparator()
+        self._act(self.recent_menu, "清除清單 Clear", lambda: self.settings.setValue("recent", []))
+
+    def new_project(self):
+        from .. import archive
+        dlg = QDialog(self); dlg.setWindowTitle("新增專案 New Project")
+        form = QFormLayout(dlg)
+        name = QLineEdit(); name.setPlaceholderText("英數字、底線，例如 my_board")
+        title = QLineEdit(); title.setPlaceholderText("顯示用標題，例如 USB 溫度計")
+        w = QDoubleSpinBox(); w.setRange(5, 400); w.setValue(60); w.setSuffix(" mm")
+        hgt = QDoubleSpinBox(); hgt.setRange(5, 500); hgt.setValue(40); hgt.setSuffix(" mm")
+        form.addRow("專案名稱", name); form.addRow("標題", title); form.addRow("板寬", w); form.addRow("板高", hgt)
+        bb = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        bb.accepted.connect(dlg.accept); bb.rejected.connect(dlg.reject); form.addRow(bb)
+        if dlg.exec() != QDialog.Accepted:
+            return
+        if not self.close_project():
+            return
+        try:
+            pd = archive.new_project(name.text().strip(), title.text().strip(), w.value(), hgt.value())
+        except Exception as e:  # noqa: BLE001
+            QMessageBox.critical(self, "無法建立專案", str(e)); return
+        self.set_project(pd.name)
+        QMessageBox.information(self, "已建立", f"已建立 {pd}/design.yaml\n\n接著在 Claude Code 請 Claude 設計電路，"
+                                "或用「檔案 → 編輯 design.yaml」自行填寫，再按「流程 → 全流程 Build」。")
+
+    def open_project(self):
+        from .. import archive
+        src, _ = QFileDialog.getOpenFileName(self, "開啟專案：選擇 design.yaml", str(config.PROJECTS),
+                                             "aipcb 專案 (design.yaml);;所有檔案 (*)")
+        if not src:
+            return
+        pd = Path(src).resolve().parent
+        if pd.parent == config.PROJECTS.resolve():
+            self.open_by_name(pd.name); return
+        if QMessageBox.question(self, "開啟專案", f"{pd}\n不在專案資料夾 projects/ 內。\n\n要把它複製進來並開啟嗎？"
+                                ) != QMessageBox.Yes:
+            return
+        self._do_import(pd)
+
+    def save_snapshot(self) -> bool:
+        from .. import archive
+        if not self.project:
+            return False
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            res = archive.export_project(self.pd)
+        except Exception as e:  # noqa: BLE001
+            QApplication.restoreOverrideCursor(); QMessageBox.critical(self, "存檔失敗", str(e)); return False
+        QApplication.restoreOverrideCursor()
+        self._mark_saved()
+        self.statusBar().showMessage(f"已存檔：{res['zip'] or res['folder']}", 10000)
+        return True
+
+    def save_as(self):
+        from .. import archive
+        cur = self.project
+        if not cur:
+            return
+        new, ok = QInputDialog.getText(self, "另存新專案 Save As", "新專案名稱（英數字、底線、減號）：", text=f"{cur}_copy")
+        if not ok or not new.strip():
+            return
+        try:
+            res = archive.duplicate_project(self.pd, new.strip())
+        except Exception as e:  # noqa: BLE001
+            QMessageBox.critical(self, "另存失敗", str(e)); return
+        self.set_project(res["project"], ask=False)        # the copy is identical: nothing to save
+        self.statusBar().showMessage(f"已另存為 projects/{res['project']}", 10000)
+
+    def edit_design(self):
+        self._open_path(self.pd / "design.yaml")
+
+    def reveal_project(self):
+        if sys.platform == "darwin":
+            subprocess.Popen(["open", "-R", str(self.pd / "design.yaml")])
+        else:
+            self._open_path(self.pd)
+
+    def open_exports(self):
+        from .. import archive
+        archive.EXPORTS.mkdir(parents=True, exist_ok=True)
+        self._open_path(archive.EXPORTS)
+
+    def about(self):
+        QMessageBox.about(self, "關於 aipcb", "<b>aipcb</b> — Claude 驅動的本機 EDA<br>"
+                          "KiCad 10 檔案格式 / ERC / DRC / Gerber，物理擺放、A* 佈線、ngspice 模擬，全部離線執行。")
 
     # ------------------------------------------------------------- helpers
     @property
     def pd(self) -> Path:
-        return config.PROJECTS / self.project_box.currentText()
+        return config.PROJECTS / (self.project or "")
 
     @property
     def out(self) -> Path:
@@ -212,8 +504,10 @@ class Dashboard(QMainWindow):
 
     def poll(self):
         """Refresh whatever changed on disk (Claude may be driving the flow through MCP)."""
+        if not self.project:
+            return
         watch = ["status.json", "checks.json", "review.md", "preview/index.json", "sim/summary.json", "pipeline.log",
-                 "schematic_map.json", "wiring.json"]
+                 "schematic_map.json", "wiring.json", "review.json", "../design.yaml"]
         changed = False
         for rel in watch:
             p = self.out / rel
@@ -224,7 +518,7 @@ class Dashboard(QMainWindow):
             self.refresh_all()
 
     def refresh_all(self, *_):
-        if not self.project_box.currentText():
+        if not self.project:
             return
         self.refresh_stages(); self.refresh_previews(); self.refresh_sims(); self.refresh_checks()
         self.refresh_review(); self.refresh_bom(); self.refresh_log()
@@ -253,6 +547,7 @@ class Dashboard(QMainWindow):
     def refresh_previews(self, *_):
         idx = self._json("preview/index.json", {}) or {}
         self.sch_view.load(idx.get("schematic"))
+        self.sch_info.load(self.pd)
         self.wiring.load(self.out)
         self.wdiag.load(self.out)
         self.pcb_view.load(idx.get(self.pcb_layer.currentText()))
@@ -375,6 +670,85 @@ class Dashboard(QMainWindow):
             self.run(["fab", "--force"])
         else:
             self.run(["fab"])
+
+    def export_project(self):
+        from .. import archive
+        name = self.project
+        if not name:
+            return
+        archive.EXPORTS.mkdir(parents=True, exist_ok=True)
+        dest = QFileDialog.getExistingDirectory(self, f"選擇「{name}」的匯出位置", str(archive.EXPORTS))
+        if not dest:
+            return
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            res = archive.export_project(self.pd, dest)
+        except Exception as e:  # noqa: BLE001
+            QApplication.restoreOverrideCursor()
+            QMessageBox.critical(self, "匯出失敗", str(e)); return
+        QApplication.restoreOverrideCursor()
+        msg = (f"已匯出 {res['files']} 個檔案（{res['bytes'] / 1e6:.1f} MB）\n\n資料夾：{res['folder']}\n"
+               f"存檔：{res['zip']}\n\n資料夾內 README.md 說明內容與匯入方式。")
+        if res["notes"]:
+            msg += "\n\n備註：\n" + "\n".join(res["notes"])
+        box = QMessageBox(QMessageBox.Information, "匯出完成", msg, QMessageBox.Ok, self)
+        show = box.addButton("在 Finder 顯示", QMessageBox.ActionRole)
+        box.exec()
+        if box.clickedButton() is show:
+            subprocess.Popen(["open", "-R", res["zip"] or res["folder"]] if sys.platform == "darwin"
+                             else ["xdg-open", str(Path(res["folder"]).parent)])
+
+    def import_project(self):
+        from .. import archive
+        src, _ = QFileDialog.getOpenFileName(
+            self, "匯入專案：選擇 .zip，或匯出資料夾中的 manifest.json（也可選專案的 design.yaml）",
+            str(archive.EXPORTS if archive.EXPORTS.exists() else config.ROOT),
+            "aipcb 匯出 (*.zip manifest.json design.yaml);;所有檔案 (*)")
+        if not src:
+            return
+        self._do_import(Path(src))
+
+    def _do_import(self, src: Path):
+        from .. import archive
+        try:
+            info = archive.inspect(Path(src))
+        except Exception as e:  # noqa: BLE001
+            QMessageBox.critical(self, "無法匯入", str(e)); return
+        name, overwrite = info["name"], False
+        desc = f"專案：{name}\n標題：{info.get('title') or ''}  rev {info.get('rev') or ''}\n匯出時間：{info.get('exported') or '—'}"
+        if info["exists"]:
+            box = QMessageBox(QMessageBox.Question, "專案已存在",
+                              f"{desc}\n\n本機已有同名專案「{name}」。要怎麼處理？\n"
+                              "（覆蓋前會先把現有專案備份到 exports/，不會刪除）", parent=self)
+            b_new = box.addButton("另存新名稱…", QMessageBox.AcceptRole)
+            b_over = box.addButton("覆蓋（先備份）", QMessageBox.DestructiveRole)
+            box.addButton("取消", QMessageBox.RejectRole)
+            box.exec()
+            if box.clickedButton() is b_over:
+                overwrite = True
+            elif box.clickedButton() is b_new:
+                new, ok = QInputDialog.getText(self, "另存新名稱", "新專案名稱（英數字、底線、減號）：", text=f"{name}_2")
+                if not ok or not new.strip():
+                    return
+                name = new.strip()
+            else:
+                return
+        elif QMessageBox.question(self, "匯入專案", f"{desc}\n\n匯入到 projects/{name}？") != QMessageBox.Yes:
+            return
+        if not self.close_project():            # the open project is closed (asking to save) before the import
+            return
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            res = archive.import_project(Path(src), name=name, overwrite=overwrite)
+        except Exception as e:  # noqa: BLE001
+            QApplication.restoreOverrideCursor()
+            QMessageBox.critical(self, "匯入失敗", str(e)); return
+        QApplication.restoreOverrideCursor()
+        self.set_project(res["project"], ask=False)
+        extra = f"\n舊專案已備份到：{res['backup_of_previous']}" if res["backup_of_previous"] else ""
+        QMessageBox.information(self, "匯入完成", f"已匯入 projects/{res['project']}"
+                                f"{'（檔案完整性已驗證）' if res['verified'] else ''}{extra}\n\n"
+                                "如需在本機重新產生所有檔案，按「▶ 全流程 Build」。")
 
     def open_kicad(self, what):
         ext = "kicad_sch" if what == "sch" else "kicad_pcb"
